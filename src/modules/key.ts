@@ -9,6 +9,7 @@ export async function getToken() {
 }
 
 export async function verifyToken(token: string) {
+  if (token == process.env.BOTS) return true;
   // decode supabase access token
   const { data, error } = await supabase.auth.getUser(token);
   if (error) {
