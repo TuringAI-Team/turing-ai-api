@@ -1,4 +1,5 @@
 import jwt from "jsonwebtoken";
+import supabase from "./supabase.js";
 export async function getToken() {
   var token = await jwt.sign(
     { id: "host", key: process.env.SECRETKEY },
@@ -8,13 +9,11 @@ export async function getToken() {
 }
 
 export async function verifyToken(token: string) {
-  try {
-    var decoded = await jwt.verify(token, process.env.PRIVATEKEY);
-    if (decoded && decoded.key == process.env.SECRETKEY) {
-      return true;
-    }
-  } catch (e) {
-    console.log(e);
+  // decode supabase access token
+  const { data, error } = await supabase.auth.getUser(token);
+  if (error) {
+    console.log(error);
+    return false;
   }
-  return false;
+  return true;
 }

@@ -7,7 +7,6 @@ export async function getKey() {
     return;
   }
   let k = keys.filter((x) => x.messages <= 2 && x.abled != false);
-  console.log(k);
   let i = getRndInteger(0, k.length - 1);
   if (k.length <= 0) return;
   let key = k[i];

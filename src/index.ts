@@ -46,6 +46,4 @@ app.use("/", AudioRoutes);
 
 app.listen(app.get("port"), async () => {
   console.log(`Server is running on port ${app.get("port")}`);
-  let newToken = await getToken();
-  console.log(newToken);
 });
