@@ -157,7 +157,7 @@ async function getSearchResults(conversation, searchEngine) {
       results: results,
     });
   }
-
+  console.log(searchResults);
   return JSON.stringify(searchResults);
 }
 
