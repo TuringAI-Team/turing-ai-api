@@ -2,6 +2,7 @@ import chatGPT3 from "./gpt-3.js";
 import chatGPT35 from "./chatgpt.js";
 import supabase from "../supabase.js";
 import OpenAssistant from "./oa.js";
+import Alan from "./alan.js";
 
 export async function getConversation(id, model): Promise<any> {
   var { data } = await supabase
@@ -21,7 +22,12 @@ export async function saveMsg(model, userMsg, aiMsg, id, ispremium) {
   if (model == "gpt-3") {
     conversation = `\n<split>User: ${userMsg}\nAI: ${aiMsg}`;
   }
-  if (model == "chatgpt" || model == "dan") {
+  if (
+    model == "chatgpt" ||
+    model == "dan" ||
+    model == "alan-gpt3" ||
+    model == "alan-chatgpt"
+  ) {
     conversation = `user: ${userMsg}<split>assistant: ${aiMsg}<split>`;
   }
   var { data } = await supabase
@@ -90,9 +96,9 @@ export async function getMessages(
   conversation,
   model: string,
   fullMsg: string,
-  instructions: string
+  instructions?: string
 ) {
-  if (model == "chatgpt" || model == "dan") {
+  if (model == "chatgpt" || model == "dan" || model == "gpt-4") {
     let messages = [];
     if (instructions) {
       messages.push({
@@ -128,4 +134,4 @@ export async function getMessages(
   }
 }
 
-export { chatGPT3, chatGPT35, OpenAssistant };
+export { chatGPT3, chatGPT35, OpenAssistant, Alan };

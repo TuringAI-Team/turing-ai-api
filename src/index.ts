@@ -13,7 +13,7 @@ import { getToken, verifyToken } from "./modules/key.js";
 app.use(helmet());
 app.use(
   cors({
-    origin: "*",
+    origin: ["http://localhost:3000", "https://app.turing-ai.xyz"],
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })

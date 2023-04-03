@@ -5,6 +5,7 @@ import {
   chatGPT3,
   getConversation,
   OpenAssistant,
+  Alan,
 } from "../modules/text/index.js";
 
 const router = express.Router();
@@ -35,6 +36,20 @@ router.post("/chat/:model", async (req: Request, res: Response) => {
     let result = await OpenAssistant(message);
     res.json(result).status(200);
   }
+});
+router.post("/alan/:model", async (req: Request, res: Response) => {
+  var { model } = req.params;
+  var { message, userName, conversationId, searchEngine } = req.body;
+  let conversation = await getConversation(conversationId, `alan-${model}`);
+  let result = await Alan(
+    userName,
+    conversation,
+    message,
+    conversationId,
+    model,
+    searchEngine
+  );
+  res.json(result).status(200);
 });
 
 export default router;
