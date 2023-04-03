@@ -4,6 +4,7 @@ import { Configuration, OpenAIApi } from "openai";
 import { getMessages, saveMsg } from "./index.js";
 import googleAPI from "googlethis";
 import axios from "axios";
+import { predict } from "replicate-api";
 
 export default async function Alan(
   userName: string = "Anonymous",
@@ -11,8 +12,14 @@ export default async function Alan(
   message: string,
   conversationId: string,
   model: string = "chatgpt",
-  searchEngine: string = "google"
+  searchEngine: string = "google",
+  photo?: string
 ) {
+  var imageDescription;
+  if (photo && !imageDescription) {
+    imageDescription = await getImageDescription(photo);
+  }
+
   if (model == "chatgpt") {
     let acc = await getKey();
     if (!acc) {
@@ -26,17 +33,29 @@ export default async function Alan(
         apiKey: key,
       });
       let messages: any = await getMessages(conversation, "chatgpt", message);
+
       let instructions = await getInstruction("alan", userName);
       let results = await getSearchResults(messages, searchEngine);
-      if (results) {
-        instructions = `${instructions}\nHere you have results from ${searchEngine} that you can use to answer the user, do not mention the results, extract information from them to answer the question..\n${results}`;
+      if (imageDescription) {
+        messages.push({
+          role: "system",
+          content: ``,
+        });
       }
-      messages = await getMessages(
-        conversation,
-        "chatgpt",
-        message,
-        instructions
-      );
+      instructions = `${instructions}${
+        imageDescription
+          ? `\nHere you have an image description of image attached by the user. Do not refer to it as \"description\" or \"image description\", refer to it as image. Read all necessary information from the description, then form a response.\n${imageDescription}`
+          : ""
+      }${
+        results
+          ? `\nHere you have results from ${searchEngine} that you can use to answer the user, do not mention the results, extract information from them to answer the question.\n${results}`
+          : ""
+      }`;
+      messages.push({
+        role: "system",
+        content: instructions,
+      });
+
       const openai = new OpenAIApi(configuration);
 
       const completion = await openai.createChatCompletion({
@@ -167,4 +186,21 @@ async function chatgpt(messages, maxtokens, options?) {
       error: err.message,
     };
   }
+}
+
+export async function getImageDescription(image) {
+  const prediction = await predict({
+    model: "salesforce/blip-2", // The model name
+    input: {
+      image: image,
+      caption: true,
+      use_nucleus_sampling: false,
+      context: "",
+    }, // The model specific input
+    token: process.env.REPLICATE_API_KEY, // You need a token from replicate.com
+    poll: true, // Wait for the model to finish
+  });
+
+  if (prediction.error) return prediction.error;
+  return prediction.output;
 }

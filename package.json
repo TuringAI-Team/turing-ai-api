@@ -20,6 +20,7 @@
     "helmet": "^6.0.1",
     "jsonwebtoken": "^9.0.0",
     "openai": "^3.2.1",
+    "replicate-api": "^0.4.4",
     "sharp": "^0.31.3"
   },
   "description": "``` npm create astro@latest -- --template basics ```",
