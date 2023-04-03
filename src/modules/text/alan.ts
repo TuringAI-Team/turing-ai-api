@@ -114,7 +114,7 @@ async function getSearchResults(conversation, searchEngine) {
   let messages = [];
   messages.push({
     role: "system",
-    content: `This is a chat between an user and sentient chat assistant Alan. Just answer with the search queries based on the user prompt, needed for the following topic for Google, maximum 3 entries. Make each of the queries descriptive and include all related topics. If the prompt is a question/request to/about Alan directly, reply with 'N'. Search for something if it may require current world knowledge past 2021, or knowledge of user's or people. Create a | seperated list without quotes.  If you no search queries are applicable, answer with 'N' . Don't add any explanations, extra text or puntuation`,
+    content: `This is a chat between an user and a chat assistant. Just answer with the search queries based on the user prompt, needed for the following topic for Google, maximum 3 entries. Make each of the queries descriptive and include all related topics. If the prompt is a question/request to/about you directly, reply with 'N'. Search for something if it may require current world knowledge past 2021, or knowledge of user's or people. Create a | seperated list without quotes.  If you no search queries are applicable, answer with 'N' . Don't add any explanations, extra text or puntuation. You can ONLY REPLY WITH SEARCH QUERIES.`,
   });
   conversation = conversation.map((m) => `${m.role}:${m.content}`);
   messages.push({
@@ -122,7 +122,7 @@ async function getSearchResults(conversation, searchEngine) {
     content: conversation.join("\n"),
   });
 
-  let searchQueries: any = await chatgpt(messages, 150, { temperature: 0.75 });
+  let searchQueries: any = await chatgpt(messages, 150, { temperature: 0.5 });
   if (searchQueries.error) return null;
   searchQueries = searchQueries.response;
   // search in google and get results
@@ -157,7 +157,6 @@ async function getSearchResults(conversation, searchEngine) {
       results: results,
     });
   }
-  console.log(searchResults);
   return JSON.stringify(searchResults);
 }
 
