@@ -10,9 +10,9 @@ export default async function STT(
   if (ai == "gladia") {
     try {
       const form = new FormData();
-      form.append("audio_url", file);
+      console.log(file);
+      form.append("audio", file, `audio-${randomUUID()}.ogg`);
       form.append("language_behaviour", "automatic single language");
-
       const response = await axios.post(
         "https://api.gladia.io/audio/text/audio-transcription/",
         form,
@@ -29,11 +29,13 @@ export default async function STT(
         }
       );
       var res = response.data;
+      console.log(res);
       var transcription = "";
       for (var i = 0; i < res.prediction.length; i++) {
         var tr = res.prediction[i];
         transcription += `${tr.transcription} `;
       }
+      console.log(transcription);
       return transcription;
     } catch (err) {
       console.log(err);
