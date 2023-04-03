@@ -39,7 +39,14 @@ router.post("/chat/:model", async (req: Request, res: Response) => {
 });
 router.post("/alan/:model", async (req: Request, res: Response) => {
   var { model } = req.params;
-  var { message, userName, conversationId, searchEngine, photo } = req.body;
+  var {
+    message,
+    userName,
+    conversationId,
+    searchEngine,
+    photo,
+    imageGenerator,
+  } = req.body;
   let conversation = await getConversation(conversationId, `alan-${model}`);
   let result = await Alan(
     userName,
@@ -48,7 +55,8 @@ router.post("/alan/:model", async (req: Request, res: Response) => {
     conversationId,
     model,
     searchEngine,
-    photo
+    photo,
+    imageGenerator
   );
   res.json(result).status(200);
 });

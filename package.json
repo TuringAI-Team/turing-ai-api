@@ -14,6 +14,7 @@
     "canvas": "^2.11.0",
     "chatgpt-official": "^1.1.7",
     "cors": "^2.8.5",
+    "delay": "^5.0.0",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "googlethis": "^1.7.1",

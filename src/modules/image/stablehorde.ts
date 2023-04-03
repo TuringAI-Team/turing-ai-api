@@ -22,7 +22,7 @@ export async function generateImg(
   width: number = 512,
   height: number = 512,
   sampler_name: string = "k_dpmpp_sde",
-  cfg_scale: number
+  cfg_scale?: number
 ) {
   var passFilter = await filter(prompt, model);
   if (passFilter.isCP) {
@@ -38,7 +38,7 @@ export async function generateImg(
       prompt: prompt,
       nsfw: nsfw,
       censor_nsfw: nsfw == true ? false : true,
-      r2: false,
+      r2: true,
       shared: true,
       models: [model],
       params: {
