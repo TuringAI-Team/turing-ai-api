@@ -8,6 +8,8 @@ import { predict } from "replicate-api";
 import generateImgD from "../image/dall-e.js";
 import delay from "delay";
 import { generateImg, checkGeneration } from "../image/stablehorde.js";
+import generateVideo from "../video/damo.js";
+import { Riffusion } from "../audio/songs.js";
 
 export default async function Alan(
   userName: string = "Anonymous",
@@ -17,7 +19,9 @@ export default async function Alan(
   model: string = "chatgpt",
   searchEngine: string = "google",
   photo?: string,
-  imageGenerator?: string
+  imageGenerator?: string,
+  videoGenerator?: string,
+  audioGenerator?: string
 ) {
   var imageDescription;
   if (photo && !imageDescription) {
@@ -39,7 +43,7 @@ export default async function Alan(
       let messages: any = await getMessages(conversation, "chatgpt", message);
 
       let instructions = await getInstruction("alan", userName);
-      instructions.replace("{model}", model);
+      console.log(instructions);
       let results = await getSearchResults(messages, searchEngine);
       instructions = `${instructions}${
         imageDescription
@@ -47,7 +51,7 @@ export default async function Alan(
           : ""
       }${
         results
-          ? `\nHere you have results from ${searchEngine} that you can use to answer the user, do not mention the results, extract information from them to answer the question.\n${results}`
+          ? `\nHere you have results from Google that you can use to answer the user, do not mention the results, extract information from them to answer the question.\n${results}`
           : ""
       }`;
       messages.push({
@@ -87,16 +91,42 @@ export default async function Alan(
           ); // this returns de generation id that need to be checked to get images
           await delay(18000);
           let check: any = await checkGeneration(result.id);
+          console.log(check.done);
           if (check.done) {
             images = check.generations.map((i) => i.img);
           } else {
             await delay(check.wait_time * 1000 + 2000);
+            console.log(check.done);
             check = await checkGeneration(result.id);
             images = check.generations.map((i) => i.img);
           }
         }
 
-        return { response, images };
+        return { response, images, photoPrompt: imagePrompt[0] };
+      }
+      if (response.includes("GEN_VID=")) {
+        let videoPrompt = response.split("GEN_VID=")[1];
+        response = response.split("GEN_VID=")[0];
+        let video;
+
+        if (videoGenerator == "damo-text-to-video") {
+          video = await generateVideo(videoPrompt);
+        }
+
+        return { response, video, videoPrompt };
+      }
+      console.log(`\n\n${response}`);
+      if (response.includes("GEN_AUD=") || response.includes("GEN_SONG=")) {
+        let audioPrompt = response.split("GEN_AUD=")[1];
+        response = response.split("GEN_AUD=")[0];
+        let audio;
+
+        if (audioGenerator == "riffusion") {
+          audio = await Riffusion(audioPrompt);
+          audio = audio.audio;
+        }
+
+        return { response, audio, audioPrompt };
       }
       return { response };
     } catch (err: any) {
@@ -114,7 +144,7 @@ async function getSearchResults(conversation, searchEngine) {
   let messages = [];
   messages.push({
     role: "system",
-    content: `This is a chat between an user and a chat assistant. Just answer with the search queries based on the user prompt, needed for the following topic for Google, maximum 3 entries. Make each of the queries descriptive and include all related topics. If the prompt is a question/request to/about you directly, reply with 'N'. Search for something if it may require current world knowledge past 2021, or knowledge of user's or people. Create a | seperated list without quotes.  If you no search queries are applicable, answer with 'N' . Don't add any explanations, extra text or puntuation. You can ONLY REPLY WITH SEARCH QUERIES.`,
+    content: `This is a chat between an user and a chat assistant. Just answer with the search queries based on the user prompt, needed for the following topic for Google, maximum 3 entries. Make each of the queries descriptive and include all related topics. If the prompt is a question/request to/about the chat assistant directly, reply with 'N'. Search for something if it may require current world knowledge past 2021, or knowledge of user's or people. Create a | seperated list without quotes.  If you no search queries are applicable, answer with 'N' . NO EXPLANATIONS, EXTRA TEXT OR PUNTUATION. You can ONLY REPLY WITH SEARCH QUERIES.`,
   });
   conversation = conversation.map((m) => `${m.role}:${m.content}`);
   messages.push({

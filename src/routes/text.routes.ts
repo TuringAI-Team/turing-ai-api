@@ -46,6 +46,8 @@ router.post("/alan/:model", async (req: Request, res: Response) => {
     searchEngine,
     photo,
     imageGenerator,
+    videoGenerator,
+    audioGenerator,
   } = req.body;
   let conversation = await getConversation(conversationId, `alan-${model}`);
   let result = await Alan(
@@ -56,7 +58,9 @@ router.post("/alan/:model", async (req: Request, res: Response) => {
     model,
     searchEngine,
     photo,
-    imageGenerator
+    imageGenerator,
+    videoGenerator,
+    audioGenerator
   );
   res.json(result).status(200);
 });
