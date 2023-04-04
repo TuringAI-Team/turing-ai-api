@@ -63,7 +63,6 @@ export default async function Alan(
             ? `\nThe user can request information related with an image, here you have a description of the image. REFER AS THIS DESCRIPTION AS THE IMAGE. Image: ${imageDescription}`
             : ""
         }`;
-      console.log(instructions);
       /*${
         imageDescription
           ? `\nThe user have sent an image, here you have a description of the image. REFER AS THIS DESCRIPTION AS THE IMAGE. Read all necessary information from the description, then form a response.\n${imageDescription}`
@@ -91,6 +90,8 @@ export default async function Alan(
       let response = completion.data.choices[0].message.content;
       await removeMessage(acc.id);
       await saveMsg(`alan-${model}`, message, response, conversationId, true);
+      console.log(`\n\n${response}`);
+
       if (response.includes("GEN_IMG=")) {
         let imagePrompt = response.split("GEN_IMG=")[1].split("|");
         response = response.split("GEN_IMG=")[0];
@@ -136,7 +137,6 @@ export default async function Alan(
 
         return { response, video, videoPrompt };
       }
-      console.log(`\n\n${response}`);
       if (response.includes("GEN_AUD=") || response.includes("GEN_SONG=")) {
         let audioPrompt = response.split("GEN_AUD=")[1];
         response = response.split("GEN_AUD=")[0];
@@ -180,7 +180,7 @@ async function getSearchResults(conversation, searchEngine) {
   let messages = [];
   messages.push({
     role: "system",
-    content: `This is a chat between an user and a chat assistant. Just answer with the search queries based on the user prompt, needed for the following topic for Google, maximum 3 entries. Make each of the queries descriptive and include all related topics. If the prompt is a question/request to/about the chat assistant directly, reply with 'N'. Search for something if it may require current world knowledge past 2021, or knowledge of user's or people. Create a | seperated list without quotes.  If you no search queries are applicable, answer with 'N' . NO EXPLANATIONS, EXTRA TEXT OR PUNTUATION. You can ONLY REPLY WITH SEARCH QUERIES.`,
+    content: `This is a chat between an user and a chat assistant. Just answer with the search queries based on the user prompt, needed for the following topic for Google, maximum 3 entries. Make each of the queries descriptive and include all related topics. If the prompt is a question/request to/about the chat assistant directly, reply with 'N'. If the prompt is a request of an image, video, audio, song, etc, reply with 'N'. If the prompt is a request to modify an image, reply with 'N'. Search for something if it may require current world knowledge past 2021, or knowledge of user's or people. Create a | seperated list without quotes.  If you no search queries are applicable, answer with 'N' . NO EXPLANATIONS, EXTRA TEXT OR PUNTUATION. You can ONLY REPLY WITH SEARCH QUERIES.`,
   });
   conversation = conversation.map((m) => `${m.role}:${m.content}`);
   messages.push({

@@ -30,13 +30,13 @@ app.use(async (req: Request, res: Response, next) => {
       if (isvalid) {
         next();
       } else {
-        res.status(401).send("Unauthorized");
+        res.status(401).send({ error: "Unauthorized" });
       }
     } else {
-      res.status(401).send("Unauthorized");
+      res.status(401).send({ error: "Unauthorized" });
     }
   } else {
-    res.status(401).send("Unauthorized");
+    res.status(401).send({ error: "Unauthorized" });
   }
 });
 
