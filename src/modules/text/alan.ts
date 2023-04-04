@@ -10,6 +10,7 @@ import delay from "delay";
 import { generateImg, checkGeneration } from "../image/stablehorde.js";
 import generateVideo from "../video/damo.js";
 import { Riffusion } from "../audio/songs.js";
+import { normal } from "../image/controlnet.js";
 
 export default async function Alan(
   userName: string = "Anonymous",
@@ -21,7 +22,8 @@ export default async function Alan(
   photo?: string,
   imageGenerator?: string,
   videoGenerator?: string,
-  audioGenerator?: string
+  audioGenerator?: string,
+  imageModificator?: string
 ) {
   var imageDescription;
   if (photo && !imageDescription) {
@@ -42,14 +44,32 @@ export default async function Alan(
       });
       let messages: any = await getMessages(conversation, "chatgpt", message);
 
-      let instructions = await getInstruction("alan", userName);
+      let instructions =
+        `Current date: {date}\nName of the user talking to: {userName}\nYou are an AI named Alan. You have been developed by Turing AI.\nYou can view and receive images, generate images, generate videos, generate audio, generate music, modify images, execute code and search in internet for real-time information.
+      \nConsider the following in your responses:
+      - Be conversational 
+      - Add unicode emoji to be more playful in your responses.` +
+        `\nThe user can request images to be generated. (like \"show me an image of ...\" or \"generate an image of ...\"). You MAY add 'GEN_IMG=Image generation prompt with fitting & descriptive keywords' to the end of your response to display an image, keep the description below 70 characters. Do not refer to sources inside the GEN_IMG= tag. IF ASKED FOR, DO NOT GENERATE UNLESS ASKED.` +
+        `\nThe user can request videos to be generated. (like \"show me a video of ...\" or \"generate a video of ...\"). You MAY add 'GEN_VID=Video generation prompt with fitting & descriptive keywords' to the end of your response to display an video, keep the description below 70 characters. Do not refer to sources inside the GEN_VID= tag. IF ASKED FOR, DO NOT GENERATE UNLESS ASKED.` +
+        `\nThe user can request audios/songs/melodies to be generated. (like \"show me a audio/song of ...\" or \"generate a audio/song of ...\"). You MAY add 'GEN_AUD=Audio/Song/Melody generation prompt with fitting & descriptive keywords' to the end of your response to display an audio, keep the description below 70 characters. Do not refer to sources inside the GEN_AUD= tag. IF ASKED FOR, DO NOT GENERATE UNLESS ASKED.` +
+        `${
+          photo
+            ? `\nThe user can request imaged to be modified. (like \"modify me this image of ...\" or \"modify this image of ...\"). You MAY add 'MOD_IMG=Image modification prompt with fitting & descriptive keywords' to the end of your response to display the modified image, keep the description below 70 characters. Do not refer to sources inside the MOD_IMG= tag. IF ASKED FOR, DO NOT GENERATE UNLESS ASKED.`
+            : ""
+        }` +
+        `${
+          imageDescription
+            ? `\nThe user can request information related with an image, here you have a description of the image. REFER AS THIS DESCRIPTION AS THE IMAGE. Image: ${imageDescription}`
+            : ""
+        }`;
       console.log(instructions);
+      /*${
+        imageDescription
+          ? `\nThe user have sent an image, here you have a description of the image. REFER AS THIS DESCRIPTION AS THE IMAGE. Read all necessary information from the description, then form a response.\n${imageDescription}`
+          : ""
+      } */
       let results = await getSearchResults(messages, searchEngine);
       instructions = `${instructions}${
-        imageDescription
-          ? `\nHere you have an image description of the image the user send to you refer as this description as the image. Read all necessary information from the description, then form a response.\n${imageDescription}`
-          : ""
-      }${
         results
           ? `\nHere you have results from Google that you can use to answer the user, do not mention the results, extract information from them to answer the question.\n${results}`
           : ""
@@ -127,6 +147,21 @@ export default async function Alan(
         }
 
         return { response, audio, audioPrompt };
+      }
+      if (response.includes("MOD_IMG=")) {
+        let modificationPrompt = response.split("MOD_IMG=")[1];
+        response = response.split("MOD_IMG=")[0];
+        let modifiedImage;
+        if (imageModificator == "controlnet") {
+          modifiedImage = await normal(photo, modificationPrompt, {});
+          console.log(modifiedImage);
+          modifiedImage = modifiedImage.image;
+        }
+        return {
+          response,
+          images: [modifiedImage],
+          photoPrompt: modificationPrompt,
+        };
       }
       return { response };
     } catch (err: any) {
