@@ -7,6 +7,7 @@ import {
   OpenAssistant,
   Alan,
 } from "../modules/text/index.js";
+import supabase from "../modules/supabase.js";
 
 const router = express.Router();
 
@@ -65,6 +66,17 @@ router.post("/alan/:model", async (req: Request, res: Response) => {
     imageModificator
   );
   res.json(result).status(200);
+});
+
+router.delete("/conversation/:model", async (req: Request, res: Response) => {
+  var { model } = req.params;
+  var { conversationId } = req.body;
+  var { data } = await supabase
+    .from("conversations")
+    .delete()
+    .eq("id", conversationId)
+    .eq("model", model);
+  res.json({ message: "Conversation deleted" }).status(200);
 });
 
 export default router;
