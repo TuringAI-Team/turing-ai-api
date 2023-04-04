@@ -155,8 +155,7 @@ export default async function Alan(
         let modifiedImage;
         if (imageModificator == "controlnet") {
           modifiedImage = await normal(photo, modificationPrompt, {});
-          console.log(modifiedImage);
-          modifiedImage = modifiedImage.image;
+          modifiedImage = modifiedImage[1];
         }
         return {
           response,
