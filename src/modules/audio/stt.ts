@@ -10,8 +10,7 @@ export default async function STT(
   if (ai == "gladia") {
     try {
       const form = new FormData();
-      console.log(file);
-      form.append("audio", file, `audio-${randomUUID()}.ogg`);
+      form.append("audio_url", file);
       form.append("language_behaviour", "automatic single language");
       const response = await axios.post(
         "https://api.gladia.io/audio/text/audio-transcription/",
