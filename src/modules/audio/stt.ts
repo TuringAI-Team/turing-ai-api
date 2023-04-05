@@ -9,6 +9,7 @@ export default async function STT(
 ) {
   if (ai == "gladia") {
     try {
+      console.log(file);
       const form = new FormData();
       form.append("audio_url", file);
       form.append("language_behaviour", "automatic single language");
