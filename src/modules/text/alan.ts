@@ -33,7 +33,7 @@ export default async function Alan(
     imageDescription = await getImageDescription(photo);
   }
 
-  if (model == "chatgpt") {
+  if (model == "chatgpt" || model == "gpt-4") {
     let acc = await getKey();
     if (!acc) {
       return {
@@ -83,7 +83,7 @@ export default async function Alan(
       const openai = new OpenAIApi(configuration);
 
       const completion = await openai.createChatCompletion({
-        model: "gpt-3.5-turbo",
+        model: model == "chatgpt" ? "gpt-3.5-turbo" : "gpt-4",
         max_tokens: 500,
         messages: messages,
       });
@@ -118,13 +118,17 @@ export default async function Alan(
           ); // this returns de generation id that need to be checked to get images
           let done = false;
           let lastCheck;
+          console.log(
+            "generating image, this may take a while, please wait..."
+          );
           while (!done) {
             if (lastCheck) {
               await delay(lastCheck.wait_time * 1000 + 1000);
             } else {
-              await delay(18000);
+              await delay(15000);
             }
             lastCheck = await checkGeneration(result.id);
+            console.log(lastCheck.done);
             if (lastCheck.done) {
               images = lastCheck.generations.map((i) => i.img);
               done = true;
@@ -220,7 +224,6 @@ export default async function Alan(
         error: err.message,
       };
     }
-  } else if (model == "gpt-4") {
   } else if (model == "alpaca") {
   } else if (model == "llama") {
   }
