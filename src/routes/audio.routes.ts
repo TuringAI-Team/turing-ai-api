@@ -6,7 +6,7 @@ const router = express.Router();
 
 router.post("/transcript", async (req: Request, res: Response) => {
   let { ai, model, file } = req.body;
-  let result = await STT("gladia", "", file);
+  let result = await STT("whisper", "", file);
   res.json(result).status(200);
 });
 
