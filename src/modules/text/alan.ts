@@ -22,6 +22,7 @@ export default async function Alan(
   searchEngine: string = "google",
   photo?: string,
   imageGenerator?: string,
+  nsfwFilter?: boolean,
   videoGenerator?: string,
   audioGenerator?: string,
   imageModificator?: string
@@ -46,11 +47,8 @@ export default async function Alan(
       let messages: any = await getMessages(conversation, "chatgpt", message);
 
       let instructions =
-        `Current date: ${getToday()}\nName of the user talking to: ${userName}\nYou are an AI named Alan. You have been developed by Turing AI.\nYou can view and receive images, generate images, generate videos, generate audio, generate music, modify images, execute code and search in internet for real-time information.
-      \nConsider the following in your responses:
-      - Be conversational 
-      - Add unicode emoji to be more playful in your responses.` +
-        `\nThe user can request images/draws/pictures to be generated. (like \"show me an image/draw/picture of ...\" or \"generate an image/draw/picture of ...\"). You MAY add 'GEN_IMG=Image/draw/picture generation prompt with fitting & descriptive keywords' to the end of your response to display an image/draw/picture, keep the description below 70 characters. Do not refer to sources inside the GEN_IMG= tag. IF ASKED FOR, DO NOT GENERATE UNLESS ASKED.` +
+        `Current date: ${getToday()}\nName of the user talking to: ${userName}\nYou are an AI named Alan which have been developed by TuringAI.\nYou can view images. You can execute code and search in internet for real-time information.` +
+        `\nThe user can request images to be generated. (like \"show me a photo of ...\" or \"generate an image of ...\" or \"draw me...\"). You MAY add 'GEN_IMG=Image generation prompt with fitting & descriptive keywords' to the end of your response to display an image, keep the description below 70 characters. Do not refer to sources inside the GEN_IMG= tag. IF ASKED FOR, DO NOT GENERATE UNLESS ASKED.` +
         `\nThe user can request videos to be generated. (like \"show me a video of ...\" or \"generate a video of ...\"). You MAY add 'GEN_VID=Video generation prompt with fitting & descriptive keywords' to the end of your response to display an video, keep the description below 70 characters. Do not refer to sources inside the GEN_VID= tag. IF ASKED FOR, DO NOT GENERATE UNLESS ASKED.` +
         `\nThe user can request audios/songs/melodies to be generated. (like \"show me a audio/song of ...\" or \"generate a audio/song of ...\"). You MAY add 'GEN_AUD=Audio/Song/Melody generation prompt with fitting & descriptive keywords' to the end of your response to display an audio, keep the description below 70 characters. Do not refer to sources inside the GEN_AUD= tag. IF ASKED FOR, DO NOT GENERATE UNLESS ASKED.` +
         `${
@@ -62,7 +60,9 @@ export default async function Alan(
           imageDescription
             ? `\nThe user can request information related with an image, here you have a description of the image. REFER AS THIS DESCRIPTION AS THE IMAGE. Image: ${imageDescription}`
             : ""
-        }`;
+        }\nConsider the following in your responses:
+        - Be conversational 
+        - Add unicode emoji to be more playful in your responses.`;
       /*${
         imageDescription
           ? `\nThe user have sent an image, here you have a description of the image. REFER AS THIS DESCRIPTION AS THE IMAGE. Read all necessary information from the description, then form a response.\n${imageDescription}`
@@ -93,42 +93,53 @@ export default async function Alan(
       console.log(`\n\n${response}`);
 
       if (response.includes("GEN_IMG=")) {
-        let imagePrompt = response.split("GEN_IMG=")[1].split("|");
-        response = response.split("GEN_IMG=")[0];
+        let imagePrompt = response.split("GEN_IMG=")[1].split(".")[0];
+        response = `${response.split("GEN_IMG=")[0]} ${
+          response.split("GEN_IMG=")[1].split(".")[1]
+            ? response.split("GEN_IMG=")[1].split(".")[1]
+            : ""
+        }`;
         let images;
         if (imageGenerator == "dall-e-2") {
-          images = await generateImgD(imagePrompt[0], 1);
+          images = await generateImgD(imagePrompt, 1);
           images = images.map((i) => i.attachment);
         }
         if (imageGenerator == "stable-diffusion") {
           let result: any = await generateImg(
-            imagePrompt[0],
+            imagePrompt,
             50,
-            false,
+            nsfwFilter,
             1,
-            "Dreamlike Photoreal",
+            "Dreamshaper",
             512,
             512,
             "k_dpmpp_sde"
           ); // this returns de generation id that need to be checked to get images
-          await delay(18000);
-          let check: any = await checkGeneration(result.id);
-          console.log(check.done);
-          if (check.done) {
-            images = check.generations.map((i) => i.img);
-          } else {
-            await delay(check.wait_time * 1000 + 2000);
-            console.log(check.done);
-            check = await checkGeneration(result.id);
-            images = check.generations.map((i) => i.img);
+          let done = false;
+          let lastCheck;
+          while (!done) {
+            if (lastCheck) {
+              await delay(lastCheck.wait_time * 1000 + 1000);
+            } else {
+              await delay(18000);
+            }
+            lastCheck = await checkGeneration(result.id);
+            if (lastCheck.done) {
+              images = lastCheck.generations.map((i) => i.img);
+              done = true;
+            }
           }
         }
 
-        return { response, images, photoPrompt: imagePrompt[0] };
+        return { response, images, photoPrompt: imagePrompt };
       }
       if (response.includes("GEN_VID=")) {
-        let videoPrompt = response.split("GEN_VID=")[1];
-        response = response.split("GEN_VID=")[0];
+        let videoPrompt = response.split("GEN_VID=")[1].split(".")[0];
+        response = `${response.split("GEN_VID=")[0]} ${
+          response.split("GEN_VID=")[1].split(".")[1]
+            ? response.split("GEN_VID=")[1].split(".")[1]
+            : ""
+        }`;
         let video;
 
         if (videoGenerator == "damo-text-to-video") {
@@ -138,8 +149,12 @@ export default async function Alan(
         return { response, video, videoPrompt };
       }
       if (response.includes("GEN_AUD=") || response.includes("GEN_SONG=")) {
-        let audioPrompt = response.split("GEN_AUD=")[1];
-        response = response.split("GEN_AUD=")[0];
+        let audioPrompt = response.split("GEN_AUD=")[1].split(".")[0];
+        response = `${response.split("GEN_AUD=")[0]} ${
+          response.split("GEN_AUD=")[1].split(".")[1]
+            ? response.split("GEN_AUD=")[1].split(".")[1]
+            : ""
+        }`;
         let audio;
 
         if (audioGenerator == "riffusion") {
@@ -150,8 +165,12 @@ export default async function Alan(
         return { response, audio, audioPrompt };
       }
       if (response.includes("MOD_IMG=")) {
-        let modificationPrompt = response.split("MOD_IMG=")[1];
-        response = response.split("MOD_IMG=")[0];
+        let modificationPrompt = response.split("MOD_IMG=")[1].split(".")[0];
+        response = `${response.split("MOD_IMG=")[0]} ${
+          response.split("MOD_IMG=")[1].split(".")[1]
+            ? response.split("MOD_IMG=")[1].split(".")[1]
+            : ""
+        }`;
         let modifiedImage;
         if (
           imageModificator == "controlnet" ||
@@ -215,22 +234,23 @@ async function getSearchResults(conversation, searchEngine) {
   conversation = conversation.map((m) => `${m.role}:${m.content}`);
   messages.push({
     role: "user",
-    content: conversation.join("\n"),
+    content: `Conversation: ${conversation.join(" | ")}`,
   });
 
   let searchQueries: any = await chatgpt(messages, 150, { temperature: 0.25 });
   if (searchQueries.error) return null;
-  searchQueries = searchQueries.response;
+  searchQueries = searchQueries.response.replaceAll('"', "");
   // search in google and get results
-  console.log(`searchQueries: ${searchQueries}`);
   let searchResults = [];
   if (
     searchQueries == "N AT ALL COSTS" ||
     searchQueries == "N" ||
-    searchQueries == "N/A"
+    searchQueries == "N/A" ||
+    searchQueries == "N."
   )
     return null;
   searchQueries = searchQueries.split("|");
+  console.log(`searchQueries: ${searchQueries}`);
   for (let i = 0; i < searchQueries.length; i++) {
     const query = searchQueries[i];
     if (query == "N" || query == "N.") continue;
@@ -246,7 +266,6 @@ async function getSearchResults(conversation, searchEngine) {
         AbstractText: results.AbstractText,
         AbstractURL: results.AbstractURL,
       };
-      console.log(results);
     }
     searchResults.push({
       query: query,

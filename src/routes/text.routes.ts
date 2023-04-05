@@ -47,6 +47,7 @@ router.post("/alan/:model", async (req: Request, res: Response) => {
     searchEngine,
     photo,
     imageGenerator,
+    nsfwFilter,
     videoGenerator,
     audioGenerator,
     imageModificator,
@@ -61,6 +62,7 @@ router.post("/alan/:model", async (req: Request, res: Response) => {
     searchEngine,
     photo,
     imageGenerator,
+    nsfwFilter,
     videoGenerator,
     audioGenerator,
     imageModificator
