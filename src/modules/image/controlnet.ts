@@ -1,7 +1,8 @@
 import { predict } from "replicate-api";
-export async function normal(image, prompt, options) {
+
+export async function controlnet(image, prompt, model = "normal") {
   const prediction = await predict({
-    model: "jagilley/controlnet-normal", // The model name
+    model: `jagilley/controlnet-${model}`, // The model name
     input: {
       image: image,
       prompt: prompt,

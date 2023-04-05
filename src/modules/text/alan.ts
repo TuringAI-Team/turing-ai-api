@@ -10,7 +10,7 @@ import delay from "delay";
 import { generateImg, checkGeneration } from "../image/stablehorde.js";
 import generateVideo from "../video/damo.js";
 import { Riffusion } from "../audio/songs.js";
-import { normal } from "../image/controlnet.js";
+import { controlnet } from "../image/controlnet.js";
 import { getToday } from "./instructions.js";
 
 export default async function Alan(
@@ -153,8 +153,39 @@ export default async function Alan(
         let modificationPrompt = response.split("MOD_IMG=")[1];
         response = response.split("MOD_IMG=")[0];
         let modifiedImage;
-        if (imageModificator == "controlnet") {
-          modifiedImage = await normal(photo, modificationPrompt, {});
+        if (
+          imageModificator == "controlnet" ||
+          imageModificator == "controlnet-normal"
+        ) {
+          modifiedImage = await controlnet(photo, modificationPrompt, "normal");
+          modifiedImage = modifiedImage[1];
+        }
+        if (imageModificator == "controlnet-canny") {
+          modifiedImage = await controlnet(photo, modificationPrompt, "canny");
+          modifiedImage = modifiedImage[1];
+        }
+        if (imageModificator == "controlnet-hough") {
+          modifiedImage = await controlnet(photo, modificationPrompt, "hough");
+          modifiedImage = modifiedImage[1];
+        }
+        if (imageModificator == "controlnet-hed") {
+          modifiedImage = await controlnet(photo, modificationPrompt, "hed");
+          modifiedImage = modifiedImage[1];
+        }
+        if (imageModificator == "controlnet-depth2img") {
+          modifiedImage = await controlnet(
+            photo,
+            modificationPrompt,
+            "depth2img"
+          );
+          modifiedImage = modifiedImage[1];
+        }
+        if (imageModificator == "controlnet-pose") {
+          modifiedImage = await controlnet(photo, modificationPrompt, "pose");
+          modifiedImage = modifiedImage[1];
+        }
+        if (imageModificator == "controlnet-seg") {
+          modifiedImage = await controlnet(photo, modificationPrompt, "seg");
           modifiedImage = modifiedImage[1];
         }
         return {
@@ -179,7 +210,7 @@ async function getSearchResults(conversation, searchEngine) {
   let messages = [];
   messages.push({
     role: "system",
-    content: `This is a chat between an user and a chat assistant. Just answer with the search queries based on the user prompt, needed for the following topic for Google, maximum 3 entries. Make each of the queries descriptive and include all related topics. If the prompt is a question/request to/about the chat assistant directly, reply with 'N'. If the prompt is a request of an image, video, audio, song, etc, reply with 'N'. If the prompt is a request to modify an image, reply with 'N'. Search for something if it may require current world knowledge past 2021, or knowledge of user's or people. Create a | seperated list without quotes.  If you no search queries are applicable, answer with 'N' . NO EXPLANATIONS, EXTRA TEXT OR PUNTUATION. You can ONLY REPLY WITH SEARCH QUERIES.`,
+    content: `This is a chat between an user and a chat assistant. Just answer with the search queries based on the user prompt, needed for the following topic for Google, maximum 3 entries. Make each of the queries descriptive and include all related topics. If the prompt is a question to/about the chat assistant directly, reply with 'N'. If the prompt is a request of an image, video, audio, song, etc, reply with 'N'. If the prompt is a request to modify an image, reply with 'N'. Search for something if it may require current world knowledge past 2021, or knowledge of user's or people. Create a | seperated list without quotes.  If you no search queries are applicable, answer with 'N' . NO EXPLANATIONS, EXTRA TEXT OR PUNTUATION. You can ONLY REPLY WITH SEARCH QUERIES IN THE MENTION FORMAT.`,
   });
   conversation = conversation.map((m) => `${m.role}:${m.content}`);
   messages.push({
@@ -187,7 +218,7 @@ async function getSearchResults(conversation, searchEngine) {
     content: conversation.join("\n"),
   });
 
-  let searchQueries: any = await chatgpt(messages, 150, { temperature: 0.5 });
+  let searchQueries: any = await chatgpt(messages, 150, { temperature: 0.25 });
   if (searchQueries.error) return null;
   searchQueries = searchQueries.response;
   // search in google and get results
