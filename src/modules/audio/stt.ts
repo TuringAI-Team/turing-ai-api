@@ -76,7 +76,7 @@ export default async function STT(
       let resp = await openai.createTranscription(stream, "whisper-1");
       // delete file
       await fs.unlinkSync(filePath);
-      //  await removeMessage(acc.id);
+      await removeMessage(acc.id);
 
       return { text: resp.data.text };
     } catch (err: any) {
