@@ -82,7 +82,7 @@ export default async function STT(
     } catch (err: any) {
       await fs.unlinkSync(filePath);
 
-      console.log(err);
+      console.log(err.data);
       return {
         error: err.message,
       };
