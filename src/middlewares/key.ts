@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import supabase from "./supabase.js";
+import supabase from "../modules/supabase.js";
 export async function getToken() {
   var token = await jwt.sign(
     { id: "host", key: process.env.SECRETKEY },

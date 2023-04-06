@@ -9,7 +9,7 @@ import TextRoutes from "./routes/text.routes.js";
 import AudioRoutes from "./routes/audio.routes.js";
 const app: Application = express();
 
-import { getToken, verifyToken } from "./modules/key.js";
+import { getToken, verifyToken } from "./middlewares/key.js";
 app.use(helmet());
 app.use(
   cors({

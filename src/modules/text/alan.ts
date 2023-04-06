@@ -69,7 +69,9 @@ export default async function Alan(
           ? `\nThe user have sent an image, here you have a description of the image. REFER AS THIS DESCRIPTION AS THE IMAGE. Read all necessary information from the description, then form a response.\n${imageDescription}`
           : ""
       } */
+      console.log(instructions);
       let results = await getSearchResults(messages, searchEngine);
+
       instructions = `${instructions}${
         results
           ? `\nHere you have results from Google that you can use to answer the user, do not mention the results, extract information from them to answer the question.\n${results}`
