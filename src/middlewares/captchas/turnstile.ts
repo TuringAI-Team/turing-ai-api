@@ -1,3 +1,4 @@
+import axios from "axios";
 export default async function (req, res, next) {
   //  captcha token is on headers
   const token = req.headers["x-captcha-token"];
@@ -26,8 +27,9 @@ async function validate(secret: string, token: string, ip?: string) {
     formData.append("remoteip", ip);
   }
 
-  var res = await fetch(API_URL, {
-    body: formData,
+  var res = await axios({
+    url: API_URL,
+    data: formData,
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
   });
@@ -38,7 +40,7 @@ async function validate(secret: string, token: string, ip?: string) {
     hostname?: string;
     action?: string;
     cdata?: string;
-  } = await res.json();
+  } = res.data;
   /* Error descriptions */
   var error = data["error-codes"][0];
   if (error) {
