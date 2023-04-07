@@ -12,6 +12,7 @@ import generateVideo from "../video/damo.js";
 import { Riffusion } from "../audio/songs.js";
 import { controlnet } from "../image/controlnet.js";
 import { getToday } from "./instructions.js";
+import wiki from "wikipedia";
 
 export default async function Alan(
   userName: string = "Anonymous",
@@ -33,7 +34,7 @@ export default async function Alan(
     imageDescription = await getImageDescription(photo);
   }
 
-  if (model == "chatgpt" || model == "gpt-4") {
+  if (model == "chatgpt" || model == "gpt4") {
     let acc = await getKey();
     if (!acc) {
       return {
@@ -73,7 +74,9 @@ export default async function Alan(
 
       instructions = `${instructions}${
         results
-          ? `\nHere you have results from Google that you can use to answer the user, do not mention the results, extract information from them to answer the question.\n${results}`
+          ? `\nHere you have results from ${
+              searchEngine == "wikipedia" ? "Wikipedia" : "Google"
+            } that you can use to answer the user, do not mention the results, extract information from them to answer the question.\n${results}`
           : ""
       }`;
       messages.push({
@@ -235,7 +238,9 @@ async function getSearchResults(conversation, searchEngine) {
   let messages = [];
   messages.push({
     role: "system",
-    content: `This is a chat between an user and a chat assistant. Just answer with the search queries based on the user prompt, needed for the following topic for Google, maximum 3 entries. Make each of the queries descriptive and include all related topics. If the prompt is a question to/about the chat assistant directly, reply with 'N'. If the prompt is a request of an image, video, audio, song, etc, reply with 'N'. If the prompt is a request to modify an image, reply with 'N'. Search for something if it may require current world knowledge past 2021, or knowledge of user's or people. Create a | seperated list without quotes.  If you no search queries are applicable, answer with 'N' . NO EXPLANATIONS, EXTRA TEXT OR PUNTUATION. You can ONLY REPLY WITH SEARCH QUERIES IN THE MENTION FORMAT.`,
+    content: `This is a chat between an user and a chat assistant. Just answer with the search queries based on the user prompt, needed for the following topic for ${
+      searchEngine == "wikipedia" ? "Wikipedia" : "Google"
+    }, maximum 3 entries. Make each of the queries descriptive and include all related topics. If the prompt is a question to/about the chat assistant directly, reply with 'N'. If the prompt is a request of an image, video, audio, song, etc, reply with 'N'. If the prompt is a request to modify an image, reply with 'N'. Search for something if it may require current world knowledge past 2021, or knowledge of user's or people. Create a | seperated list without quotes.  If you no search queries are applicable, answer with 'N' . NO EXPLANATIONS, EXTRA TEXT OR PUNTUATION. You can ONLY REPLY WITH SEARCH QUERIES IN THE MENTION FORMAT.`,
   });
   conversation = conversation.map((m) => `${m.role}:${m.content}`);
   messages.push({
@@ -261,7 +266,7 @@ async function getSearchResults(conversation, searchEngine) {
   for (let i = 0; i < searchQueries.length; i++) {
     const query = searchQueries[i];
     if (query == "N" || query == "N.") continue;
-    let results;
+    var results;
     if (searchEngine == "google") {
       results = await google(query);
     }
@@ -273,6 +278,12 @@ async function getSearchResults(conversation, searchEngine) {
         AbstractText: results.AbstractText,
         AbstractURL: results.AbstractURL,
       };
+    }
+    if (searchEngine == "wikipedia") {
+      let quer: any = await wiki.search(query);
+      quer = quer.suggestion;
+      results = await wiki.page(quer);
+      console.log(results);
     }
     searchResults.push({
       query: query,

@@ -23,7 +23,8 @@
     "jsonwebtoken": "^9.0.0",
     "openai": "^3.2.1",
     "replicate-api": "^0.4.4",
-    "sharp": "^0.31.3"
+    "sharp": "^0.31.3",
+    "wikipedia": "^2.0.0"
   },
   "description": "``` npm create astro@latest -- --template basics ```",
   "main": "dist/index.js",
