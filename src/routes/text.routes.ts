@@ -8,6 +8,7 @@ import {
   Alan,
 } from "../modules/text/index.js";
 import supabase from "../modules/supabase.js";
+import turnstile from "../middlewares/captchas/turnstile.js";
 
 const router = express.Router();
 /*
@@ -38,7 +39,7 @@ router.post("/chat/:model", async (req: Request, res: Response) => {
     res.json(result).status(200);
   }
 });*/
-router.post("/alan/:model", async (req: Request, res: Response) => {
+router.post("/alan/:model", turnstile, async (req: Request, res: Response) => {
   var { model } = req.params;
   var {
     message,
