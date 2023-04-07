@@ -73,15 +73,19 @@ router.post("/alan/:model", turnstile, async (req: Request, res: Response) => {
   res.json(result).status(200);
 });
 
-router.delete("/conversation/:model", async (req: Request, res: Response) => {
-  var { model } = req.params;
-  var { conversationId } = req.body;
-  var { data } = await supabase
-    .from("conversations")
-    .delete()
-    .eq("id", conversationId)
-    .eq("model", model);
-  res.json({ message: "Conversation deleted" }).status(200);
-});
+router.delete(
+  "/conversation/:model",
+  turnstile,
+  async (req: Request, res: Response) => {
+    var { model } = req.params;
+    var { conversationId } = req.body;
+    var { data } = await supabase
+      .from("conversations")
+      .delete()
+      .eq("id", conversationId)
+      .eq("model", model);
+    res.json({ message: "Conversation deleted" }).status(200);
+  }
+);
 
 export default router;
