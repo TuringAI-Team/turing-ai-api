@@ -7,6 +7,8 @@ import "dotenv/config";
 import ImageRoutes from "./routes/image.routes.js";
 import TextRoutes from "./routes/text.routes.js";
 import AudioRoutes from "./routes/audio.routes.js";
+import OtherRoutes from "./routes/other.routes.js";
+
 const app: Application = express();
 
 import { getToken, verifyToken } from "./middlewares/key.js";
@@ -43,6 +45,7 @@ app.use(async (req: Request, res: Response, next) => {
 app.use("/", ImageRoutes);
 app.use("/", TextRoutes);
 app.use("/", AudioRoutes);
+app.use("/", OtherRoutes);
 
 app.listen(app.get("port"), async () => {
   console.log(`Server is running on port ${app.get("port")}`);

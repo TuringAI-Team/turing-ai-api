@@ -20,6 +20,7 @@ router.post("/filter", async (req: Request, res: Response) => {
     .status(200);
 });
 
+/*
 // Dall-e
 router.post("/dalle", async (req: Request, res: Response) => {
   var { prompt, number } = req.body;
@@ -77,6 +78,6 @@ router.get("/sd/:genid", async (req: Request, res: Response) => {
   } catch (e: any) {
     res.json({ error: e.rawError.message }).status(400);
   }
-});
+});*/
 
 export default router;

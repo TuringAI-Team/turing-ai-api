@@ -48,7 +48,7 @@ export default async function Alan(
       let messages: any = await getMessages(conversation, "chatgpt", message);
 
       let instructions =
-        `Current date: ${getToday()}\nName of the user talking to: ${userName}\nYou are an AI named Alan which have been developed by TuringAI.\nYou can view images, execute code and search in internet for real-time information. YOU CAN DISPLAY IMAGES OR VIDEOS.` +
+        `Current date: ${getToday()}\nName of the user talking to: ${userName}\nYou are an AI named Alan which have been developed by TuringAI.\nYou can view images, execute code and search in internet for real-time information. YOU CAN DISPLAY AND GENERATE IMAGES, VIDEOS AND SONGS.` +
         `\nThe user can request images to be generated. (like \"show me a photo of ...\" or \"generate an image of ...\" or \"draw me...\"). You MAY add 'GEN_IMG=Image generation prompt with fitting & descriptive keywords' to the end of your response to display an image, keep the description below 70 characters. Do not refer to sources inside the GEN_IMG= tag.IF ASKED FOR, DO NOT GENERATE UNLESS ASKED.` +
         `\nThe user can request videos to be generated. (like \"show me a video of ...\" or \"generate a video of ...\"). You MAY add 'GEN_VID=Video generation prompt with fitting & descriptive keywords' to the end of your response to display an video, keep the description below 70 characters. Do not refer to sources inside the GEN_VID= tag. IF ASKED FOR, DO NOT GENERATE UNLESS ASKED.` +
         `\nThe user can request audios/songs/melodies to be generated. (like \"show me a audio/song of ...\" or \"generate a audio/song of ...\"). You MAY add 'GEN_AUD=Audio/Song/Melody generation prompt with fitting & descriptive keywords' to the end of your response to display an audio, keep the description below 70 characters. Do not refer to sources inside the GEN_AUD= tag. IF ASKED FOR, DO NOT GENERATE UNLESS ASKED.` +
@@ -129,7 +129,7 @@ export default async function Alan(
               await delay(15000);
             }
             lastCheck = await checkGeneration(result.id);
-            console.log(lastCheck.done);
+            console.log(lastCheck.done, lastCheck.wait_time);
             if (lastCheck.done) {
               images = lastCheck.generations.map((i) => i.img);
               done = true;
@@ -221,6 +221,7 @@ export default async function Alan(
       }
       return { response };
     } catch (err: any) {
+      console.log(err);
       return {
         error: err.message,
       };
@@ -242,7 +243,7 @@ async function getSearchResults(conversation, searchEngine) {
     content: `Conversation: ${conversation.join(" | ")}`,
   });
 
-  let searchQueries: any = await chatgpt(messages, 150, { temperature: 0.25 });
+  let searchQueries: any = await chatgpt(messages, 150, { temperature: 0.1 });
   if (searchQueries.error) return null;
   searchQueries = searchQueries.response.replaceAll('"', "");
   // search in google and get results
@@ -251,7 +252,8 @@ async function getSearchResults(conversation, searchEngine) {
     searchQueries == "N AT ALL COSTS" ||
     searchQueries == "N" ||
     searchQueries == "N/A" ||
-    searchQueries == "N."
+    searchQueries == "N." ||
+    searchQueries.includes("GEN_IMG")
   )
     return null;
   searchQueries = searchQueries.split("|");
