@@ -17,7 +17,7 @@ app.use(
   cors({
     origin: ["http://localhost:3000", "https://app.turing-ai.xyz"],
     methods: ["GET", "POST", "PUT", "DELETE"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    allowedHeaders: ["Content-Type", "Authorization", "x-captcha-token"],
   })
 );
 app.use(express.json({ limit: "50mb" }));
