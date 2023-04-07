@@ -7,7 +7,6 @@ export default async function (req, res, next) {
   }
   try {
     const data = await validate(process.env.TURNSTILE_SECRET, token);
-    console.log(data);
     if (data.success) {
       return next();
     }
