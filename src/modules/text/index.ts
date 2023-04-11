@@ -95,10 +95,10 @@ export async function saveMsg(model, userMsg, aiMsg, id, ispremium) {
 export async function getMessages(
   conversation,
   model: string,
-  fullMsg: string,
+  fullMsg?: string,
   instructions?: string
 ) {
-  if (model == "chatgpt" || model == "dan" || model == "gpt-4") {
+  if (model == "chatgpt" || model == "dan" || model == "gpt4") {
     let messages = [];
     if (instructions) {
       messages.push({
@@ -121,10 +121,12 @@ export async function getMessages(
         }
       });
     }
-    messages.push({
-      role: "user",
-      content: fullMsg,
-    });
+    if (fullMsg) {
+      messages.push({
+        role: "user",
+        content: fullMsg,
+      });
+    }
     return messages;
   } else {
     let prompt = `${instructions ? instructions : ""}${

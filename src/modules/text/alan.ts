@@ -29,10 +29,11 @@ export default async function Alan(
   audioGenerator?: string,
   imageModificator?: string
 ) {
-  console.log(photo, imageDescription);
+  console.log(photo ? "photo" : "no photo", imageDescription);
   if (photo && !imageDescription) {
     imageDescription = await getImageDescription(photo);
   }
+  console.log(imageDescription);
 
   if (model == "chatgpt" || model == "gpt4") {
     let acc = await getKey();
@@ -46,8 +47,10 @@ export default async function Alan(
       const configuration = new Configuration({
         apiKey: key,
       });
-      let messages: any = await getMessages(conversation, "chatgpt", message);
-
+      let c: any = await getMessages(conversation, "chatgpt", message);
+      // get the last 6 messages from c array
+      c = c.slice(Math.max(c.length - 6, 0));
+      let messages = c;
       let instructions =
         `Current date: ${getToday()}\nName of the user talking to: ${userName}\nYou are an AI named Alan which have been developed by TuringAI.\nYou can view images, execute code and search in internet for real-time information. YOU CAN DISPLAY AND GENERATE IMAGES, VIDEOS AND SONGS.` +
         `\nThe user can request images to be generated. (like \"show me a photo of ...\" or \"generate an image of ...\" or \"draw me...\"). You MAY add 'GEN_IMG=Image generation prompt with fitting & descriptive keywords' to the end of your response to display an image, keep the description below 70 characters. Do not refer to sources inside the GEN_IMG= tag.IF ASKED FOR, DO NOT GENERATE UNLESS ASKED.` +
@@ -127,12 +130,12 @@ export default async function Alan(
           );
           while (!done) {
             if (lastCheck) {
-              await delay(lastCheck.wait_time * 1000 + 1000);
+              await delay(lastCheck.wait_time * 1000 + 3000);
             } else {
               await delay(15000);
             }
             lastCheck = await checkGeneration(result.id);
-            console.log(lastCheck.done, lastCheck.wait_time);
+            console.log(lastCheck, lastCheck.wait_time);
             if (lastCheck.done) {
               images = lastCheck.generations.map((i) => i.img);
               done = true;

@@ -9,6 +9,7 @@ import {
 } from "../modules/text/index.js";
 import supabase from "../modules/supabase.js";
 import turnstile from "../middlewares/captchas/turnstile.js";
+import SaveInDataset from "../modules/text/dataset.js";
 
 const router = express.Router();
 /*
@@ -78,7 +79,10 @@ router.delete(
   turnstile,
   async (req: Request, res: Response) => {
     var { model } = req.params;
-    var { conversationId } = req.body;
+    var { conversationId, userName } = req.body;
+    let conversation = await getConversation(conversationId, model);
+    // await SaveInDataset(conversation, userName);
+    //return;
     var { data } = await supabase
       .from("conversations")
       .delete()
