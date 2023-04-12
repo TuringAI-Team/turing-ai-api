@@ -8,6 +8,7 @@ import ImageRoutes from "./routes/image.routes.js";
 import TextRoutes from "./routes/text.routes.js";
 import AudioRoutes from "./routes/audio.routes.js";
 import OtherRoutes from "./routes/other.routes.js";
+import CacheRoutes from "./routes/cache.routes.js";
 
 const app: Application = express();
 
@@ -46,6 +47,7 @@ app.use("/", ImageRoutes);
 app.use("/", TextRoutes);
 app.use("/", AudioRoutes);
 app.use("/", OtherRoutes);
+app.use("/", CacheRoutes);
 
 app.listen(app.get("port"), async () => {
   console.log(`Server is running on port ${app.get("port")}`);

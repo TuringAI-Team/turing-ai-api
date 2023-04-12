@@ -81,8 +81,7 @@ router.delete(
     var { model } = req.params;
     var { conversationId, userName } = req.body;
     let conversation = await getConversation(conversationId, model);
-    // await SaveInDataset(conversation, userName);
-    //return;
+    await SaveInDataset(conversation, userName, model);
     var { data } = await supabase
       .from("conversations")
       .delete()

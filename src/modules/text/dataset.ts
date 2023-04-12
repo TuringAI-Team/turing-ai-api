@@ -4,7 +4,7 @@ import supabase from "../supabase.js";
 import cld from "cld";
 import fs from "fs";
 
-export default async function SaveInDataset(conversation, userName) {
+export default async function SaveInDataset(conversation, userName, model) {
   let msgs = await getMessages(conversation, "chatgpt");
   let id = randomUUID();
   let data: any = {
@@ -17,18 +17,47 @@ export default async function SaveInDataset(conversation, userName) {
     },
   };
   console.log(msgs.length);
-  var lastR = {};
+  let lastMsg;
   for (let i = 0; i < msgs.length; i++) {
     let msg = msgs[i];
+    let content = msg.content.replaceAll(userName, "user");
     // if is first user message
     if (msg.role == "user" && i == 0) {
-      data.prompt.text = msg.content;
+      data.prompt.text = content;
       data.prompt.lang = await getLang(msg.content);
+      lastMsg = data.prompt.replies;
     }
-    // for the next replies follow this format, the assistant add a reply to the prompter, the prompter apply a reply to the assistant, the assistant apply a reply to the prompter reply and so on.
+    if (msg.role == "assistant" && i == 1) {
+      lastMsg.push({
+        text: content,
+        role: "assistant",
+        lang: await getLang(msg.content),
+        replies: [],
+      });
+      lastMsg = data.prompt.replies[0].replies;
+    }
+    if (i > 1) {
+      lastMsg.push({
+        text: content,
+        role: "prompter",
+        lang: await getLang(msg.content),
+        replies: [],
+      });
+      lastMsg = lastMsg[0].replies;
+    }
   }
-  console.log(JSON.stringify(data));
-  fs.writeFileSync("./data1.json", JSON.stringify(data), "utf-8");
+  try {
+    await supabase.from("dataset").insert([
+      {
+        id: id,
+        model: model,
+        data: data,
+        dataset: `0-${model}`,
+      },
+    ]);
+  } catch (err) {
+    console.log(err);
+  }
 }
 
 async function getLang(text) {
