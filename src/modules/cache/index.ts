@@ -25,9 +25,7 @@ async function saveInCache(message: string, response, model) {
       responses = { [message]: { text: response, uses: 1 } };
     }
     await redisClient.set(model, JSON.stringify(responses));
-  } catch (e) {
-    console.log(e);
-  }
+  } catch (e) {}
 }
 async function addUsesInCache(message, model) {
   let responses: any = await redisClient.get(model);
