@@ -25,7 +25,7 @@ export default async function Alan(
   photo?: string,
   imageDescription?: any,
   imageGenerator?: string,
-  nsfwFilter?: boolean,
+  nsfwFilter?: string,
   videoGenerator?: string,
   audioGenerator?: string,
   imageModificator?: string
@@ -114,10 +114,13 @@ export default async function Alan(
           images = images.map((i) => i.attachment);
         }
         if (imageGenerator == "stable-diffusion") {
+          // nsfwfilter to boolean
+          let nsfw = nsfwFilter == "true" ? true : false;
+
           let result: any = await generateImg(
             imagePrompt,
             50,
-            nsfwFilter,
+            nsfw,
             1,
             "Dreamshaper",
             512,
