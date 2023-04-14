@@ -16,14 +16,18 @@ async function checkInCache(message, model) {
   return {};
 }
 async function saveInCache(message: string, response, model) {
-  let responses: any = await redisClient.get(model);
-  if (responses) {
-    responses = JSON.parse(responses);
-    responses[message] = { text: response, uses: 1 };
-  } else {
-    responses = { [message]: { text: response, uses: 1 } };
+  try {
+    let responses: any = await redisClient.get(model);
+    if (responses) {
+      responses = JSON.parse(responses);
+      responses[message] = { text: response, uses: 1 };
+    } else {
+      responses = { [message]: { text: response, uses: 1 } };
+    }
+    await redisClient.set(model, JSON.stringify(responses));
+  } catch (e) {
+    console.log(e);
   }
-  await redisClient.set(model, JSON.stringify(responses));
 }
 async function addUsesInCache(message, model) {
   let responses: any = await redisClient.get(model);
