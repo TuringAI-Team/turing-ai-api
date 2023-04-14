@@ -11,6 +11,7 @@ import { generateImg, checkGeneration } from "../image/stablehorde.js";
 import generateVideo from "../video/damo.js";
 import { Riffusion } from "../audio/songs.js";
 import { controlnet } from "../image/controlnet.js";
+import { kandinsky } from "../image/kandinsky.js";
 import { getToday } from "./instructions.js";
 import wiki from "wikipedia";
 
@@ -141,6 +142,10 @@ export default async function Alan(
               done = true;
             }
           }
+        }
+        if (imageGenerator == "kandinsky") {
+          images = await kandinsky(imagePrompt, 50, 4);
+          images = [images];
         }
 
         return { response, images, photoPrompt: imagePrompt };
