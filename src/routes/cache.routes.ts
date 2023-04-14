@@ -11,8 +11,9 @@ import {
 const router = express.Router();
 
 router.post("/savecache", async (req: Request, res: Response) => {
-  console.log("svae cache");
   let { message, response, model } = req.body;
+  console.log("save cache" + " " + model);
+
   await saveInCache(message, response, model);
   res.json({ success: true }).status(200);
 });
