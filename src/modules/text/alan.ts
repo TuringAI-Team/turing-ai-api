@@ -124,11 +124,15 @@ export default async function Alan(
             512,
             "k_dpmpp_sde"
           ); // this returns de generation id that need to be checked to get images
+          console.log(result);
           let done = false;
           let lastCheck;
           console.log(
             "generating image, this may take a while, please wait..."
           );
+          if (!result.id) {
+            return { response, images: [], photoPrompt: imagePrompt };
+          }
           while (!done) {
             if (lastCheck) {
               await delay(lastCheck.wait_time * 1000 + 3000);
