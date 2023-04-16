@@ -1,12 +1,11 @@
 import express from "express";
 import { Request, Response } from "express";
-import { verify } from "hcaptcha";
-import { hasVoted } from "../modules/top-gg.js";
 import {
   checkInCache,
   saveInCache,
   addUsesInCache,
 } from "../modules/cache/index.js";
+import redisClient from "../modules/cache/redis.js";
 
 const router = express.Router();
 
@@ -28,6 +27,18 @@ router.post("/addusescache", async (req: Request, res: Response) => {
 
   let { message, model } = req.body;
   await addUsesInCache(message, model);
+  res.json({ success: true }).status(200);
+});
+
+router.get("/cache/:key", async (req: Request, res: Response) => {
+  let { key } = req.params;
+  let response = await redisClient.get(key);
+  res.json({ success: true, response: response }).status(200);
+});
+router.post("/cache/:key", async (req: Request, res: Response) => {
+  let { key } = req.params;
+  let { value } = req.body;
+  await redisClient.set(key, value);
   res.json({ success: true }).status(200);
 });
 
