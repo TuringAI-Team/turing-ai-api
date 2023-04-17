@@ -35,4 +35,6 @@ jobs:
           password: ${{ secrets.PASSWORD }}
           script: |
             cd /home/loick/github/turing-ai-api
+            npm i
+            npm run build
             pm2 reload 0
