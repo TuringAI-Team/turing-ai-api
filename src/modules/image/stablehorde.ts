@@ -15,10 +15,10 @@ import filter from "../filter/index.js";
 
 export async function generateImg(
   prompt: string,
-  steps: number = 30,
+  steps: number = 50,
   nsfw: boolean = false,
   n: number = 1,
-  model: string = "Stable Diffusion",
+  model: string = "Dreamshaper",
   width: number = 512,
   height: number = 512,
   sampler_name: string = "k_dpmpp_sde",
@@ -27,6 +27,8 @@ export async function generateImg(
   var passFilter = await filter(prompt, model);
   if (passFilter.isCP) {
     return {
+      id: null,
+      error: true,
       message:
         "To prevent generation of unethical images, we cannot allow this prompt with NSFW models/tags.",
       filter: true,
@@ -51,9 +53,9 @@ export async function generateImg(
         cfg_scale: cfg_scale,
       },
     });
-    return generation;
+    return { ...generation, error: false };
   } catch (e) {
-    return { message: e, ...passFilter };
+    return { message: e, ...passFilter, error: true, id: null };
   }
 }
 export async function generateImg2img(

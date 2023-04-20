@@ -1,4 +1,5 @@
 import axios from "axios";
+import { checkCaptchaToken } from "../../modules/keys.js";
 export default async function (req, res, next) {
   //  captcha token is on headers
   const token = req.headers["x-captcha-token"];
@@ -6,6 +7,10 @@ export default async function (req, res, next) {
     return res.status(400).json({ error: "Captcha token is required" });
   }
   try {
+    let valid = await checkCaptchaToken(token, req);
+    if (valid) {
+      return next();
+    }
     const data = await validate(process.env.TURNSTILE_SECRET, token);
     if (data.success) {
       return next();

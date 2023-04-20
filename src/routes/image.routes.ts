@@ -8,11 +8,13 @@ import {
   checkGeneration,
 } from "../modules/image/stablehorde.js";
 import generateImgD from "../modules/image/dall-e.js";
+import turnstile from "../middlewares/captchas/turnstile.js";
+import delay from "delay";
 
 const router = express.Router();
 
 // Filter
-router.post("/filter", async (req: Request, res: Response) => {
+router.post("/filter", turnstile, async (req: Request, res: Response) => {
   var { prompt, model } = req.body;
   var result = await filter(prompt, model);
   res
@@ -27,9 +29,9 @@ router.post("/dalle", async (req: Request, res: Response) => {
   var result = await generateImgD(prompt, number);
   res.json(result).status(200);
 });
-
+*/
 // Stable Diffusion
-router.post("/sd", async (req: Request, res: Response) => {
+router.post("/sd", turnstile, async (req: Request, res: Response) => {
   var {
     prompt,
     model,
@@ -41,6 +43,7 @@ router.post("/sd", async (req: Request, res: Response) => {
     sampler_name,
     cfg_scale,
   } = req.body;
+
   var result = await generateImg(
     prompt,
     steps,
@@ -52,7 +55,37 @@ router.post("/sd", async (req: Request, res: Response) => {
     sampler_name,
     cfg_scale
   );
-  res.json(result).status(200);
+  let done = false;
+  let lastCheck;
+  let images = [];
+  if (result.message || result.error || !result.id) {
+    res.json(result).status(400);
+    return;
+  }
+
+  res.writeHead(200, {
+    "Content-Type": "text/plain",
+    "Transfer-Encoding": "chunked",
+  });
+  console.log("generating image, this may take a while, please wait...");
+  lastCheck = await checkGeneration(result.id);
+  res.write(`${JSON.stringify(lastCheck)}\n`);
+
+  while (!done) {
+    if (lastCheck) {
+      await delay(lastCheck.wait_time * 1000 + 3000);
+    } else {
+      await delay(15000);
+    }
+    lastCheck = await checkGeneration(result.id);
+    res.write(`${JSON.stringify(lastCheck)}\n`);
+    console.log(lastCheck, lastCheck.wait_time);
+    if (lastCheck.done) {
+      images = lastCheck.generations.map((i) => i.img);
+      done = true;
+      res.end();
+    }
+  }
 });
 router.get("/sd/:genid", async (req: Request, res: Response) => {
   var { genid } = req.params;
@@ -78,6 +111,6 @@ router.get("/sd/:genid", async (req: Request, res: Response) => {
   } catch (e: any) {
     res.json({ error: e.rawError.message }).status(400);
   }
-});*/
+});
 
 export default router;

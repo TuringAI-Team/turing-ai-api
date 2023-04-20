@@ -41,5 +41,10 @@ router.post("/cache/:key", async (req: Request, res: Response) => {
   await redisClient.set(key, value);
   res.json({ success: true }).status(200);
 });
+router.delete("/cache/:key", async (req: Request, res: Response) => {
+  let { key } = req.params;
+  await redisClient.del(key);
+  res.json({ success: true }).status(200);
+});
 
 export default router;

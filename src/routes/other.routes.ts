@@ -2,6 +2,8 @@ import express from "express";
 import { Request, Response } from "express";
 import { verify } from "hcaptcha";
 import { hasVoted } from "../modules/top-gg.js";
+import { generateKey } from "../modules/keys.js";
+import turnstile from "../middlewares/captchas/turnstile.js";
 
 const router = express.Router();
 
@@ -18,6 +20,14 @@ router.get("/topgg/:id", async (req: Request, res: Response) => {
   let { id } = req.params;
   let hasvoted = await hasVoted(id);
   res.json({ hasVoted: hasvoted });
+});
+router.post("/key", async (req: Request, res: Response) => {
+  let { ips } = req.body;
+  let key = await generateKey(ips);
+  res.json(key);
+});
+router.get("/ping", turnstile, (req, res) => {
+  res.json({ success: true }).status(200);
 });
 
 export default router;
