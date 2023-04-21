@@ -60,19 +60,22 @@ export async function generateImg(
 }
 export async function generateImg2img(
   prompt: string,
-  model: string,
-  amount: number,
-  nsfw: boolean,
+  model: string = "Dreamshaper",
+  steps: number = 50,
+  amount: number = 1,
+  nsfw: boolean = false,
   source_image: string,
-  width: number,
-  height: number,
-  sampler_name: string,
+  width: number = 512,
+  height: number = 512,
+  sampler_name: string = "k_dpmpp_sde",
   cfg_scale: number,
-  strength: number
+  strength: number = 0.5
 ) {
   var passFilter = await filter(prompt, model);
   if (passFilter.isCP) {
     return {
+      error: true,
+      id: null,
       message:
         "To prevent generation of unethical images, we cannot allow this prompt with NSFW models/tags.",
       ...passFilter,
@@ -90,7 +93,7 @@ export async function generateImg2img(
       source_processing: StableHorde.SourceImageProcessingTypes.img2img,
       params: {
         n: amount,
-        steps: 40,
+        steps: steps,
         // @ts-ignore
         sampler_name: sampler_name,
         width: width,
@@ -99,9 +102,9 @@ export async function generateImg2img(
         denoising_strength: strength,
       },
     });
-    return { ...generation, ...passFilter };
+    return { ...generation, ...passFilter, error: false };
   } catch (e) {
-    return { message: e, ...passFilter };
+    return { message: e, ...passFilter, error: true, id: null };
   }
 }
 export async function mergeBase64(imgs: Buffer[], width, height) {

@@ -10,6 +10,7 @@ import {
 import generateImgD from "../modules/image/dall-e.js";
 import turnstile from "../middlewares/captchas/turnstile.js";
 import delay from "delay";
+import { controlnet } from "../modules/image/controlnet.js";
 
 const router = express.Router();
 
@@ -30,6 +31,26 @@ router.post("/dalle", async (req: Request, res: Response) => {
   res.json(result).status(200);
 });
 */
+// Controlnet
+router.post("/controlnet", turnstile, async (req: Request, res: Response) => {
+  let { model, image, prompt } = req.body;
+  let availableModels = [
+    "normal",
+    "canny",
+    "hough",
+    "hed",
+    "depth2img",
+    "pose",
+    "seg",
+  ];
+  if (!availableModels.includes(model)) {
+    res.json({ error: "Invalid model" }).status(400);
+    return;
+  }
+  var result = await controlnet(image, prompt, model);
+  res.json(result).status(200);
+});
+
 // Stable Diffusion
 router.post("/sd", turnstile, async (req: Request, res: Response) => {
   var {
@@ -54,6 +75,66 @@ router.post("/sd", turnstile, async (req: Request, res: Response) => {
     height,
     sampler_name,
     cfg_scale
+  );
+  let done = false;
+  let lastCheck;
+  let images = [];
+  if (result.message || result.error || !result.id) {
+    res.json(result).status(400);
+    return;
+  }
+
+  res.writeHead(200, {
+    "Content-Type": "text/plain",
+    "Transfer-Encoding": "chunked",
+  });
+  console.log("generating image, this may take a while, please wait...");
+  lastCheck = await checkGeneration(result.id);
+  res.write(`${JSON.stringify(lastCheck)}\n`);
+
+  while (!done) {
+    if (lastCheck) {
+      await delay(lastCheck.wait_time * 1000 + 3000);
+    } else {
+      await delay(15000);
+    }
+    lastCheck = await checkGeneration(result.id);
+    res.write(`${JSON.stringify(lastCheck)}\n`);
+    console.log(lastCheck, lastCheck.wait_time);
+    if (lastCheck.done) {
+      images = lastCheck.generations.map((i) => i.img);
+      done = true;
+      res.end();
+    }
+  }
+});
+router.post("/sd/img2img", turnstile, async (req: Request, res: Response) => {
+  var {
+    prompt,
+    model,
+    steps,
+    amount,
+    nsfw,
+    source_image,
+    width,
+    height,
+    sampler_name,
+    cfg_scale,
+    strength,
+  } = req.body;
+
+  var result = await generateImg2img(
+    prompt,
+    model,
+    steps,
+    amount,
+    nsfw,
+    source_image,
+    width,
+    height,
+    sampler_name,
+    cfg_scale,
+    strength
   );
   let done = false;
   let lastCheck;

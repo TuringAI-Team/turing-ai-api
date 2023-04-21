@@ -1,5 +1,6 @@
 import { VoteClient } from "topgg-votes";
 import fs from "fs";
+import redisClient from "./cache/redis.js";
 
 const votesClient = new VoteClient()
   .setToken(process.env.TOPGG_TOKEN)
@@ -37,3 +38,7 @@ export async function hasVoted(userId) {
     return false;
   }
 }
+votesClient.on("botVote", ({ userId }) => {
+  console.log(`User ${userId} just voted!`);
+  redisClient.set(`voted:${userId}`, Date.now());
+});
