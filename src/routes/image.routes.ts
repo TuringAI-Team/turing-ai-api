@@ -100,7 +100,6 @@ router.post("/sd", turnstile, async (req: Request, res: Response) => {
     }
     lastCheck = await checkGeneration(result.id);
     res.write(`${JSON.stringify(lastCheck)}\n`);
-    console.log(lastCheck, lastCheck.wait_time);
     if (lastCheck.done) {
       images = lastCheck.generations.map((i) => i.img);
       done = true;
@@ -160,7 +159,6 @@ router.post("/sd/img2img", turnstile, async (req: Request, res: Response) => {
     }
     lastCheck = await checkGeneration(result.id);
     res.write(`${JSON.stringify(lastCheck)}\n`);
-    console.log(lastCheck, lastCheck.wait_time);
     if (lastCheck.done) {
       images = lastCheck.generations.map((i) => i.img);
       done = true;

@@ -25,6 +25,7 @@ export async function generateImg(
   cfg_scale?: number
 ) {
   var passFilter = await filter(prompt, model);
+  console.log(passFilter);
   if (passFilter.isCP) {
     return {
       id: null,
