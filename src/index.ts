@@ -32,7 +32,6 @@ app.set("port", process.env.PORT || 3000);
 app.use(async (req: Request, res: Response, next) => {
   if (req.headers.authorization) {
     const token = req.headers.authorization;
-    console.log(token);
     if (token) {
       var isvalid = await verifyToken(token.replaceAll("Bearer ", ""));
       if (isvalid) {
