@@ -1,5 +1,5 @@
 import supabase from "./supabase.js";
-import { getRndInteger } from "./utils.js";
+import { getRndInteger } from "./text/utils.js";
 
 export async function getKey() {
   let keys = await getKeys();

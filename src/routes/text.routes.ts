@@ -10,10 +10,14 @@ import {
 import supabase from "../modules/supabase.js";
 import turnstile from "../middlewares/captchas/turnstile.js";
 import SaveInDataset from "../modules/text/dataset.js";
+import { Configuration, OpenAIApi } from "openai";
+import { OpenAIExt } from "openai-ext";
+import { StableLM } from "../modules/text/stablelm.js";
 
 const router = express.Router();
+
 /*
-router.post("/chat/:model", async (req: Request, res: Response) => {
+router.post("/chat/:model", turnstile, async (req: Request, res: Response) => {
   var { model } = req.params;
   var { message, userName, conversationId } = req.body;
   if (model != "sd") {
@@ -40,6 +44,96 @@ router.post("/chat/:model", async (req: Request, res: Response) => {
     res.json(result).status(200);
   }
 });*/
+router.post("/open-ai", turnstile, async (req: Request, res: Response) => {
+  let {
+    messages,
+    model = "gpt-3.5-turbo",
+    maxTokens = 100,
+    temperature = 0.7,
+    topP,
+    presencePenalty,
+  }: {
+    messages: Array<{
+      content: string;
+      role: "system" | "user" | "assistant";
+      name?: string;
+    }>;
+    model: string;
+    maxTokens: number;
+    temperature: number;
+    topP: number;
+    presencePenalty: number;
+  } = req.body;
+  let key = process.env.OPENAI_API_KEY;
+  const configuration = new Configuration({
+    apiKey: key,
+  });
+  res.setHeader("Content-Type", "text/html; charset=utf-8");
+  res.setHeader("Transfer-Encoding", "chunked");
+  const openai = new OpenAIApi(configuration);
+  let previousContent;
+  OpenAIExt.streamServerChatCompletion(
+    {
+      model: model,
+      max_tokens: maxTokens,
+      temperature: temperature,
+      messages: messages,
+    },
+    {
+      openai: openai,
+      handler: {
+        // Content contains the string draft, which may be partial. When isFinal is true, the completion is done.
+        onContent(content, isFinal, stream) {
+          if (!previousContent) {
+            res.write(content);
+          } else {
+            res.write(content.replace(previousContent, ""));
+          }
+          previousContent = content;
+        },
+        onDone(stream) {
+          res.end();
+        },
+        onError(error, stream) {
+          console.error(error);
+        },
+      },
+    }
+  );
+});
+
+router.post("/stablelm", turnstile, async (req: Request, res: Response) => {
+  let {
+    prompt,
+    instructions = null,
+    maxTokens = 500,
+  }: {
+    prompt: string;
+    instructions: string;
+    maxTokens: number;
+  } = req.body;
+  let result = await StableLM(prompt, maxTokens);
+  res.json(result).status(200);
+});
+
+router.post(
+  "/open-assistant",
+  turnstile,
+  async (req: Request, res: Response) => {
+    let {
+      prompt,
+      maxTokens = 500,
+      model = "oasst-sft-4-pythia-12b-epoch-3.5",
+    }: {
+      prompt: string;
+      maxTokens: number;
+      model: string;
+    } = req.body;
+    let result = await OpenAssistant(prompt, model);
+    res.json(result).status(200);
+  }
+);
+
 router.post("/alan/:model", turnstile, async (req: Request, res: Response) => {
   var { model } = req.params;
   var {

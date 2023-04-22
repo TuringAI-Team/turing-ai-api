@@ -6,6 +6,9 @@ const instructions = {
   chatgpt: {
     instruction: `Current date: {date} Name of the user talking to: {userName}`,
   },
+  gpt4: {
+    instruction: `Current date: {date} Name of the user talking to: {userName}`,
+  },
   sdModel: {
     instruction: `Here you have a list of models for generate images with ai, the models includes their descriptiopn and styles: {models}\nBased on this list answer with the best model for the user prompt, do not include explanations only the model name. Do not use the list order to select a model. If you can't provide a model recommendation answer only with no-model`,
   },

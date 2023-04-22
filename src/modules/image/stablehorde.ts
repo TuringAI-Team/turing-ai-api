@@ -15,18 +15,21 @@ import filter from "../filter/index.js";
 
 export async function generateImg(
   prompt: string,
-  steps: number = 30,
+  steps: number = 50,
   nsfw: boolean = false,
   n: number = 1,
-  model: string = "Stable Diffusion",
+  model: string = "Dreamshaper",
   width: number = 512,
   height: number = 512,
   sampler_name: string = "k_dpmpp_sde",
   cfg_scale?: number
 ) {
   var passFilter = await filter(prompt, model);
+  console.log(passFilter);
   if (passFilter.isCP) {
     return {
+      id: null,
+      error: true,
       message:
         "To prevent generation of unethical images, we cannot allow this prompt with NSFW models/tags.",
       filter: true,
@@ -51,26 +54,29 @@ export async function generateImg(
         cfg_scale: cfg_scale,
       },
     });
-    return generation;
+    return { ...generation, error: false };
   } catch (e) {
-    return { message: e, ...passFilter };
+    return { message: e, ...passFilter, error: true, id: null };
   }
 }
 export async function generateImg2img(
   prompt: string,
-  model: string,
-  amount: number,
-  nsfw: boolean,
+  model: string = "Dreamshaper",
+  steps: number = 50,
+  amount: number = 1,
+  nsfw: boolean = false,
   source_image: string,
-  width: number,
-  height: number,
-  sampler_name: string,
+  width: number = 512,
+  height: number = 512,
+  sampler_name: string = "k_dpmpp_sde",
   cfg_scale: number,
-  strength: number
+  strength: number = 0.5
 ) {
   var passFilter = await filter(prompt, model);
   if (passFilter.isCP) {
     return {
+      error: true,
+      id: null,
       message:
         "To prevent generation of unethical images, we cannot allow this prompt with NSFW models/tags.",
       ...passFilter,
@@ -88,7 +94,7 @@ export async function generateImg2img(
       source_processing: StableHorde.SourceImageProcessingTypes.img2img,
       params: {
         n: amount,
-        steps: 40,
+        steps: steps,
         // @ts-ignore
         sampler_name: sampler_name,
         width: width,
@@ -97,9 +103,9 @@ export async function generateImg2img(
         denoising_strength: strength,
       },
     });
-    return { ...generation, ...passFilter };
+    return { ...generation, ...passFilter, error: false };
   } catch (e) {
-    return { message: e, ...passFilter };
+    return { message: e, ...passFilter, error: true, id: null };
   }
 }
 export async function mergeBase64(imgs: Buffer[], width, height) {

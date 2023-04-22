@@ -1,0 +1,12 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Turing AI API",
+    "version": "1.0.0"
+  },
+  "host": "api.turingai.tech",
+  "basePath": "/",
+  "schemes": ["https"],
+  "paths": {},
+  "definitions": {}
+}

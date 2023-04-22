@@ -2,6 +2,8 @@ import underagedCebs from "./underagedCelebs.js";
 import { OpenAIApi, Configuration } from "openai";
 
 export default async function filter(prompt, model) {
+  console.log("Filtering prompt");
+
   var youngWords = [
     "kid",
     "kids",
@@ -12,6 +14,7 @@ export default async function filter(prompt, model) {
     "boy",
     "baby",
     "young",
+    "younger",
     "teen",
     "teenager",
     "niñita",
@@ -59,6 +62,7 @@ export default async function filter(prompt, model) {
     "breasts",
     "butt",
     "small_breasts",
+    "breasts",
   ];
   var isNsfw = false;
   var isYoung = false;
