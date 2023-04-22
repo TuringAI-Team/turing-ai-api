@@ -4,8 +4,7 @@ import { getKey, removeMessage } from "../openai.js";
 import getInstruction from "./instructions.js";
 import { getMessages, saveMsg } from "./index.js";
 import axios from "axios";
-import { HfInference } from "@huggingface/inference";
-const hf = new HfInference(process.env.HUGGINGFACE_TOKEN);
+import { textGeneration } from "../hf.js";
 
 export default async function OpenAssistant(
   message: string,
@@ -29,8 +28,7 @@ export async function huggingface(model, input) {
     let oldText;
     let loop = true;
     while (loop) {
-      let response = await hf.textGeneration({
-        model: model,
+      let response = await textGeneration(model, {
         inputs: input,
       });
       let answer = response.generated_text.split("<|assistant|>")[1];
