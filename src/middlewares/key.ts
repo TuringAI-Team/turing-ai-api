@@ -4,6 +4,7 @@ import supabase from "../modules/supabase.js";
 export async function verifyToken(token: string) {
   // verify token
   try {
+    console.log(token);
     let decoded = jwt.verify(token, process.env.SECRET_KEY);
     if (!decoded) {
       // decode supabase access token
