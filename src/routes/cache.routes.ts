@@ -11,6 +11,7 @@ const router = express.Router();
 
 router.post("/savecache", async (req: Request, res: Response) => {
   let { message, response, model } = req.body;
+  if (model == "chatgpt") return res.json({ success: true }).status(200);
   console.log("save cache" + " " + model);
 
   await saveInCache(message, response, model);
