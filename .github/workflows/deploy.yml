@@ -16,15 +16,6 @@ jobs:
 
       # Install Node.js and PM2
 
-      # Upload code to VPS using SSH
-      - name: Upload code to VPS
-        uses: appleboy/scp-action@master
-        with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          password: ${{ secrets.PASSWORD }}
-          source: ./
-          target: /home/loick/github/turing-ai-api
 
       # Connect to remote server via SSH to start the bot using PM2
       - name: Start bot with PM2
@@ -35,6 +26,7 @@ jobs:
           password: ${{ secrets.PASSWORD }}
           script: |
             cd /home/loick/github/turing-ai-api
+            npm run git
             npm i
             npm run build
             pm2 reload 0
