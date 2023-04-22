@@ -17,7 +17,11 @@ export async function verifyToken(token: string) {
       return true;
     }
   } catch (err) {
-    console.log(err);
-    return false;
+    const { data, error } = await supabase.auth.getUser(token);
+    if (error) {
+      console.log(error);
+      return false;
+    }
+    return true;
   }
 }

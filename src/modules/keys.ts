@@ -24,37 +24,41 @@ export async function generateKey(ips?: Array<String>) {
 }
 
 export async function checkCaptchaToken(token: string, req) {
-  let decoded = jwt.verify(token, process.env.SECRET_KEY);
-  let ApiToken = req.headers.authorization;
-  ApiToken = ApiToken.replace("Bearer ", "");
-  if (!decoded) {
-    return false;
-  }
-  if (decoded["apiToken"]) {
-    if (decoded["apiToken"] != ApiToken) {
+  try {
+    let decoded = jwt.verify(token, process.env.SECRET_KEY);
+    let ApiToken = req.headers.authorization;
+    ApiToken = ApiToken.replace("Bearer ", "");
+    if (!decoded) {
       return false;
     }
-    let decodedApiToken = jwt.verify(
-      decoded["apiToken"],
-      process.env.SECRET_KEY
-    );
-    if (!decodedApiToken) {
-      return false;
-    }
-    if (decodedApiToken["id"] != decoded["id"]) {
-      return false;
-    }
-    // check ip
-    if (decodedApiToken["ips"]) {
-      if (
-        !decodedApiToken["ips"].includes(req.ip) &&
-        req.ip != "::1" &&
-        decodedApiToken["ips"].length > 0
-      ) {
+    if (decoded["apiToken"]) {
+      if (decoded["apiToken"] != ApiToken) {
         return false;
       }
-    }
+      let decodedApiToken = jwt.verify(
+        decoded["apiToken"],
+        process.env.SECRET_KEY
+      );
+      if (!decodedApiToken) {
+        return false;
+      }
+      if (decodedApiToken["id"] != decoded["id"]) {
+        return false;
+      }
+      // check ip
+      if (decodedApiToken["ips"]) {
+        if (
+          !decodedApiToken["ips"].includes(req.ip) &&
+          req.ip != "::1" &&
+          decodedApiToken["ips"].length > 0
+        ) {
+          return false;
+        }
+      }
 
-    return true;
+      return true;
+    }
+  } catch (e) {
+    return false;
   }
 }
