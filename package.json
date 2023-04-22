@@ -6,7 +6,7 @@
     "build": "tsc",
     "start": "tsc && node .",
     "dev": "concurrently \"tsc --watch\" \"npx nodemon\"",
-    "git": "git fetch && git pull"
+    "git": "git fetch && git stash && git pull"
   },
   "dependencies": {
     "@huggingface/inference": "^2.0.0",
