@@ -19,7 +19,7 @@ import { verifyToken } from "./middlewares/key.js";
 app.use(helmet());
 app.use(
   cors({
-    origin: ["http://localhost:3000", "https://app.turing-ai.xyz"],
+    origin: ["http://lukas-batema-super-space-garbanzo-95qqxr69x4qcx7wr-3000.preview.app.github.dev/", "https://app.turing-ai.xyz"],
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization", "x-captcha-token"],
   })
@@ -52,6 +52,26 @@ app.use("/text", TextRoutes);
 app.use("/audio", AudioRoutes);
 app.use("/other", OtherRoutes);
 app.use("/cache", CacheRoutes);
+
+const options = {
+  definition: {
+    openapi: "3.0.0",
+    info: {
+      title: "Turing AI",
+      version: "1.0.0",
+      description: "API Documentation for Turing AI",
+    },
+    servers: [
+      {
+        url: `http://lukas-batema-super-space-garbanzo-95qqxr69x4qcx7wr-3000.preview.app.github.dev/`,
+      },
+    ],
+  },
+  apis: ["./src/routes/*.ts"],
+};
+
+const specs = swaggerJSDoc(options);
+app.use("/docs", swaggerUi.serve, swaggerUi.setup(specs));
 
 app.listen(app.get("port"), async () => {
   console.log(`Server is running on port ${app.get("port")}`);
