@@ -16,6 +16,7 @@ import { StableLM } from "../modules/text/stablelm.js";
 
 const router = express.Router();
 
+<<<<<<< Updated upstream
 /*
 router.post("/chat/:model", turnstile, async (req: Request, res: Response) => {
   var { model } = req.params;
@@ -45,6 +46,18 @@ router.post("/chat/:model", turnstile, async (req: Request, res: Response) => {
   }
 });*/
 router.post("/open-ai", turnstile, async (req: Request, res: Response) => {
+=======
+router.post(`/:m`, turnstile, async (req: Request, res: Response) => {
+  let availableModels = [
+    "open-ai",
+    "stablelm",
+    "open-assistant",
+    "dolly",
+    "vicuna",
+    "langchain",
+  ];
+  let { m } = req.params;
+>>>>>>> Stashed changes
   let {
     messages,
     model = "gpt-3.5-turbo",
@@ -131,6 +144,20 @@ router.post(
     } = req.body;
     let result = await OpenAssistant(prompt, model);
     res.json(result).status(200);
+<<<<<<< Updated upstream
+=======
+  } else if (m == "dolly") {
+    let { maxTokens = 500 } = req.body;
+    let result: any = await Dolly(prompt, maxTokens);
+    result.response = result.response.join(" ");
+    res.json(result).status(200);
+  } else if (m == "vicuna") {
+    let { maxTokens = 500 } = req.body;
+    let result: any = await Vicuna(prompt, maxTokens);
+    result.response = result.response.join(" ");
+    res.json(result).status(200);
+  } else if (m == "langchain") {
+>>>>>>> Stashed changes
   }
 );
 
