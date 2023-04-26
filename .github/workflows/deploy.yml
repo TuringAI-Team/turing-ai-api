@@ -25,8 +25,8 @@ jobs:
           username: ${{ secrets.USERNAME }}
           password: ${{ secrets.PASSWORD }}
           script: |
-            cd /home/loick/github/turing-ai-api
+            cd /home/loick/github/turing-api
             npm run git
             npm i
             npm run build
-            pm2 reload 0
+            pm2 reload TuringAPI

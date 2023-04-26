@@ -4,11 +4,11 @@ async function checkInCache(message, model) {
   if (wordCount <= 1) {
     return {};
   }*/
-  let responses = await redisClient.get(model);
+  let responses = await redisClient.get(message);
   if (responses) {
     responses = JSON.parse(responses);
-    if (responses[message]) {
-      return responses[message];
+    if (responses[model]) {
+      return responses[model];
     } else {
       return {};
     }
@@ -17,14 +17,30 @@ async function checkInCache(message, model) {
 }
 async function saveInCache(message: string, response, model) {
   try {
-    let responses: any = await redisClient.get(model);
+    let responses: any = await redisClient.get(message);
     if (responses) {
       responses = JSON.parse(responses);
-      responses[message] = { text: response, uses: 1 };
+      await redisClient.set(
+        message,
+        JSON.stringify({
+          ...responses,
+          [model]: {
+            response: response,
+            uses: 0,
+          },
+        })
+      );
     } else {
-      responses = { [message]: { text: response, uses: 1 } };
+      await redisClient.set(
+        message,
+        JSON.stringify({
+          [model]: {
+            response: response,
+            uses: 0,
+          },
+        })
+      );
     }
-    await redisClient.set(model, JSON.stringify(responses));
   } catch (e) {}
 }
 async function addUsesInCache(message, model) {
