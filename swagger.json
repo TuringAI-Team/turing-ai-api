@@ -4,9 +4,9 @@
     "title": "Turing AI API",
     "version": "1.0.0"
   },
-  "host": "http://lukas-batema-super-space-garbanzo-95qqxr69x4qcx7wr-15266.preview.app.github.dev/",
+  "host": "api.turingai.tech",
   "basePath": "/",
-  "schemes": ["http"],
+  "schemes": ["https"],
   "paths": {},
   "definitions": {}
 }

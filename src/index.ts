@@ -16,10 +16,19 @@ import CacheRoutes from "./routes/cache.routes.js";
 const app: Application = express();
 
 import { verifyToken } from "./middlewares/key.js";
+
+// generateKey([
+//   "152.160.174.34",
+//   "172.16.5.4",
+//   "172.17.0.1",
+//   "127.0.0.1",
+//   "0.0.0.0"
+// ]);
+
 app.use(helmet());
 app.use(
   cors({
-    origin: ["http://lukas-batema-super-space-garbanzo-95qqxr69x4qcx7wr-3000.preview.app.github.dev/", "https://app.turing-ai.xyz"],
+    origin: ["http://localhost:3000", "https://app.turing-ai.xyz"],
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization", "x-captcha-token"],
   })
@@ -63,7 +72,7 @@ const options = {
     },
     servers: [
       {
-        url: `http://lukas-batema-super-space-garbanzo-95qqxr69x4qcx7wr-3000.preview.app.github.dev/`,
+        url: `https://localhost:${app.get("port")}`,
       },
     ],
   },
