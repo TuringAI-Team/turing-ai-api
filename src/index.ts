@@ -16,6 +16,15 @@ import CacheRoutes from "./routes/cache.routes.js";
 const app: Application = express();
 
 import { verifyToken } from "./middlewares/key.js";
+
+// generateKey([
+//   "152.160.174.34",
+//   "172.16.5.4",
+//   "172.17.0.1",
+//   "127.0.0.1",
+//   "0.0.0.0"
+// ]);
+
 app.use(helmet());
 app.use(
   cors({
@@ -33,6 +42,26 @@ app.use("/text", TextRoutes);
 app.use("/audio", AudioRoutes);
 app.use("/other", OtherRoutes);
 app.use("/cache", CacheRoutes);
+
+const options = {
+  definition: {
+    openapi: "3.0.0",
+    info: {
+      title: "Turing AI",
+      version: "1.0.0",
+      description: "API Documentation for Turing AI",
+    },
+    servers: [
+      {
+        url: `https://localhost:${app.get("port")}`,
+      },
+    ],
+  },
+  apis: ["./src/routes/*.ts"],
+};
+
+const specs = swaggerJSDoc(options);
+app.use("/docs", swaggerUi.serve, swaggerUi.setup(specs));
 
 app.listen(app.get("port"), async () => {
   console.log(`Server is running on port ${app.get("port")}`);
