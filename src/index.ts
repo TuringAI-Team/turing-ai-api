@@ -28,25 +28,6 @@ app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
 app.set("port", process.env.PORT || 3000);
 
-// key middleware
-app.use(async (req: Request, res: Response, next) => {
-  if (req.headers.authorization) {
-    const token = req.headers.authorization;
-    if (token) {
-      var isvalid = await verifyToken(token.replaceAll("Bearer ", ""));
-      if (isvalid) {
-        next();
-      } else {
-        res.status(401).send({ error: "Unauthorized" });
-      }
-    } else {
-      res.status(401).send({ error: "Unauthorized" });
-    }
-  } else {
-    res.status(401).send({ error: "Unauthorized" });
-  }
-});
-
 app.use("/imgs", ImageRoutes);
 app.use("/text", TextRoutes);
 app.use("/audio", AudioRoutes);
