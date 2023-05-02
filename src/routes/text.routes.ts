@@ -206,6 +206,7 @@ router.post(`/:m`, key, turnstile, async (req: Request, res: Response) => {
     presencePenalty,
     prompt,
     instructions,
+    chat = true,
   } = req.body;
   if (!availableModels.includes(m)) {
     res.json({ success: false, error: "Model not found" }).status(404);
@@ -282,7 +283,7 @@ router.post(`/:m`, key, turnstile, async (req: Request, res: Response) => {
     const openai = new OpenAIApi(configuration);
     const response = await openai.createCompletion({
       model: model,
-      prompt: `Human: ${prompt}\nAI:`,
+      prompt: `${chat == true ? `Human: ${prompt}\nAI:` : prompt}`,
       max_tokens: maxTokens,
     });
     let result = { response: response.data.choices[0].text };
