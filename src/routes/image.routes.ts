@@ -28,10 +28,9 @@ router.post("/filter", key, turnstile, async (req: Request, res: Response) => {
 // Dall-e
 router.post("/dalle", key, turnstile, async (req: Request, res: Response) => {
   var { prompt, n = 1, size = "512x512" } = req.body;
-  let key = process.env.PAWAN_API_KEY;
+  let key = process.env.OPENAI_API_KEY;
   let configuration = new Configuration({
     apiKey: key,
-    basePath: "https://api.pawan.krd/v1",
   });
   const openai = new OpenAIApi(configuration);
 
