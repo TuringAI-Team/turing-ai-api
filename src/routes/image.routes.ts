@@ -27,20 +27,24 @@ router.post("/filter", key, turnstile, async (req: Request, res: Response) => {
 
 // Dall-e
 router.post("/dalle", key, turnstile, async (req: Request, res: Response) => {
-  var { prompt, n = 1, size = "512x512" } = req.body;
-  let key = process.env.OPENAI_API_KEY;
-  let configuration = new Configuration({
-    apiKey: key,
-  });
-  const openai = new OpenAIApi(configuration);
+  try {
+    var { prompt, n = 1, size = "512x512" } = req.body;
+    let key = process.env.OPENAI_API_KEY;
+    let configuration = new Configuration({
+      apiKey: key,
+    });
+    const openai = new OpenAIApi(configuration);
 
-  const response = await openai.createImage({
-    prompt: prompt,
-    size: size,
-    n: n,
-  });
-  let result = { response: response.data };
-  res.json(result).status(200);
+    const response = await openai.createImage({
+      prompt: prompt,
+      size: size,
+      n: n,
+    });
+    let result = { response: response.data };
+    res.json(result).status(200);
+  } catch (err) {
+    res.json(err).status(400);
+  }
 });
 
 // Controlnet
