@@ -186,108 +186,112 @@ router.delete(
 );
 
 router.post(`/:m`, key, turnstile, async (req: Request, res: Response) => {
-  let availableModels = [
-    "open-ai",
-    "stablelm",
-    "open-assistant",
-    "dolly",
-    "vicuna",
-    "langchain",
-    "koala",
-    "fastchat",
-    "llama",
-  ];
-  let { m } = req.params;
-  let {
-    messages,
-    model,
-    temperature,
-    topP,
-    presencePenalty,
-    prompt,
-    instructions,
-    chat = true,
-  } = req.body;
-  if (!availableModels.includes(m)) {
-    res.json({ success: false, error: "Model not found" }).status(404);
-    return;
-  }
-
-  if (m === "open-ai" && model != "text-davinci-003") {
-    let { maxTokens = 100 } = req.body;
-    let key = process.env.OPENAI_API_KEY;
-    const configuration = new Configuration({
-      apiKey: key,
-    });
-    res.setHeader("Content-Type", "text/html; charset=utf-8");
-    res.setHeader("Transfer-Encoding", "chunked");
-    const openai = new OpenAIApi(configuration);
-    let previousContent;
-    OpenAIExt.streamServerChatCompletion(
-      {
-        model: model,
-        max_tokens: maxTokens,
-        temperature: temperature,
-        messages: messages,
-      },
-      {
-        openai: openai,
-        handler: {
-          // Content contains the string draft, which may be partial. When isFinal is true, the completion is done.
-          onContent(content, isFinal, stream) {
-            if (!previousContent) {
-              res.write(content);
-            } else {
-              res.write(content.replace(previousContent, ""));
-            }
-            previousContent = content;
-          },
-          onDone(stream) {
-            res.end();
-          },
-          onError(error, stream) {
-            console.error(error);
-          },
-        },
-      }
-    );
-  } else if (m === "stablelm") {
-    let { maxTokens = 500 } = req.body;
-    let result: any = await StableLM(prompt, maxTokens);
-    result.response = result.response.join(" ");
-    res.json(result).status(200);
-  } else if (m === "open-assistant") {
-    let result = await OpenAssistant(prompt, model);
-    res.json(result).status(200);
-  } else if (m == "dolly") {
-    let { maxTokens = 500 } = req.body;
-    let result: any = await Dolly(prompt, maxTokens);
-    result.response = result.response.join(" ");
-    res.json(result).status(200);
-  } else if (m == "langchain") {
-    let { maxTokens = 500 } = req.body;
-    let result: any = await LangChain(model, {
+  try {
+    let availableModels = [
+      "open-ai",
+      "stablelm",
+      "open-assistant",
+      "dolly",
+      "vicuna",
+      "langchain",
+      "koala",
+      "fastchat",
+      "llama",
+    ];
+    let { m } = req.params;
+    let {
+      messages,
+      model,
+      temperature,
+      topP,
+      presencePenalty,
       prompt,
-    });
-    res.json(result).status(200);
-  } else {
-    let { maxTokens = 500 } = req.body;
-    let key = process.env.PAWAN_API_KEY;
-    let configuration = new Configuration({
-      apiKey: key,
-      basePath: "https://api.pawan.krd/v1",
-    });
-    if (!model) {
-      model = formatModel(m);
+      instructions,
+      chat = true,
+    } = req.body;
+    if (!availableModels.includes(m)) {
+      res.json({ success: false, error: "Model not found" }).status(404);
+      return;
     }
-    const openai = new OpenAIApi(configuration);
-    const response = await openai.createCompletion({
-      model: model,
-      prompt: `${chat == true ? `Human: ${prompt}\nAI:` : prompt}`,
-      max_tokens: maxTokens,
-    });
-    let result = { response: response.data.choices[0].text };
-    res.json(result).status(200);
+
+    if (m === "open-ai" && model != "text-davinci-003") {
+      let { maxTokens = 100 } = req.body;
+      let key = process.env.OPENAI_API_KEY;
+      const configuration = new Configuration({
+        apiKey: key,
+      });
+      res.setHeader("Content-Type", "text/html; charset=utf-8");
+      res.setHeader("Transfer-Encoding", "chunked");
+      const openai = new OpenAIApi(configuration);
+      let previousContent;
+      OpenAIExt.streamServerChatCompletion(
+        {
+          model: model,
+          max_tokens: maxTokens,
+          temperature: temperature,
+          messages: messages,
+        },
+        {
+          openai: openai,
+          handler: {
+            // Content contains the string draft, which may be partial. When isFinal is true, the completion is done.
+            onContent(content, isFinal, stream) {
+              if (!previousContent) {
+                res.write(content);
+              } else {
+                res.write(content.replace(previousContent, ""));
+              }
+              previousContent = content;
+            },
+            onDone(stream) {
+              res.end();
+            },
+            onError(error, stream) {
+              console.error(error);
+            },
+          },
+        }
+      );
+    } else if (m === "stablelm") {
+      let { maxTokens = 500 } = req.body;
+      let result: any = await StableLM(prompt, maxTokens);
+      result.response = result.response.join(" ");
+      res.json(result).status(200);
+    } else if (m === "open-assistant") {
+      let result = await OpenAssistant(prompt, model);
+      res.json(result).status(200);
+    } else if (m == "dolly") {
+      let { maxTokens = 500 } = req.body;
+      let result: any = await Dolly(prompt, maxTokens);
+      result.response = result.response.join(" ");
+      res.json(result).status(200);
+    } else if (m == "langchain") {
+      let { maxTokens = 500 } = req.body;
+      let result: any = await LangChain(model, {
+        prompt,
+      });
+      res.json(result).status(200);
+    } else {
+      let { maxTokens = 500 } = req.body;
+      let key = process.env.PAWAN_API_KEY;
+      let configuration = new Configuration({
+        apiKey: key,
+        basePath: "https://api.pawan.krd/v1",
+      });
+      if (!model) {
+        model = formatModel(m);
+      }
+      const openai = new OpenAIApi(configuration);
+      const response = await openai.createCompletion({
+        model: model,
+        prompt: `${chat == true ? `Human: ${prompt}\nAI:` : prompt}`,
+        max_tokens: maxTokens,
+      });
+      let result = { response: response.data.choices[0].text };
+      res.json(result).status(200);
+    }
+  } catch (error) {
+    res.json({ success: false, error: error }).status(500);
   }
 });
 function formatModel(model: string) {
