@@ -2,17 +2,15 @@ import { predict } from "replicate-api";
 
 export default async function generateVideo(
   prompt: string,
-  num_frames: number = 16,
-  num_inference_steps: number = 50,
-  fps: number = 8
+  ddim_steps: number = 50,
+  lora_model: string = "None"
 ) {
   const prediction = await predict({
-    model: "cjwbw/damo-text-to-video", // The model name
+    model: "cjwbw/videocrafter", // The model name
     input: {
       prompt: prompt,
-      num_frames: num_frames,
-      num_inference_steps: num_inference_steps,
-      fps: fps,
+      ddim_steps: ddim_steps,
+      lora_model: lora_model,
     }, // The model specific input
     token: process.env.REPLICATE_API_KEY, // You need a token from replicate.com
     poll: true, // Wait for the model to finish
