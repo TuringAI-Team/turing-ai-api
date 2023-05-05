@@ -29,7 +29,11 @@ import { verifyToken } from "./middlewares/key.js";
 app.use(helmet());
 app.use(
   cors({
-    origin: ["http://localhost:3000", "https://app.turing-ai.xyz"],
+    origin: [
+      "http://localhost:3000",
+      "https://app.turing-ai.xyz",
+      "https://app.turing.sh",
+    ],
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization", "x-captcha-token"],
   })
