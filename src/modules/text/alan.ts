@@ -143,6 +143,7 @@ export default class Alan {
           done: false,
           generating: null,
           generationPrompt: null,
+          generated: null,
           results: null,
           searching: searchQueries,
         });
@@ -182,6 +183,8 @@ export default class Alan {
             done: false,
             generating: "image",
             generationPrompt: imagePrompt,
+            generated: null,
+            results: null,
             searching: null,
           });
           let images;
@@ -241,6 +244,7 @@ export default class Alan {
             done: true,
             generating: null,
             generationPrompt: imagePrompt,
+            generated: "image",
             results: images,
             searching: null,
           });
@@ -259,6 +263,8 @@ export default class Alan {
             done: false,
             generating: "video",
             generationPrompt: videoPrompt,
+            results: null,
+            generated: null,
             searching: null,
           });
           if (videoGenerator == "damo-text-to-video") {
@@ -269,6 +275,7 @@ export default class Alan {
             done: true,
             generating: null,
             generationPrompt: videoPrompt,
+            generated: "video",
             results: video,
             searching: null,
           });
@@ -287,6 +294,8 @@ export default class Alan {
             done: false,
             generating: "audio",
             generationPrompt: audioPrompt,
+            results: null,
+            generated: null,
             searching: null,
           });
           if (audioGenerator == "riffusion") {
@@ -299,6 +308,7 @@ export default class Alan {
             generating: null,
             generationPrompt: audioPrompt,
             results: audio,
+            generated: "audio",
             searching: null,
           });
           return { response, audio, audioPrompt, event };
@@ -315,6 +325,8 @@ export default class Alan {
             done: false,
             generating: "mod-image",
             generationPrompt: modificationPrompt,
+            results: null,
+            generated: null,
             searching: null,
           });
           let modifiedImage;
@@ -371,6 +383,7 @@ export default class Alan {
             generating: null,
             generationPrompt: modificationPrompt,
             results: [modifiedImage],
+            generated: "image",
             searching: null,
           });
           return {
@@ -386,6 +399,7 @@ export default class Alan {
           done: true,
           generating: null,
           generationPrompt: null,
+          generated: null,
           results: null,
           searching: null,
         });
