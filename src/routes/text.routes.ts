@@ -148,7 +148,7 @@ router.post(
       imageModificator,
     } = req.body;
     let conversation = await getConversation(conversationId, `alan-${model}`);
-    let result = await Alan(
+    let result = new Alan(
       userName,
       conversation,
       message,
@@ -163,7 +163,18 @@ router.post(
       audioGenerator,
       imageModificator
     );
-    res.json(result).status(200);
+    result.msg();
+    res.setHeader("Content-Type", "text/html; charset=utf-8");
+    res.setHeader("Transfer-Encoding", "chunked");
+    result.event.on("data", (data) => {
+      console.log(data);
+      res.write(JSON.stringify(data) + ",\n\n");
+      if (data.done) {
+        res.end();
+      }
+    });
+
+    // res.json(result).status(200);
   }
 );
 
