@@ -5,6 +5,7 @@ import {
   chatGPT3,
   getConversation,
   OpenAssistant,
+  getAlanConversation,
   Alan,
 } from "../modules/text/index.js";
 import supabase from "../modules/supabase.js";
@@ -149,7 +150,10 @@ router.post(
       imageModificator,
       pluginList,
     } = req.body;
-    let conversation = await getConversation(conversationId, `alan-${model}`);
+    let conversation = await getAlanConversation(
+      conversationId,
+      `alan-${model}`
+    );
     let result = new Alan(
       userName,
       conversation,
@@ -171,9 +175,12 @@ router.post(
     res.setHeader("Transfer-Encoding", "chunked");
     result.event.on("data", (data) => {
       console.log(data);
-      res.write(JSON.stringify(data) + ",\n\n");
       if (data.done) {
+        res.write("data: " + JSON.stringify(data) + "\n\n");
+
         res.end();
+      } else {
+        res.write("data: " + JSON.stringify(data) + "\n");
       }
     });
 
@@ -189,7 +196,7 @@ router.delete(
     var { model } = req.params;
     var { conversationId, userName } = req.body;
     let conversation = await getConversation(conversationId, model);
-    await SaveInDataset(conversation, userName, model);
+    // await SaveInDataset(conversation, userName, model);
     var { data } = await supabase
       .from("conversations")
       .delete()

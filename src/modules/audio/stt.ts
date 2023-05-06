@@ -54,13 +54,7 @@ export default async function STT(
     }
   }
   if (ai == "whisper") {
-    let acc = await getKey();
-    if (!acc) {
-      return {
-        error: "We are at maximum capacity, please try again later.",
-      };
-    }
-    let key = acc.key;
+    let key = process.env.OPENAI_API_KEY;
     file = file.replace("data:audio/mp3; codecs=opus;base64,", "");
     // base64 to buffer
     let buff: any = Buffer.from(file, "base64");
@@ -76,7 +70,6 @@ export default async function STT(
       let resp = await openai.createTranscription(stream, "whisper-1");
       // delete file
       await fs.unlinkSync(filePath);
-      await removeMessage(acc.id);
 
       return { text: resp.data.text };
     } catch (err: any) {

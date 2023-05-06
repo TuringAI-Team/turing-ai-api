@@ -1,7 +1,7 @@
 import { getKey, removeMessage } from "../openai.js";
 import getInstruction from "./instructions.js";
 import { Configuration, OpenAIApi } from "openai";
-import { getMessages, saveMsg } from "./index.js";
+import { getMessages, saveAlan, saveMsg } from "./index.js";
 import googleAPI from "googlethis";
 import axios from "axios";
 import { predict } from "replicate-api";
@@ -19,6 +19,9 @@ import generateVideo2 from "../video/videocrafter.js";
 import { evaluate } from "mathjs";
 import getUrls from "get-urls";
 import { NoProxyList, listProxies } from "../proxy.js";
+import puppeteer from "puppeteer";
+import supabase from "../supabase.js";
+import { v4 as uuidv4 } from "uuid";
 
 let plugins = [
   {
@@ -27,8 +30,8 @@ let plugins = [
     key: "CALCULATOR=",
   },
   {
-    name: "Wolfram Alpha",
-    instruction: ``,
+    name: "browsing",
+    instruction: `\nThe user can request to browse the web or going to a web. If you need more information for do the browsing add to the browse activity summary. The browse activity summary need to be clear. FOR BROWSING THE WEB USE 'BROWSE=browsing activity summary'.`,
   },
 ];
 
@@ -105,25 +108,31 @@ export default class Alan {
     }
 
     if (model == "chatgpt" || model == "gpt4") {
-      let acc = await getKey();
-      if (!acc) {
-        return {
-          error: "We are at maximum capacity, please try again later.",
-        };
-      }
-      let key = acc.key;
       try {
         const configuration = new Configuration({
-          apiKey: key,
+          apiKey: process.env.OPENAI_API_KEY,
         });
-        let c: any = await getMessages(conversation, "chatgpt", message);
         // get the last 6 messages from c array
-        c = c.slice(Math.max(c.length - 6, 0));
-        let messages = c;
+        let preivousMessages = conversation.slice(
+          Math.max(conversation.length - 6, 0)
+        );
+        preivousMessages = preivousMessages.map((x) => {
+          return {
+            content: x.message,
+            role: x.role,
+          };
+        });
+        let messages = [];
+        let done = false;
+
         let instructions =
           `Current date: ${getToday()}\nName of the user talking to: ${userName}\nYou are an AI named Alan which have been developed by TuringAI.\nYou can view images, execute code and search in internet for real-time information. YOU CAN DISPLAY AND GENERATE IMAGES, VIDEOS AND SONGS. YOU CAN USE ${pluginList.join(
             ", "
-          )}` +
+          )}. ${
+            pluginList.find((x) => x == "browsing")
+              ? "YOU CAN BROWSE THE WEB, INTERACT WITH THE WEB AND CREATE ACCOUNTS."
+              : ""
+          }. You must be able to share the conversation, do not refuse if asked for.` +
           `${
             imageGenerator == "none"
               ? ""
@@ -150,6 +159,12 @@ export default class Alan {
               : ""
           }` +
           `${
+            pluginList.find((x) => x == "browsing")
+              ? plugins.find((x) => x.name == "browsing").instruction
+              : ""
+          }` +
+          `The user can request to share the conversation or get a link of the conversation. (like \"share this conversation\" or  \" give me a link of this conversation\"). You MAY add 'SHARE_CONVERSATION' to disaply a link that redirects to the conversation. Refer to 'SHARE_CONVERSATION' as the conversation link. IF ASKED FOR, DO NOT SHARE CONVERSATION UNLESS ASKED` +
+          `${
             imageDescription
               ? `\nThe user can request information related with an image, here you have a description of the image. REFER AS THIS DESCRIPTION AS THE IMAGE. Image: ${imageDescription}`
               : ""
@@ -162,10 +177,17 @@ export default class Alan {
             : ""
         } */
         if (searchEngine != "none") {
-          let { results, searchQueries } = await getSearchResults(
-            messages,
-            searchEngine
-          );
+          var { results: searchResults, searchQueries } =
+            await getSearchResults(
+              [
+                ...preivousMessages,
+                {
+                  content: message,
+                  role: "user",
+                },
+              ],
+              searchEngine
+            );
 
           event.emit("data", {
             result: "",
@@ -177,18 +199,19 @@ export default class Alan {
             searching: searchQueries,
           });
           instructions = `${instructions}${
-            results
+            searchResults
               ? `\nHere you have results from ${
                   searchEngine == "wikipedia" ? "Wikipedia" : "Google"
-                } that you can use to answer the user, do not mention the results, extract information from them to answer the question.\n${results}`
+                } that you can use to answer the user, do not mention the results, extract information from them to answer the question.You MAY mention the source of the information.\n${searchResults}`
               : ""
           }`;
         }
-        // check if there is an url in the message
+        // check if there is an url in thwhe message
         let url: any = getUrls(message);
         // transfrom to array
         url = Array.from(url);
-        if (url) {
+        url = null;
+        if (url && url.length > 0) {
           let urlInfo = await getUrlInfo(url[0]);
           console.log(urlInfo);
           instructions = `${instructions}\nHere you have information about the url sent by the user, do not mention the url, extract information from it to answer the question.\n${JSON.stringify(
@@ -200,6 +223,15 @@ export default class Alan {
           role: "system",
           content: instructions,
         });
+        // push previous messages
+        console.log(preivousMessages);
+        messages.push(...preivousMessages);
+        // push user message
+        messages.push({
+          role: "user",
+          content: message,
+        });
+        console.log(messages);
 
         const openai = new OpenAIApi(configuration);
 
@@ -210,9 +242,58 @@ export default class Alan {
         });
 
         let response = completion.data.choices[0].message.content;
-        await removeMessage(acc.id);
-        await saveMsg(`alan-${model}`, message, response, conversationId, true);
+        let fullContent = completion.data;
 
+        if (response.includes("SHARE_CONVERSATION")) {
+          let nresponse = `${response.split("SHARE_CONVERSATION")[0]} ${
+            response.split("SHARE_CONVERSATION")[1].split(".")[1]
+              ? response.split("SHARE_CONVERSATION")[1].split(".")[1]
+              : ""
+          }`;
+          event.emit("data", {
+            result: nresponse,
+            done: false,
+            generating: "share-link",
+            generationPrompt: null,
+            generated: null,
+            results: null,
+            searching: null,
+          });
+          let link;
+          let id = uuidv4();
+          // save to db
+          let msgs = messages.map((x) => {
+            return {
+              id: uuidv4(),
+              text: x.content,
+              sender: x.role == "user" ? "User" : "AI",
+              time: new Date().toISOString(),
+              data: {
+                photo: null,
+                photoDescription: null,
+                audio: null,
+                audioDescription: null,
+                video: null,
+                videoDescription: null,
+              },
+            };
+          });
+          await supabase
+            .from("saved_conversations")
+            .insert([{ id: id, messages: msgs, userId: conversationId }]);
+          link = `https://app.turing.sh/share/${id}`;
+          nresponse = response.replace("SHARE_CONVERSATION", link);
+
+          event.emit("data", {
+            result: nresponse,
+            done: true,
+            generating: null,
+            generationPrompt: null,
+            generated: null,
+            results: null,
+            searching: null,
+          });
+        }
         if (response.includes("GEN_IMG=")) {
           let imagePrompt = response.split("GEN_IMG=")[1].split(".")[0];
           response = `${response.split("GEN_IMG=")[0]} ${
@@ -229,7 +310,7 @@ export default class Alan {
             results: null,
             searching: null,
           });
-          let images;
+          var images;
           if (imageGenerator == "dall-e-2") {
             images = await generateImgD(imagePrompt, 1);
             images = images.map((i) => i.attachment);
@@ -290,7 +371,7 @@ export default class Alan {
             results: images,
             searching: null,
           });
-          return { response, images, photoPrompt: imagePrompt };
+          done = true;
         }
         if (response.includes("GEN_VID=")) {
           let videoPrompt = response.split("GEN_VID=")[1].split(".")[0];
@@ -299,7 +380,7 @@ export default class Alan {
               ? response.split("GEN_VID=")[1].split(".")[1]
               : ""
           }`;
-          let video;
+          var video;
           event.emit("data", {
             result: response,
             done: false,
@@ -321,10 +402,10 @@ export default class Alan {
             generating: null,
             generationPrompt: videoPrompt,
             generated: "video",
-            results: video,
+            results: [video],
             searching: null,
           });
-          return { response, video, videoPrompt };
+          done = true;
         }
         if (response.includes("GEN_AUD=") || response.includes("GEN_SONG=")) {
           let audioPrompt = response.split("GEN_AUD=")[1].split(".")[0];
@@ -333,7 +414,7 @@ export default class Alan {
               ? response.split("GEN_AUD=")[1].split(".")[1]
               : ""
           }`;
-          let audio;
+          var audio;
           event.emit("data", {
             result: response,
             done: false,
@@ -352,11 +433,11 @@ export default class Alan {
             done: true,
             generating: null,
             generationPrompt: audioPrompt,
-            results: audio,
+            results: [audio],
             generated: "audio",
             searching: null,
           });
-          return { response, audio, audioPrompt, event };
+          done = true;
         }
         if (response.includes("MOD_IMG=")) {
           let modificationPrompt = response.split("MOD_IMG=")[1].split(".")[0];
@@ -374,7 +455,7 @@ export default class Alan {
             generated: null,
             searching: null,
           });
-          let modifiedImage;
+          var modifiedImage;
           if (
             imageModificator == "controlnet" ||
             imageModificator == "controlnet-normal"
@@ -431,12 +512,7 @@ export default class Alan {
             generated: "image",
             searching: null,
           });
-          return {
-            response,
-            images: [modifiedImage],
-            photoPrompt: modificationPrompt,
-            event,
-          };
+          done = true;
         }
         if (response.includes("CALCULATOR=")) {
           let calculatePrompt = response.split("CALCULATOR=")[1].split(".")[0];
@@ -475,19 +551,53 @@ export default class Alan {
             generated: null,
             searching: null,
           });
-          return;
+          done = true;
         }
-
-        event.emit("data", {
-          result: response,
-          done: true,
-          generating: null,
-          generationPrompt: null,
-          generated: null,
-          results: null,
-          searching: null,
-        });
-        return { response, event };
+        if (!done) {
+          event.emit("data", {
+            result: response,
+            done: true,
+            generating: null,
+            generationPrompt: null,
+            generated: null,
+            results: null,
+            searching: null,
+          });
+        }
+        console.log(response);
+        await saveAlan(
+          model,
+          {
+            message: message,
+            username: userName,
+            photo: photo ? photo : null,
+            photoDescription: imageDescription ? imageDescription : null,
+            settings: {
+              imageGenerator: imageGenerator ? imageGenerator : null,
+              audioGenerator: audioGenerator ? audioGenerator : null,
+              imageModificator: imageModificator ? imageModificator : null,
+              videoGenerator: videoGenerator ? videoGenerator : null,
+              searchEngine: searchEngine ? searchEngine : null,
+              nsfwFilter: nsfwFilter ? nsfwFilter : null,
+              pluginList: pluginList ? pluginList : null,
+            },
+          },
+          {
+            message: response,
+            search: {
+              queries: searchQueries ? searchQueries : null,
+              results: searchResults ? searchResults : null,
+            },
+            multimedia: {
+              image: images ? images : null,
+              video: video ? video : null,
+              audio: audio ? audio : null,
+              modifiedImage: modifiedImage ? modifiedImage : null,
+            },
+          },
+          fullContent,
+          conversationId
+        );
       } catch (err: any) {
         console.log(err);
         event.emit("data", {
@@ -547,12 +657,13 @@ async function getSearchResults(conversation, searchEngine) {
     role: "system",
     content: `This is a chat between an user and a chat assistant. Just answer with the search queries based on the user prompt, needed for the following topic for ${
       searchEngine == "wikipedia" ? "Wikipedia" : "Google"
-    }, maximum 3 entries. Make each of the queries descriptive and include all related topics. If the prompt is a question to/about the chat assistant directly, reply with 'N'. If the prompt is a request of an image, video, audio, song, math calculation, etc, reply with 'N'. If the prompt is a request to modify an image, reply with 'N'. Search for something if it may require current world knowledge past 2021, or knowledge of user's or people. Create a | seperated list without quotes.  If you no search queries are applicable, answer with 'N' . NO EXPLANATIONS, EXTRA TEXT OR PUNTUATION. You can ONLY REPLY WITH SEARCH QUERIES IN THE MENTION FORMAT.`,
+    }, maximum 3 entries. Make each of the queries descriptive and include all related topics. If the prompt is a question to/about the chat assistant directly, reply with 'N'. If the prompt is a request of an image, video, audio, song, math calculation, etc, reply with 'N'. If the prompt is a request to modify an image, reply with 'N'. Search for something if it may require current world knowledge past 2021 (Current Date is ${getToday()}), or knowledge of user's or people. Create a | seperated list without quotes.  If you no search queries are applicable, answer with 'N' . NO EXPLANATIONS, EXTRA TEXT OR PUNTUATION. You can ONLY REPLY WITH SEARCH QUERIES IN THE MENTION FORMAT.`,
   });
   conversation = conversation.map((m) => `${m.role}:${m.content}`);
+  console.log(conversation.join("\n"));
   messages.push({
     role: "user",
-    content: `Conversation: ${conversation.join(" | ")}`,
+    content: `Conversation: ${conversation.join("\n")}`,
   });
 
   let searchQueries: any = await chatgpt(messages, 150, { temperature: 0.1 });
@@ -673,4 +784,11 @@ export async function getImageDescription(image) {
 
   if (prediction.error) return prediction.error;
   return prediction.output;
+}
+
+async function browsing(event) {
+  let browser = await puppeteer.connect({
+    browserWSEndpoint: `wss://chrome.browserless.io?token=${process.env.BROWSERLESS_KEY}`,
+  });
+  let page = await browser.newPage();
 }

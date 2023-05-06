@@ -92,6 +92,87 @@ export async function saveMsg(model, userMsg, aiMsg, id, ispremium) {
       .eq("model", model);
   }
 }
+
+export async function getAlanConversation(id, model): Promise<any> {
+  id = `${id}-alan`;
+  var { data } = await supabase
+    .from("conversations_new")
+    .select("*")
+    .eq("id", id)
+    .eq("tone", model);
+  if (data && data[0]) {
+    if (!data[0].history) return [];
+    return data[0].history;
+  }
+  return [];
+}
+export async function saveAlan(model, input, output, fulloutput, id) {
+  model = `alan-${model}`;
+  id = `${id}-alan`;
+  let { data: conversation } = await supabase
+    .from("conversations_new")
+    .select("*")
+    .eq("id", id)
+    .eq("tone", model)
+    .eq("model", "alan");
+
+  let newInput = {
+    role: "user",
+    message: input.message,
+    userName: input.userName,
+    settings: {
+      imageGenerator: input.settings.imageGenerator,
+      videoGenerator: input.settings.videoGenerator,
+      pluginList: input.settings.pluginList,
+      audioGenerator: input.settings.audioGenerator,
+      imageModificator: input.settings.imageModificator,
+      nsfwFilter: input.settings.nsfwFilter,
+      searchEngine: input.settings.searchEngine,
+    },
+    photo: input.photo,
+    photoDescription: input.photoDescription,
+  };
+  let newOutput = {
+    role: "assistant",
+    message: output.message,
+    search: {
+      queries: output.search.queries,
+      results: output.search.results,
+    },
+    multimedia: {
+      audio: output.multimedia.audio,
+      video: output.multimedia.video,
+      image: output.multimedia.image,
+      modifiedImage: output.multimedia.modifiedImage,
+    },
+    fullOutput: fulloutput,
+  };
+  if (!conversation || !conversation[0]) {
+    let { error } = await supabase.from("conversations_new").insert({
+      id: id,
+      tone: model,
+      history: [newInput, newOutput],
+      model: "alan",
+    });
+    console.log(error);
+  } else {
+    let previous = conversation[0].history;
+    if (previous) {
+      previous.push(newInput);
+      previous.push(newOutput);
+    }
+    let { error } = await supabase
+      .from("conversations_new")
+      .update({
+        history: previous,
+      })
+      .eq("id", id)
+      .eq("tone", model)
+      .eq("model", "alan");
+    console.log(error);
+  }
+  return;
+}
 export async function getMessages(
   conversation,
   model: string,

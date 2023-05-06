@@ -28,6 +28,7 @@
     "mathjs": "^11.8.0",
     "openai": "^3.2.1",
     "openai-ext": "^1.2.4",
+    "puppeteer": "^19.11.1",
     "redis": "^4.6.5",
     "replicate-api": "^0.4.4",
     "sharp": "^0.31.3",
