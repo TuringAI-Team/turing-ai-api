@@ -300,11 +300,12 @@ router.post(`/:m`, key, turnstile, async (req: Request, res: Response) => {
         prompt: `${chat == true ? `Human: ${prompt}\nAI:` : prompt}`,
         max_tokens: maxTokens,
       });
+      // @ts-ignore
       let result = { response: response.data.choices[0].text };
       res.json(result).status(200);
     }
-  } catch (error) {
-    console.log(error);
+  } catch (error: any) {
+    console.log(error.data);
     res.json({ success: false, error: error }).status(500);
   }
 });
