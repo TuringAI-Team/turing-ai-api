@@ -163,7 +163,7 @@ export default class Alan {
               ? plugins.find((x) => x.name == "browsing").instruction
               : ""
           }` +
-          `The user can request to share the conversation or get a link of the conversation. (like \"share this conversation\" or  \" give me a link of this conversation\"). You MAY add 'SHARE_CONVERSATION' to disaply a link that redirects to the conversation. Refer to 'SHARE_CONVERSATION' as the conversation link. IF ASKED FOR, DO NOT SHARE CONVERSATION UNLESS ASKED` +
+          /*   `The user can request to share the conversation or get a link of the conversation. (like \"share this conversation\" or  \" give me a link of this conversation\"). You MAY add 'SHARE_CONVERSATION' to disaply a link that redirects to the conversation. Refer to 'SHARE_CONVERSATION' as the conversation link. IF ASKED FOR, DO NOT SHARE CONVERSATION UNLESS ASKED` +*/
           `${
             imageDescription
               ? `\nThe user can request information related with an image, here you have a description of the image. REFER AS THIS DESCRIPTION AS THE IMAGE. Image: ${imageDescription}`
