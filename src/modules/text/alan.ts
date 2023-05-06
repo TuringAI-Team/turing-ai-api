@@ -225,14 +225,12 @@ export default class Alan {
           content: instructions,
         });
         // push previous messages
-        console.log(preivousMessages);
         messages.push(...preivousMessages);
         // push user message
         messages.push({
           role: "user",
           content: message,
         });
-        console.log(messages);
 
         const openai = new OpenAIApi(configuration);
 
