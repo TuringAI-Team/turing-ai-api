@@ -29,4 +29,5 @@ jobs:
             npm run git
             npm i
             npm run build
+            nvm use 18
             pm2 reload TuringAPI
