@@ -28,6 +28,7 @@ let plugins = [
   },
   {
     name: "Wolfram Alpha",
+    instruction: ``,
   },
 ];
 
