@@ -146,6 +146,7 @@ router.post(
       videoGenerator,
       audioGenerator,
       imageModificator,
+      pluginList,
     } = req.body;
     let conversation = await getConversation(conversationId, `alan-${model}`);
     let result = new Alan(
@@ -161,7 +162,8 @@ router.post(
       nsfwFilter,
       videoGenerator,
       audioGenerator,
-      imageModificator
+      imageModificator,
+      pluginList
     );
     result.msg();
     res.setHeader("Content-Type", "text/html; charset=utf-8");
@@ -302,6 +304,7 @@ router.post(`/:m`, key, turnstile, async (req: Request, res: Response) => {
       res.json(result).status(200);
     }
   } catch (error) {
+    console.log(error);
     res.json({ success: false, error: error }).status(500);
   }
 });

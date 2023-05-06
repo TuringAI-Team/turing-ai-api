@@ -59,7 +59,7 @@ const options = {
     },
     servers: [
       {
-        url: `https://localhost:${app.get("port")}`,
+        url: `https://api.turingai.tech/`,
       },
     ],
   },
