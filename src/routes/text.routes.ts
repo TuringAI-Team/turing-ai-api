@@ -17,6 +17,7 @@ import { Dolly } from "../modules/text/dolly.js";
 import { Vicuna } from "../modules/text/vicuna.js";
 import key from "../middlewares/key.js";
 import LangChain from "../modules/text/langchain.js";
+import RedPajama from "src/modules/text/redpajama.js";
 
 const router = express.Router();
 
@@ -210,6 +211,7 @@ router.post(`/:m`, key, turnstile, async (req: Request, res: Response) => {
       "koala",
       "fastchat",
       "llama",
+      "redpajama",
     ];
     let { m } = req.params;
     let {
@@ -273,6 +275,12 @@ router.post(`/:m`, key, turnstile, async (req: Request, res: Response) => {
     } else if (m === "open-assistant") {
       let result = await OpenAssistant(prompt, model);
       res.json(result).status(200);
+    } else if (m == "redpajama") {
+      if (chat) {
+        prompt = `<human>:${prompt}\n<bot>:`;
+      }
+      let result = await RedPajama(prompt, model);
+      res.json(result).status(200);
     } else if (m == "dolly") {
       let { maxTokens = 500 } = req.body;
       let result: any = await Dolly(prompt, maxTokens);
@@ -300,12 +308,10 @@ router.post(`/:m`, key, turnstile, async (req: Request, res: Response) => {
         prompt: `${chat == true ? `Human: ${prompt}\nAI:` : prompt}`,
         max_tokens: maxTokens,
       });
-      // @ts-ignore
       let result = { response: response.data.choices[0].text };
       res.json(result).status(200);
     }
   } catch (error: any) {
-    console.log(error.data);
     res.json({ success: false, error: error }).status(500);
   }
 });
