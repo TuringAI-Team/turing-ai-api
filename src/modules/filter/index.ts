@@ -2,8 +2,6 @@ import underagedCebs from "./underagedCelebs.js";
 import { OpenAIApi, Configuration } from "openai";
 
 export default async function filter(prompt, model) {
-  console.log("Filtering prompt");
-
   var youngWords = [
     "kid",
     "kids",
