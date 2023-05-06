@@ -175,12 +175,10 @@ router.post(
     res.setHeader("Transfer-Encoding", "chunked");
     result.event.on("data", (data) => {
       console.log(data);
-      if (data.done) {
-        res.write("data: " + JSON.stringify(data) + "\n\n");
+      res.write("data: " + JSON.stringify(data) + "\n\n");
 
+      if (data.done) {
         res.end();
-      } else {
-        res.write("data: " + JSON.stringify(data) + "\n");
       }
     });
 
