@@ -207,16 +207,17 @@ export default class Alan {
           }`;
         }
         // check if there is an url in thwhe message
-        let url: any = getUrls(message);
-        // transfrom to array
-        url = Array.from(url);
-        url = null;
-        if (url && url.length > 0) {
-          let urlInfo = await getUrlInfo(url[0]);
-          console.log(urlInfo);
-          instructions = `${instructions}\nHere you have information about the url sent by the user, do not mention the url, extract information from it to answer the question.\n${JSON.stringify(
-            urlInfo
-          )}`;
+        if (pluginList.find((x) => x == "urlReader")) {
+          let url: any = getUrls(message);
+          // transfrom to array
+          url = Array.from(url);
+          if (url && url.length > 0) {
+            let urlInfo = await getUrlInfo(url[0]);
+            console.log(urlInfo);
+            instructions = `${instructions}\nHere you have information about the url sent by the user, do not mention the url, extract information from it to answer the question.\n${JSON.stringify(
+              urlInfo
+            )}`;
+          }
         }
 
         messages.push({
