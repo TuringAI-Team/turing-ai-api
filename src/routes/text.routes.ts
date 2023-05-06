@@ -17,7 +17,7 @@ import { Dolly } from "../modules/text/dolly.js";
 import { Vicuna } from "../modules/text/vicuna.js";
 import key from "../middlewares/key.js";
 import LangChain from "../modules/text/langchain.js";
-import RedPajama from "src/modules/text/redpajama.js";
+import RedPajama from "../modules/text/redpajama.js";
 
 const router = express.Router();
 
