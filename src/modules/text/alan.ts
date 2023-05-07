@@ -102,6 +102,30 @@ export default class Alan {
     let searchEngine = this.searchEngine;
     let event = this.event;
     let pluginList = this.pluginList;
+    if (!pluginList) {
+      pluginList = [];
+    }
+    if (!imageGenerator) {
+      imageGenerator = "none";
+    }
+    if (!nsfwFilter) {
+      nsfwFilter = "true";
+    }
+    if (!videoGenerator) {
+      videoGenerator = "none";
+    }
+    if (!audioGenerator) {
+      audioGenerator = "none";
+    }
+    if (!imageModificator) {
+      imageModificator = "none";
+    }
+    if (!searchEngine) {
+      searchEngine = "google";
+    }
+    if (!model) {
+      model = "chatgpt";
+    }
 
     if (photo && !imageDescription) {
       imageDescription = await getImageDescription(photo);
