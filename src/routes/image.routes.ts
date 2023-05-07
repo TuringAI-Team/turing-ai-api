@@ -43,7 +43,6 @@ router.post("/dalle", key, turnstile, async (req: Request, res: Response) => {
     let result = { response: response.data };
     res.json({ success: true, result }).status(200);
   } catch (err: any) {
-    console.log(`err dalee: ${JSON.stringify(err)}}`);
     res.json({ error: err, success: false }).status(400);
   }
 });
