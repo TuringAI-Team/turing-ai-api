@@ -150,6 +150,7 @@ router.post(
       imageModificator,
       pluginList,
     } = req.body;
+    console.log(req.body);
     let conversation = await getAlanConversation(
       conversationId,
       `alan-${model}`
