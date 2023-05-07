@@ -127,6 +127,18 @@ export default class Alan {
       model = "chatgpt";
     }
 
+    if (!message) {
+      event.emit("data", {
+        error: "No message provided",
+        done: true,
+        generating: null,
+        generationPrompt: null,
+        results: null,
+        searching: null,
+      });
+      return;
+    }
+
     if (photo && !imageDescription) {
       imageDescription = await getImageDescription(photo);
     }
