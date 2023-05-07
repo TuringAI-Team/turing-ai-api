@@ -138,8 +138,9 @@ export default class Alan {
       });
       return;
     }
-
+    console.log(photo, imageDescription);
     if (photo && !imageDescription) {
+      console.log("Getting image description");
       imageDescription = await getImageDescription(photo);
     }
 
