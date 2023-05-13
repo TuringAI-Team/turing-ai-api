@@ -151,7 +151,6 @@ router.post(
       imageModificator,
       pluginList,
     } = req.body;
-    console.log(req.body);
     let conversation = await getAlanConversation(
       conversationId,
       `alan-${model}`
@@ -176,7 +175,6 @@ router.post(
     res.setHeader("Content-Type", "text/html; charset=utf-8");
     res.setHeader("Transfer-Encoding", "chunked");
     result.event.on("data", (data) => {
-      console.log(data);
       res.write("data: " + JSON.stringify(data) + "\n\n");
 
       if (data.done) {
