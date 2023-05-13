@@ -11,6 +11,7 @@ const router = express.Router();
 
 router.post("/pay", key, async (req: Request, res: Response) => {
   let { productId, gateway, email, name, userId } = req.body;
+  console.log(userId);
   const Sellix = sellix(process.env.SELLIX_KEY);
   let customer;
   let customers = await Sellix.customers.list();
