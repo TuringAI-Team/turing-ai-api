@@ -51,6 +51,8 @@ router.post("/webhook", async (req: Request, res: Response) => {
   hmac.update(JSON.stringify(payload));
   const expectedSignature = hmac.digest("hex");
 
+  console.log(`expectedSignature`, expectedSignature);
+  console.log(`signature`, signature);
   if (signature !== expectedSignature) {
     return res.status(400).send("Invalid signature");
   }
