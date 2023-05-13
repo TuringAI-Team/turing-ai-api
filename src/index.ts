@@ -18,6 +18,7 @@ import ChartRoutes from "./routes/chart.routes.js";
 const app: Application = express();
 
 import { verifyToken } from "./middlewares/key.js";
+import Ciclic from "./modules/ciclic.js";
 
 // generateKey([
 //   "152.160.174.34",
@@ -73,4 +74,5 @@ app.use("/docs", swaggerUi.serve, swaggerUi.setup(specs));
 
 app.listen(app.get("port"), async () => {
   console.log(`Server is running on port ${app.get("port")}`);
+  await Ciclic();
 });

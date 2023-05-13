@@ -17,6 +17,7 @@ router.post("/:chart", key, turnstile, async (req: Request, res: Response) => {
     "commands",
     "image",
     "vote",
+    "campaigns",
   ];
   if (!availableCharts.includes(chart)) {
     return res.status(400).json({
@@ -53,6 +54,20 @@ router.post("/:chart", key, turnstile, async (req: Request, res: Response) => {
     if (typeof data1[keys[i]] == "object") {
       // get all the keys of the object
       let subKeys = Object.keys(data1[keys[i]]);
+      for (let j = 0; j < subKeys.length; j++) {
+        // check subkeys for objects
+        if (typeof data1[keys[i]][subKeys[j]] == "object") {
+          let subSubKeys = Object.keys(data1[keys[i]][subKeys[j]]);
+          // change subkeys to be parentKey-subKey-subSubKey
+          subSubKeys = subSubKeys.map(
+            (subSubKey) => `${keys[i]}.${subKeys[j]}.${subSubKey}`
+          );
+          // remove the parent key
+          keysToRemove.push(`${keys[i]}.${subKeys[j]}`);
+          // add the subkeys
+          newKeys.push(...subSubKeys);
+        }
+      }
       // change subkeys to be parentKey-subKey
       subKeys = subKeys.map((subKey) => `${keys[i]}.${subKey}`);
       // remove the parent key
