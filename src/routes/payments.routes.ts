@@ -41,20 +41,26 @@ router.post("/pay", key, async (req: Request, res: Response) => {
 router.post("/webhook", async (req: Request, res: Response) => {
   const payload = req.body;
   console.log(`payload`, payload);
-  const signature = req.headers["x-sellix-unescaped-signature"];
-  if (!signature) {
+  const headerSignature = req.headers["x-sellix-unescaped-signature"];
+  if (!headerSignature) {
     return res.status(401).send("No signature");
     return;
   }
 
-  const hmac = createHmac("sha256", process.env.SELLIX_WEBHOOK_SECRET);
-  hmac.update(JSON.stringify(payload));
-  const expectedSignature = hmac.digest("hex");
+  const signature = crypto
+    .createHmac("sha512", process.env.SELLIX_WEBHOOK_SECRET)
+    .update(payload)
+    .digest("hex");
 
-  console.log(`expectedSignature`, expectedSignature);
-  console.log(`signature`, signature);
-  if (signature !== expectedSignature) {
-    return res.status(400).send("Invalid signature");
+  if (
+    !crypto.timingSafeEqual(
+      Buffer.from(signature),
+      // @ts-ignore
+      Buffer.from(headerSignature, "utf-8")
+    )
+  ) {
+    return res.status(401).send("Invalid signature");
+    return;
   }
   if (payload.event !== "order.paid") {
     return res.status(400).send("Invalid event type");
