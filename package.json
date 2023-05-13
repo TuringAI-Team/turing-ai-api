@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@huggingface/inference": "^2.0.0",
+    "@sellix/node-sdk": "^1.0.9",
     "@supabase/supabase-js": "^2.10.0",
     "@zeldafan0225/stable_horde": "^2.4.1",
     "canvas": "^2.11.0",
