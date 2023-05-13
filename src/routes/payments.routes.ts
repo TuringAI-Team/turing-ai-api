@@ -14,13 +14,15 @@ router.post("/pay", key, async (req: Request, res: Response) => {
   const Sellix = sellix(process.env.SELLIX_KEY);
   let customer;
   let customers = await Sellix.customers.list();
-  customer = customers.filter((c: any) => c.email === email)[0].id;
+  customer = customers.filter((c: any) => c.email === email)[0];
   if (!customer) {
     customer = await Sellix.customers.create({
       name: name,
       email: email,
       surname: "Unknown",
     });
+  } else {
+    customer = customer.id;
   }
   const payment = await Sellix.payments.create({
     product_id: productId,
