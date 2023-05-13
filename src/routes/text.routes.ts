@@ -19,6 +19,7 @@ import { Vicuna } from "../modules/text/vicuna.js";
 import key from "../middlewares/key.js";
 import LangChain from "../modules/text/langchain.js";
 import RedPajama from "../modules/text/redpajama.js";
+import { MPlugOwl } from "../modules/text/mplug-owl.js";
 
 const router = express.Router();
 
@@ -219,6 +220,7 @@ router.post(`/:m`, key, turnstile, async (req: Request, res: Response) => {
       "llama",
       "redpajama",
       "palm2",
+      "mplug-owl",
     ];
     let { m } = req.params;
     let {
@@ -303,6 +305,10 @@ router.post(`/:m`, key, turnstile, async (req: Request, res: Response) => {
       );
       res.json(result).status(200);
     } else if (m == "palm2") {
+    } else if (m == "mplug-owl") {
+      let { maxTokens = 500, img } = req.body;
+      let result: any = await MPlugOwl(prompt, maxTokens, img, temperature);
+      res.json(result).status(200);
     } else {
       let { maxTokens = 500 } = req.body;
       let key = process.env.PAWAN_API_KEY;
