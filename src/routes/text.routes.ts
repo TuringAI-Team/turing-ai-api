@@ -189,14 +189,14 @@ router.post(
 );
 
 router.delete(
-  "/conversation/:model",
+  "/alan/:model",
   key,
   turnstile,
   async (req: Request, res: Response) => {
     var { model } = req.params;
     var { conversationId, userName } = req.body;
-    let conversation = await getConversation(conversationId, model);
-    // await SaveInDataset(conversation, userName, model);
+    let conversation = await getAlanConversation(conversationId, model);
+    await SaveInDataset(conversation, userName, model);
     var { data } = await supabase
       .from("conversations")
       .delete()

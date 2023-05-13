@@ -5,7 +5,7 @@ import cld from "cld";
 import fs from "fs";
 
 export default async function SaveInDataset(conversation, userName, model) {
-  let msgs = await getMessages(conversation, "chatgpt");
+  /*let msgs = await getMessages(conversation, "chatgpt");
   let id = randomUUID();
   let data: any = {
     id: id,
@@ -45,14 +45,16 @@ export default async function SaveInDataset(conversation, userName, model) {
       });
       lastMsg = lastMsg[0].replies;
     }
-  }
+  }*/
+  let id = randomUUID();
+
   try {
     await supabase.from("dataset").insert([
       {
         id: id,
         model: model,
-        data: data,
-        dataset: `0-${model}`,
+        data: conversation,
+        dataset: `1-alan`,
       },
     ]);
   } catch (err) {
