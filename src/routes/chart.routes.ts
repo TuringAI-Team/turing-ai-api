@@ -94,6 +94,15 @@ router.post("/:chart", key, turnstile, async (req: Request, res: Response) => {
         }
         return true;
       });
+      // filter subkeys
+      keys = keys.filter((key) => {
+        if (key.includes(".")) {
+          let parentKey = key.split(".")[0];
+          let subKey = key.split(".")[1];
+          return !filter.exclude.includes(`${parentKey}.${subKey}`);
+        }
+        return true;
+      });
     }
   }
   let datasets = [];
@@ -107,6 +116,13 @@ router.post("/:chart", key, turnstile, async (req: Request, res: Response) => {
     if (key.includes(".")) {
       let parentKey = key.split(".")[0];
       let subKey = key.split(".")[1];
+      // check for subSubKey
+      if (key.split(".").length == 3) {
+        let subSubKey = key.split(".")[2];
+        data.forEach((d: any) => {
+          dataset.data.push(d.data[parentKey][subKey][subSubKey]);
+        });
+      }
 
       data.forEach((d: any) => {
         dataset.data.push(d.data[parentKey][subKey]);
