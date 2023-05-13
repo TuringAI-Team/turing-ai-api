@@ -40,6 +40,7 @@ router.post("/pay", key, async (req: Request, res: Response) => {
 });
 router.post("/webhook", async (req: Request, res: Response) => {
   const payload = req.body;
+  console.log(payload);
   const headerSignature = req.headers["x-sellix-unescaped-signature"];
 
   const signature = crypto
