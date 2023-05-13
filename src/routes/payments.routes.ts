@@ -49,7 +49,7 @@ router.post("/webhook", async (req: Request, res: Response) => {
 
   const signature = crypto
     .createHmac("sha512", process.env.SELLIX_WEBHOOK_SECRET)
-    .update(payload)
+    .update(JSON.stringify(payload))
     .digest("hex");
 
   if (
