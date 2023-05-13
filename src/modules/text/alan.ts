@@ -22,18 +22,21 @@ import { NoProxyList, listProxies } from "../proxy.js";
 import puppeteer from "puppeteer";
 import supabase from "../supabase.js";
 import { v4 as uuidv4 } from "uuid";
+import plugins from "./plugins.js";
+import { ChatOpenAI } from "langchain/chat_models/openai";
+import { initializeAgentExecutorWithOptions } from "langchain/agents";
+import { PromptTemplate } from "langchain/prompts";
 
-let plugins = [
-  {
-    name: "calculator",
-    instruction: `\nThe user can request to perform basic math operations, including addition (+), subtraction (-), multiplication (*), division (/), power (^), and square root (√). FOR DISPLAYING THE OPERATION RESULT you JUST MAY add 'CALCULATOR=operation query'. DO NOT SOLVE THE OPERATION BY URSELF USE THE CALCULATOR. Provide the numbers and the operation symbol in your query. The calculator works best with clear and concise queries. `,
-    key: "CALCULATOR=",
-  },
-  {
-    name: "browsing",
-    instruction: `\nThe user can request to browse the web or going to a web. If you need more information for do the browsing add to the browse activity summary. The browse activity summary need to be clear. FOR BROWSING THE WEB USE 'BROWSE=browsing activity summary'.`,
-  },
-];
+import {
+  RequestsGetTool,
+  RequestsPostTool,
+  AIPluginTool,
+} from "langchain/tools";
+import {
+  HumanChatMessage,
+  SystemChatMessage,
+  AIChatMessage,
+} from "langchain/schema";
 
 export default class Alan {
   userName: string;
@@ -163,13 +166,7 @@ export default class Alan {
         let done = false;
 
         let instructions =
-          `Current date: ${getToday()}\nName of the user talking to: ${userName}\nYou are an AI named Alan which have been developed by TuringAI.\nYou can view images, execute code and search in internet for real-time information. YOU CAN DISPLAY AND GENERATE IMAGES, VIDEOS AND SONGS. YOU CAN USE ${pluginList.join(
-            ", "
-          )}. ${
-            pluginList.find((x) => x == "browsing")
-              ? "YOU CAN BROWSE THE WEB, INTERACT WITH THE WEB AND CREATE ACCOUNTS."
-              : ""
-          }. You must be able to share the conversation, do not refuse if asked for.` +
+          `Current date: ${getToday()}\nName of the user talking to: ${userName}\nYou are an AI named Alan which have been developed by TuringAI.\nYou can view images, execute code and search in internet for real-time information. YOU CAN DISPLAY AND GENERATE IMAGES, VIDEOS AND SONGS. You must be able to share the conversation, do not refuse if asked for.` +
           `${
             imageGenerator == "none"
               ? ""
@@ -190,16 +187,6 @@ export default class Alan {
               ? `\nThe user can request imaged to be modified. (like \"modify me this image of ...\" or \"modify this image of ...\"). You MAY add 'MOD_IMG=Image modification prompt with fitting & descriptive keywords' to the end of your response to display the modified image, keep the description below 70 characters. Do not refer to sources inside the MOD_IMG= tag. IF ASKED FOR, DO NOT GENERATE UNLESS ASKED.`
               : ""
           }` +
-          `${
-            pluginList.find((x) => x == "calculator")
-              ? plugins.find((x) => x.name == "calculator").instruction
-              : ""
-          }` +
-          `${
-            pluginList.find((x) => x == "browsing")
-              ? plugins.find((x) => x.name == "browsing").instruction
-              : ""
-          }` +
           /*   `The user can request to share the conversation or get a link of the conversation. (like \"share this conversation\" or  \" give me a link of this conversation\"). You MAY add 'SHARE_CONVERSATION' to disaply a link that redirects to the conversation. Refer to 'SHARE_CONVERSATION' as the conversation link. IF ASKED FOR, DO NOT SHARE CONVERSATION UNLESS ASKED` +*/
           `${
             imageDescription
@@ -213,6 +200,7 @@ export default class Alan {
             ? `\nThe user have sent an image, here you have a description of the image. REFER AS THIS DESCRIPTION AS THE IMAGE. Read all necessary information from the description, then form a response.\n${imageDescription}`
             : ""
         } */
+
         if (searchEngine != "none") {
           var { results: searchResults, searchQueries } =
             await getSearchResults(
@@ -244,31 +232,47 @@ export default class Alan {
           }`;
         }
         // check if there is an url in thwhe message
-        if (pluginList.find((x) => x == "urlReader")) {
-          let url: any = getUrls(message);
-          // transfrom to array
-          url = Array.from(url);
-          if (url && url.length > 0) {
-            let urlInfo = await getUrlInfo(url[0]);
-            console.log(urlInfo);
-            instructions = `${instructions}\nHere you have information about the url sent by the user, do not mention the url, extract information from it to answer the question.\n${JSON.stringify(
-              urlInfo
-            )}`;
-          }
-        }
 
         messages.push({
           role: "system",
           content: instructions,
         });
+        console.log(instructions);
         // push previous messages
         messages.push(...preivousMessages);
         // push user message
+
+        var response;
+        var fullContent;
+        pluginList = null;
+        /*   if (pluginList) {
+          let pluginsUrls = pluginList.map((x) => plugins[x]);
+          let tools: any[] = [new RequestsGetTool(), new RequestsPostTool()];
+          for (let i = 0; i < pluginsUrls.length; i++) {
+            tools.push(await AIPluginTool.fromPluginUrl(pluginsUrls[i]));
+          }
+          const agent = await initializeAgentExecutorWithOptions(
+            tools,
+            new ChatOpenAI({
+              modelName: "gpt-3.5-turbo",
+              openAIApiKey: process.env.OPENAI_API_KEY,
+            }),
+            { agentType: "chat-zero-shot-react-description", verbose: true }
+          );
+
+          let input = `Current conversation: ${messages
+            .map((x) => `${x.role}: ${x.content}`)
+            .join(`\n`)}\nuser: ${message}\nassistant:`;
+          console.log(input);
+          const result = await agent.call({
+            input: input,
+          });
+          response = result.output;
+        } else {*/
         messages.push({
           role: "user",
           content: message,
         });
-
         const openai = new OpenAIApi(configuration);
 
         const completion = await openai.createChatCompletion({
@@ -277,8 +281,9 @@ export default class Alan {
           messages: messages,
         });
 
-        let response = completion.data.choices[0].message.content;
-        let fullContent = completion.data;
+        response = completion.data.choices[0].message.content;
+        fullContent = completion.data;
+        //}
 
         if (response.includes("SHARE_CONVERSATION")) {
           let nresponse = `${response.split("SHARE_CONVERSATION")[0]} ${
@@ -550,45 +555,7 @@ export default class Alan {
           });
           done = true;
         }
-        if (response.includes("CALCULATOR=")) {
-          let calculatePrompt = response.split("CALCULATOR=")[1].split(".")[0];
-          let nresponse = `${response.split("CALCULATOR=")[0]} ${
-            response.split("CALCULATOR=")[1].split(".")[1]
-              ? response.split("CALCULATOR=")[1].split(".")[1]
-              : ""
-          }`;
-          event.emit("data", {
-            result: nresponse,
-            done: false,
-            generating: "calculator",
-            generationPrompt: calculatePrompt,
-            results: null,
-            generated: null,
-            searching: null,
-          });
-          let result;
-          // use mathjs to calculate
-          try {
-            result = evaluate(calculatePrompt);
-          } catch (err) {
-            result = "Invalid calculation";
-          }
-          nresponse = response.replaceAll(
-            `CALCULATOR=${calculatePrompt}`,
-            result
-          );
-          console.log(response, `CALCULATOR=${calculatePrompt}`);
-          event.emit("data", {
-            result: nresponse,
-            done: true,
-            generating: null,
-            generationPrompt: calculatePrompt,
-            results: null,
-            generated: null,
-            searching: null,
-          });
-          done = true;
-        }
+
         if (!done) {
           event.emit("data", {
             result: response,

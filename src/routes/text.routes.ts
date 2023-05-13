@@ -218,12 +218,13 @@ router.post(`/:m`, key, turnstile, async (req: Request, res: Response) => {
       "fastchat",
       "llama",
       "redpajama",
+      "palm2",
     ];
     let { m } = req.params;
     let {
       messages,
       model,
-      temperature,
+      temperature = 0.9,
       topP,
       presencePenalty,
       prompt,
@@ -294,10 +295,14 @@ router.post(`/:m`, key, turnstile, async (req: Request, res: Response) => {
       res.json(result).status(200);
     } else if (m == "langchain") {
       let { maxTokens = 500 } = req.body;
-      let result: any = await LangChain(model, {
-        prompt,
-      });
+      let result: any = await LangChain(
+        model,
+        messages,
+        maxTokens,
+        temperature
+      );
       res.json(result).status(200);
+    } else if (m == "palm2") {
     } else {
       let { maxTokens = 500 } = req.body;
       let key = process.env.PAWAN_API_KEY;

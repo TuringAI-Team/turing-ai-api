@@ -13,6 +13,7 @@ import AudioRoutes from "./routes/audio.routes.js";
 import OtherRoutes from "./routes/other.routes.js";
 import CacheRoutes from "./routes/cache.routes.js";
 import VideoRoutes from "./routes/video.routes.js";
+import ChartRoutes from "./routes/chart.routes.js";
 
 const app: Application = express();
 
@@ -48,6 +49,7 @@ app.use("/audio", AudioRoutes);
 app.use("/other", OtherRoutes);
 app.use("/cache", CacheRoutes);
 app.use("/video", VideoRoutes);
+app.use("/chart", ChartRoutes);
 
 const options = {
   definition: {
