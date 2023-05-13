@@ -70,8 +70,7 @@ router.post("/webhook", async (req: Request, res: Response) => {
 
   const orderId = payload.data.id;
 
-  const order = await sellix.orders.getOrder(orderId);
-  let userId = order.custom_fields.userId;
+  let userId = payload.data.custom_fields.userId;
   let { data } = await supabase.from("users_new").select("*").eq("id", userId);
   let user = data[0];
   await supabase
