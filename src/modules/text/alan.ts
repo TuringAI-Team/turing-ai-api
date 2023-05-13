@@ -141,7 +141,6 @@ export default class Alan {
       });
       return;
     }
-    console.log(photo, imageDescription);
     if (photo && !imageDescription) {
       console.log("Getting image description");
       imageDescription = await getImageDescription(photo);
@@ -237,7 +236,6 @@ export default class Alan {
           role: "system",
           content: instructions,
         });
-        console.log(instructions);
         // push previous messages
         messages.push(...preivousMessages);
         // push user message
@@ -567,7 +565,6 @@ export default class Alan {
             searching: null,
           });
         }
-        console.log(response);
         await saveAlan(
           model,
           {
@@ -663,7 +660,6 @@ async function getSearchResults(conversation, searchEngine) {
     }, maximum 3 entries. Make each of the queries descriptive and include all related topics. If the prompt is a question to/about the chat assistant directly, reply with 'N'. If the prompt is a request of an image, video, audio, song, math calculation, etc, reply with 'N'. If the prompt is a request to modify an image, reply with 'N'. Search for something if it may require current world knowledge past 2021 (Current Date is ${getToday()}), or knowledge of user's or people. Create a | seperated list without quotes.  If you no search queries are applicable, answer with 'N' . NO EXPLANATIONS, EXTRA TEXT OR PUNTUATION. You can ONLY REPLY WITH SEARCH QUERIES IN THE MENTION FORMAT.`,
   });
   conversation = conversation.map((m) => `${m.role}:${m.content}`);
-  console.log(conversation.join("\n"));
   messages.push({
     role: "user",
     content: `Conversation: ${conversation.join("\n")}`,
@@ -684,7 +680,6 @@ async function getSearchResults(conversation, searchEngine) {
   )
     return { results: null, searchQueries: [] };
   searchQueries = searchQueries.split("|");
-  console.log(`searchQueries: ${searchQueries}`);
   for (let i = 0; i < searchQueries.length; i++) {
     const query = searchQueries[i];
     if (query == "N" || query == "N.") continue;
