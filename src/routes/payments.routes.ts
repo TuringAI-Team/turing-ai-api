@@ -78,7 +78,8 @@ router.post("/webhook", async (req: Request, res: Response) => {
     .update({
       subscription: {
         since: user.subscription.since || Date.now(),
-        expires: user.subscription.expires + ms("1m") || Date.now() + ms("1m"),
+        expires:
+          user.subscription.expires + ms("30d") || Date.now() + ms("30d"),
       },
     })
     .eq("id", userId);
