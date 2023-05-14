@@ -6,6 +6,7 @@ import key from "../middlewares/key.js";
 import sellix from "@sellix/node-sdk";
 import crypto, { createHmac } from "crypto";
 import ms from "ms";
+import redisClient from "../modules/cache/redis.js";
 
 const router = express.Router();
 
@@ -84,6 +85,36 @@ router.post("/webhook", async (req: Request, res: Response) => {
     })
     .eq("id", userId);
 
+  let stats: any = await redisClient.get("payment-stats");
+  console.log(`stats`, stats);
+  if (!stats) {
+    stats = {
+      total: 0,
+      stripe: 0,
+      paypal: 0,
+      bitcoin: 0,
+      ethereum: 0,
+      binance: 0,
+      countries: {},
+    };
+    stats.total += 1;
+    stats[payload.data.gateway] += 1;
+    stats.countries[payload.data.country] = stats.countries[
+      payload.data.country
+    ]
+      ? stats.countries[payload.data.country] + 1
+      : 1;
+  } else {
+    stats = JSON.parse(stats);
+    stats.total += 1;
+    stats[payload.data.gateway] += 1;
+    stats.countries[payload.data.country] = stats.countries[
+      payload.data.country
+    ]
+      ? stats.countries[payload.data.country] + 1
+      : 1;
+  }
+  await redisClient.set("payment-stats", JSON.stringify(stats));
   res.status(200).json({ success: true });
 });
 

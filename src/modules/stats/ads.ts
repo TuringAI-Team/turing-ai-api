@@ -32,7 +32,6 @@ export async function saveMetrics() {
   };
   let { error } = await supabase.from("metrics").insert([newMetrics]);
   console.log(error);
-  return;
   // clear temp stats
   await supabase.from("campaigns").update({ tempStats: {} }).eq("active", true);
 }
