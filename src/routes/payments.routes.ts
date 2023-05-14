@@ -42,7 +42,6 @@ router.post("/pay", key, async (req: Request, res: Response) => {
 });
 router.post("/webhook", async (req: Request, res: Response) => {
   const payload = req.body;
-  console.log(`payload`, payload);
   const headerSignature = req.headers["x-sellix-unescaped-signature"];
   if (!headerSignature) {
     return res.status(401).send("No signature");
@@ -68,10 +67,13 @@ router.post("/webhook", async (req: Request, res: Response) => {
     return res.status(400).send("Invalid event type");
     return;
   }
+  console.log(payload.data.product_id, "645fb8d0eb031");
   if (payload.data.product_id != "645fb8d0eb031") {
     return res.status(400).send("Invalid product");
     return;
   }
+  console.log(`payload`, payload);
+
   const orderId = payload.data.id;
 
   let userId = payload.data.custom_fields.userId;
