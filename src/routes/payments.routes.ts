@@ -144,7 +144,7 @@ router.post("/webhook", async (req: Request, res: Response) => {
   }
   let stats: any = await redisClient.get("payment-stats");
   console.log(`stats`, stats);
-  let country = payload.data.metadata.country;
+  let country = payload.data.country;
   if (!country) country = "Unknown";
   if (!stats) {
     stats = {
