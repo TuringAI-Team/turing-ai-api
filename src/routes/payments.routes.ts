@@ -88,7 +88,6 @@ router.post("/webhook", async (req: Request, res: Response) => {
       .select("*")
       .eq("id", userId);
     let user = data[0];
-    console.log(`user`, user);
     await supabase
       .from("users_new")
       .update({
