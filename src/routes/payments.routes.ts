@@ -130,6 +130,8 @@ router.post("/webhook", async (req: Request, res: Response) => {
   }
   let stats: any = await redisClient.get("payment-stats");
   console.log(`stats`, stats);
+  let country = payload.data.metadata.country;
+  if (!country) country = "Unknown";
   if (!stats) {
     stats = {
       total: 0,
@@ -147,10 +149,8 @@ router.post("/webhook", async (req: Request, res: Response) => {
     stats.subType[subType] += 1;
     stats.total += 1;
     stats[payload.data.gateway] += 1;
-    stats.countries[payload.data.metadata.country] = stats.countries[
-      payload.data.metadata.country
-    ]
-      ? stats.countries[payload.data.metadata.country] + 1
+    stats.countries[country] = stats.countries[country]
+      ? stats.countries[country] + 1
       : 1;
   } else {
     stats = JSON.parse(stats);
@@ -163,10 +163,8 @@ router.post("/webhook", async (req: Request, res: Response) => {
       stats.subType[subType] = 1;
     } else stats.subType[subType] += 1;
     stats[payload.data.gateway] += 1;
-    stats.countries[payload.data.metadata.country] = stats.countries[
-      payload.data.metadata.country
-    ]
-      ? stats.countries[payload.data.metadata.country] + 1
+    stats.countries[country] = stats.countries[country]
+      ? stats.countries[country] + 1
       : 1;
   }
   await redisClient.set("payment-stats", JSON.stringify(stats));
