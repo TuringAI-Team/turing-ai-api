@@ -111,6 +111,7 @@ router.post("/webhook", async (req: Request, res: Response) => {
       .select("*")
       .eq("id", serverId);
     let server = data[0];
+    console.log(`server`, server);
     await supabase
       .from("guilds_new")
       .update({
