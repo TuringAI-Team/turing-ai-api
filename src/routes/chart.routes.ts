@@ -35,17 +35,7 @@ router.post("/:chart", key, turnstile, async (req: Request, res: Response) => {
     return diff <= periodMs;
   });
   let metricData = data.map((d: any) => d.data);
-  let labels = [];
-  labels = data.map((d: any) => {
-    let date = new Date(d.time);
-    // format into dd/mm/yyyy hh:mm
-    let day = date.getDate();
-    let month = date.getMonth() + 1;
-    let year = date.getFullYear();
-    let hours = date.getHours();
-    let minutes = date.getMinutes();
-    return `${day}/${month}/${year} ${hours}:${minutes}`;
-  });
+
   let data1 = metricData[0];
   let keys = Object.keys(data1);
   let newKeys = [];
@@ -105,36 +95,88 @@ router.post("/:chart", key, turnstile, async (req: Request, res: Response) => {
       });
     }
   }
+
+  let labels = [];
   let datasets = [];
-  keys.forEach((key) => {
-    let dataset;
-    dataset = {
-      label: key,
-      data: [],
-      fill: false,
-    };
-    if (key.includes(".")) {
-      let parentKey = key.split(".")[0];
-      let subKey = key.split(".")[1];
-      // check for subSubKey
-      if (key.split(".").length == 3) {
-        let subSubKey = key.split(".")[2];
+
+  if (type != "pie" && type != "doughnut") {
+    labels = data.map((d: any) => {
+      let date = new Date(d.time);
+      // format into dd/mm/yyyy hh:mm
+      let day = date.getDate();
+      let month = date.getMonth() + 1;
+      let year = date.getFullYear();
+      let hours = date.getHours();
+      let minutes = date.getMinutes();
+      return `${day}/${month}/${year} ${hours}:${minutes}`;
+    });
+
+    keys.forEach((key) => {
+      let dataset;
+      dataset = {
+        label: key,
+        data: [],
+        fill: false,
+      };
+      if (key.includes(".")) {
+        let parentKey = key.split(".")[0];
+        let subKey = key.split(".")[1];
+        // check for subSubKey
+        if (key.split(".").length == 3) {
+          let subSubKey = key.split(".")[2];
+          data.forEach((d: any) => {
+            dataset.data.push(d.data[parentKey][subKey][subSubKey]);
+          });
+        } else {
+          data.forEach((d: any) => {
+            dataset.data.push(d.data[parentKey][subKey]);
+          });
+        }
+      } else {
         data.forEach((d: any) => {
-          dataset.data.push(d.data[parentKey][subKey][subSubKey]);
+          dataset.data.push(d.data[key]);
         });
       }
 
-      data.forEach((d: any) => {
-        dataset.data.push(d.data[parentKey][subKey]);
-      });
-    } else {
-      data.forEach((d: any) => {
-        dataset.data.push(d.data[key]);
-      });
-    }
+      datasets.push(dataset);
+    });
+  } else {
+    labels = keys;
+    // do pie chart
+    datasets = [
+      {
+        label: "Data",
+        data: [],
+        backgroundColor: [],
+      },
+    ];
+    let dataset = datasets[0];
+    keys.forEach((key) => {
+      if (key.includes(".")) {
+        let parentKey = key.split(".")[0];
+        let subKey = key.split(".")[1];
+        // check for subSubKey
+        if (key.split(".").length == 3) {
+          let subSubKey = key.split(".")[2];
+          data.forEach((d: any) => {
+            dataset.data.push(d.data[parentKey][subKey][subSubKey]);
+          });
+        } else {
+          data.forEach((d: any) => {
+            dataset.data.push(d.data[parentKey][subKey]);
+          });
+        }
+      } else {
+        data.forEach((d: any) => {
+          dataset.data.push(d.data[key]);
+        });
+      }
+      dataset.backgroundColor.push(
+        `hsl(${Math.floor(Math.random() * 360)}, 100%, 50%)`
+      );
+    });
+  }
 
-    datasets.push(dataset);
-  });
   chartImage.setConfig({
     type: type,
     data: {
