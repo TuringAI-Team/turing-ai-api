@@ -78,10 +78,12 @@ router.post("/webhook", async (req: Request, res: Response) => {
   }
   let subType = payload.data.product_id == "645fb8d0eb031" ? "user" : "server";
   console.log(`payload`, payload);
+  console.log(`subType`, subType);
 
   const orderId = payload.data.id;
   if (subType == "user") {
     let userId = payload.data.custom_fields.userId;
+    console.log(`userId`, userId);
     let { data } = await supabase
       .from("users_new")
       .select("*")
@@ -139,22 +141,28 @@ router.post("/webhook", async (req: Request, res: Response) => {
       ethereum: 0,
       binance: 0,
       countries: {},
+      subType: {
+        user: 0,
+        server: 0,
+      },
     };
+    stats.subType[subType] += 1;
     stats.total += 1;
     stats[payload.data.gateway] += 1;
-    stats.countries[payload.data.country] = stats.countries[
-      payload.data.country
+    stats.countries[payload.data.metadata.country] = stats.countries[
+      payload.data.metadata.country
     ]
-      ? stats.countries[payload.data.country] + 1
+      ? stats.countries[payload.data.metadata.country] + 1
       : 1;
   } else {
     stats = JSON.parse(stats);
     stats.total += 1;
+    stats.subType[subType] += 1;
     stats[payload.data.gateway] += 1;
-    stats.countries[payload.data.country] = stats.countries[
-      payload.data.country
+    stats.countries[payload.data.metadata.country] = stats.countries[
+      payload.data.metadata.country
     ]
-      ? stats.countries[payload.data.country] + 1
+      ? stats.countries[payload.data.metadata.country] + 1
       : 1;
   }
   await redisClient.set("payment-stats", JSON.stringify(stats));
