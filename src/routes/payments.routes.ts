@@ -178,6 +178,13 @@ router.post("/webhook", async (req: Request, res: Response) => {
       stats.subType[subType] = 1;
     } else stats.subType[subType] += 1;
     stats[payload.data.gateway] += 1;
+    if (!stats.countries) {
+      stats.countries = {};
+      stats.countries[country] = 1;
+    }
+    if (!stats.countries[country]) {
+      stats.countries[country] = 1;
+    }
     stats.countries[country] = stats.countries[country]
       ? stats.countries[country] + 1
       : 1;
