@@ -6,6 +6,7 @@ import key from "../middlewares/key.js";
 import sellix from "@sellix/node-sdk";
 import crypto, { createHmac } from "crypto";
 import ms from "ms";
+import axios from "axios";
 import redisClient from "../modules/cache/redis.js";
 
 const router = express.Router();
@@ -183,6 +184,17 @@ router.post("/webhook", async (req: Request, res: Response) => {
   }
   await redisClient.set("payment-stats", JSON.stringify(stats));
   res.status(200).json({ success: true });
+});
+router.post("/guilds", async (req: Request, res: Response) => {
+  let accessToken = req.body.accessToken;
+  let response = await axios({
+    url: `https://discord.com/api/v8/users/@me/guilds?limit=100`,
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+  let guilds = response.data;
+  res.status(response.status).json(guilds);
 });
 
 export default router;
