@@ -155,7 +155,8 @@ router.post("/webhook", async (req: Request, res: Response) => {
   } else {
     stats = JSON.parse(stats);
     stats.total += 1;
-    if (stats.subType[subType] == undefined) stats.subType[subType] = 1;
+    if (!stats.subType || stats.subType[subType] == undefined)
+      stats.subType[subType] = 1;
     else stats.subType[subType] += 1;
     stats[payload.data.gateway] += 1;
     stats.countries[payload.data.metadata.country] = stats.countries[
