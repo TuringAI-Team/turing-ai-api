@@ -106,22 +106,35 @@ router.post("/webhook", async (req: Request, res: Response) => {
     redisClient.set(`users:${userId}`, JSON.stringify(userObj));
   } else {
     let serverId = payload.data.custom_fields.serverId;
+    console.log(`serverId`, serverId);
     let { data } = await supabase
       .from("guilds_new")
       .select("*")
       .eq("id", serverId);
     let server = data[0];
     console.log(`server`, server);
-    await supabase
-      .from("guilds_new")
-      .update({
+    if (!server) {
+      await supabase.from("guilds_new").insert({
+        id: serverId,
         subscription: {
-          since: server.subscription?.since || new Date(),
-          expires:
-            server.subscription?.expires + ms("30d") || Date.now() + ms("30d"),
+          since: new Date(),
+          expires: Date.now() + ms("30d"),
         },
-      })
-      .eq("id", serverId);
+      });
+    } else {
+      await supabase
+        .from("guilds_new")
+        .update({
+          subscription: {
+            since: server.subscription?.since || new Date(),
+            expires:
+              server.subscription?.expires + ms("30d") ||
+              Date.now() + ms("30d"),
+          },
+        })
+        .eq("id", serverId);
+    }
+
     let { data: serverObj }: any = await supabase
       .from("guilds_new")
       .select("*")
