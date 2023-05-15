@@ -94,8 +94,9 @@ router.post("/webhook", async (req: Request, res: Response) => {
       .update({
         subscription: {
           since: user.subscription?.since || new Date(),
-          expires:
-            user.subscription?.expires + ms("30d") || Date.now() + ms("30d"),
+          expires: new Date(
+            user.subscription?.expires + ms("30d") || Date.now() + ms("30d")
+          ),
         },
       })
       .eq("id", userId);
@@ -119,7 +120,7 @@ router.post("/webhook", async (req: Request, res: Response) => {
         id: serverId,
         subscription: {
           since: new Date(),
-          expires: Date.now() + ms("30d"),
+          expires: new Date(Date.now() + ms("30d")),
         },
       });
     } else {
@@ -129,8 +130,8 @@ router.post("/webhook", async (req: Request, res: Response) => {
           subscription: {
             since: server.subscription?.since || new Date(),
             expires:
-              server.subscription?.expires + ms("30d") ||
-              Date.now() + ms("30d"),
+              new Date(server.subscription?.expires + ms("30d")) ||
+              new Date(Date.now() + ms("30d")),
           },
         })
         .eq("id", serverId);
