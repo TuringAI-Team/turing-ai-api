@@ -87,13 +87,14 @@ router.post("/webhook", async (req: Request, res: Response) => {
       .select("*")
       .eq("id", userId);
     let user = data[0];
+    console.log(`user`, user);
     await supabase
       .from("users_new")
       .update({
         subscription: {
-          since: user.subscription.since || new Date(),
+          since: user.subscription?.since || new Date(),
           expires:
-            user.subscription.expires + ms("30d") || Date.now() + ms("30d"),
+            user.subscription?.expires + ms("30d") || Date.now() + ms("30d"),
         },
       })
       .eq("id", userId);
@@ -114,14 +115,14 @@ router.post("/webhook", async (req: Request, res: Response) => {
       .from("guilds_new")
       .update({
         subscription: {
-          since: server.subscription.since || new Date(),
+          since: server.subscription?.since || new Date(),
           expires:
-            server.subscription.expires + ms("30d") || Date.now() + ms("30d"),
+            server.subscription?.expires + ms("30d") || Date.now() + ms("30d"),
         },
       })
       .eq("id", serverId);
     let { data: serverObj }: any = await supabase
-      .from("users_new")
+      .from("guilds_new")
       .select("*")
       .eq("id", serverId);
     serverObj = serverObj[0];
