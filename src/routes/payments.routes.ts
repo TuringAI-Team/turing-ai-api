@@ -83,7 +83,6 @@ router.post("/webhook", async (req: Request, res: Response) => {
   const orderId = payload.data.id;
   if (subType == "user") {
     let userId = payload.data.custom_fields.userId;
-    console.log(`userId`, userId);
     let { data } = await supabase
       .from("users_new")
       .select("*")
@@ -105,7 +104,7 @@ router.post("/webhook", async (req: Request, res: Response) => {
       .select("*")
       .eq("id", userId);
     userObj = userObj[0];
-    redisClient.set(`user:${userId}`, JSON.stringify(userObj));
+    redisClient.set(`users:${userId}`, JSON.stringify(userObj));
   } else {
     let serverId = payload.data.custom_fields.serverId;
     let { data } = await supabase
