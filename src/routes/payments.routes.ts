@@ -64,7 +64,7 @@ router.post("/webhook", async (req: Request, res: Response) => {
     return res.status(401).send("Invalid signature");
     return;
   }
-  if (payload.event !== "order.paid") {
+  if (payload.event != "order:paid") {
     return res.status(400).send("Invalid event type");
     return;
   }
