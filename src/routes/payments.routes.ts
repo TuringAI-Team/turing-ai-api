@@ -103,7 +103,7 @@ router.post("/webhook", async (req: Request, res: Response) => {
       .select("*")
       .eq("id", userId);
     userObj = userObj[0];
-    redisClient.set(`user:${userId}`, userObj);
+    redisClient.set(`user:${userId}`, JSON.stringify(userObj));
   } else {
     let serverId = payload.data.custom_fields.serverId;
     let { data } = await supabase
@@ -126,7 +126,7 @@ router.post("/webhook", async (req: Request, res: Response) => {
       .select("*")
       .eq("id", serverId);
     serverObj = serverObj[0];
-    redisClient.set(`guilds:${serverId}`, serverObj);
+    redisClient.set(`guilds:${serverId}`, JSON.stringify(serverObj));
   }
   let stats: any = await redisClient.get("payment-stats");
   console.log(`stats`, stats);
