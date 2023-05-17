@@ -175,6 +175,9 @@ router.post(
     res.setHeader("Content-Type", "text/html; charset=utf-8");
     res.setHeader("Transfer-Encoding", "chunked");
     result.event.on("data", (data) => {
+      // add 15% extra into data.credits
+      console.log(data.credits);
+      data.credits = data.credits * 1.15;
       res.write("data: " + JSON.stringify(data) + "\n\n");
 
       if (data.done) {

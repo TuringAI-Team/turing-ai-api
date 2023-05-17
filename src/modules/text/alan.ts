@@ -138,12 +138,16 @@ export default class Alan {
         generationPrompt: null,
         results: null,
         searching: null,
+        credits: 0,
       });
       return;
     }
+    var credits = 0;
     if (photo && !imageDescription) {
       console.log("Getting image description");
       imageDescription = await getImageDescription(photo);
+      imageDescription = imageDescription.output;
+      credits += imageDescription.credits;
     }
 
     if (model == "chatgpt" || model == "gpt4") {
@@ -201,17 +205,21 @@ export default class Alan {
         } */
 
         if (searchEngine != "none") {
-          var { results: searchResults, searchQueries } =
-            await getSearchResults(
-              [
-                ...preivousMessages,
-                {
-                  content: message,
-                  role: "user",
-                },
-              ],
-              searchEngine
-            );
+          var {
+            results: searchResults,
+            searchQueries,
+            credits: searchCredits,
+          } = await getSearchResults(
+            [
+              ...preivousMessages,
+              {
+                content: message,
+                role: "user",
+              },
+            ],
+            searchEngine
+          );
+          credits += searchCredits;
 
           event.emit("data", {
             result: "",
@@ -221,6 +229,7 @@ export default class Alan {
             generated: null,
             results: null,
             searching: searchQueries,
+            credits: credits,
           });
           instructions = `${instructions}${
             searchResults
@@ -278,7 +287,8 @@ export default class Alan {
           max_tokens: 200,
           messages: messages,
         });
-
+        let totalTokens = completion.data.usage.total_tokens;
+        credits += (totalTokens / 1000) * 0.002;
         response = completion.data.choices[0].message.content;
         fullContent = completion.data;
         //}
@@ -297,6 +307,7 @@ export default class Alan {
             generated: null,
             results: null,
             searching: null,
+            credits: credits,
           });
           let link;
           let id = uuidv4();
@@ -348,10 +359,12 @@ export default class Alan {
             generated: null,
             results: null,
             searching: null,
+            credits: credits,
           });
           var images;
           if (imageGenerator == "dall-e-2") {
             images = await generateImgD(imagePrompt, 1);
+            credits += 0.018;
             images = images.map((i) => i.attachment);
           }
           if (imageGenerator == "stable-diffusion") {
@@ -381,6 +394,7 @@ export default class Alan {
                 generationPrompt: imagePrompt,
                 results: [],
                 searching: null,
+                credits,
               });
               return { response, images: [], photoPrompt: imagePrompt };
             }
@@ -394,12 +408,16 @@ export default class Alan {
               if (lastCheck.done) {
                 images = lastCheck.generations.map((i) => i.img);
                 done = true;
+                credits += lastCheck.kudos / 2000;
               }
             }
           }
           if (imageGenerator == "kandinsky") {
+            let start = Date.now();
             images = await kandinsky(imagePrompt, 50, 4);
             images = [images];
+            let time = Date.now() - start;
+            credits += (time / 1000) * 0.0023;
           }
           event.emit("data", {
             result: response,
@@ -409,6 +427,7 @@ export default class Alan {
             generated: "image",
             results: images,
             searching: null,
+            credits,
           });
           done = true;
         }
@@ -428,12 +447,19 @@ export default class Alan {
             results: null,
             generated: null,
             searching: null,
+            credits,
           });
           if (videoGenerator == "damo-text-to-video") {
+            let start = Date.now();
             video = await generateVideo(videoPrompt);
+            let time = Date.now() - start;
+            credits += (time / 1000) * 0.0023;
           }
           if (videoGenerator == "videocrafter") {
+            let start = Date.now();
             video = await generateVideo2(videoPrompt);
+            let time = Date.now() - start;
+            credits += (time / 1000) * 0.0023;
           }
           event.emit("data", {
             result: response,
@@ -443,6 +469,7 @@ export default class Alan {
             generated: "video",
             results: [video],
             searching: null,
+            credits,
           });
           done = true;
         }
@@ -462,10 +489,14 @@ export default class Alan {
             results: null,
             generated: null,
             searching: null,
+            credits,
           });
           if (audioGenerator == "riffusion") {
+            let start = Date.now();
             audio = await Riffusion(audioPrompt);
             audio = audio.audio;
+            let time = Date.now() - start;
+            credits += (time / 1000) * 0.0023;
           }
           event.emit("data", {
             result: response,
@@ -475,6 +506,7 @@ export default class Alan {
             results: [audio],
             generated: "audio",
             searching: null,
+            credits,
           });
           done = true;
         }
@@ -493,8 +525,10 @@ export default class Alan {
             results: null,
             generated: null,
             searching: null,
+            credits,
           });
           var modifiedImage;
+          let start = Date.now();
           if (
             imageModificator == "controlnet" ||
             imageModificator == "controlnet-normal"
@@ -542,6 +576,8 @@ export default class Alan {
             modifiedImage = await controlnet(photo, modificationPrompt, "seg");
             modifiedImage = modifiedImage[1];
           }
+          let time = Date.now() - start;
+          credits += (time / 1000) * 0.0023;
           event.emit("data", {
             result: response,
             done: true,
@@ -550,6 +586,7 @@ export default class Alan {
             results: [modifiedImage],
             generated: "image",
             searching: null,
+            credits,
           });
           done = true;
         }
@@ -563,6 +600,7 @@ export default class Alan {
             generated: null,
             results: null,
             searching: null,
+            credits,
           });
         }
         await saveAlan(
@@ -594,6 +632,7 @@ export default class Alan {
               audio: audio ? audio : null,
               modifiedImage: modifiedImage ? modifiedImage : null,
             },
+            credits,
           },
           fullContent,
           conversationId
@@ -666,7 +705,11 @@ async function getSearchResults(conversation, searchEngine) {
   });
 
   let searchQueries: any = await chatgpt(messages, 150, { temperature: 0.1 });
-  if (searchQueries.error) return { results: null, searchQueries: [] };
+  if (searchQueries.error)
+    return { results: null, searchQueries: [], credits: 0 };
+  let credits = 0;
+  // 1k tokens is 0.002 credits
+  credits += (searchQueries.totalTokens / 1000) * 0.002;
   searchQueries = searchQueries.response.replaceAll('"', "");
   // search in google and get results
   let searchResults = [];
@@ -678,7 +721,7 @@ async function getSearchResults(conversation, searchEngine) {
     searchQueries.includes("GEN_IMG") ||
     searchQueries.includes("CALCULATOR")
   )
-    return { results: null, searchQueries: [] };
+    return { results: null, searchQueries: [], credits };
   searchQueries = searchQueries.split("|");
   for (let i = 0; i < searchQueries.length; i++) {
     const query = searchQueries[i];
@@ -706,7 +749,7 @@ async function getSearchResults(conversation, searchEngine) {
       results: results,
     });
   }
-  return { results: JSON.stringify(searchResults), searchQueries };
+  return { results: JSON.stringify(searchResults), searchQueries, credits };
 }
 
 async function google(query) {
@@ -758,8 +801,9 @@ async function chatgpt(messages, maxtokens, options?) {
     const completion = await openai.createChatCompletion(data);
 
     let response = completion.data.choices[0].message.content;
+    let totalTokens = completion.data.usage.total_tokens;
     await removeMessage(acc.id);
-    return { response };
+    return { response, totalTokens };
   } catch (err: any) {
     return {
       error: err.message,
@@ -768,6 +812,7 @@ async function chatgpt(messages, maxtokens, options?) {
 }
 
 export async function getImageDescription(image) {
+  let start = Date.now();
   const prediction = await predict({
     model: "salesforce/blip-2", // The model name
     input: {
@@ -779,9 +824,18 @@ export async function getImageDescription(image) {
     token: process.env.REPLICATE_API_KEY, // You need a token from replicate.com
     poll: true, // Wait for the model to finish
   });
+  let time = Date.now() - start;
+  let credits = (time / 1000) * 0.0023;
 
-  if (prediction.error) return prediction.error;
-  return prediction.output;
+  if (prediction.error)
+    return {
+      error: prediction.error,
+      credits: 0,
+    };
+  return {
+    output: prediction.output,
+    credits: credits,
+  };
 }
 
 async function browsing(event) {

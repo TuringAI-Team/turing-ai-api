@@ -11,9 +11,33 @@ import redisClient from "../modules/cache/redis.js";
 
 const router = express.Router();
 
+const creditProducts = {
+  "1": {
+    id: "646522a50ace5",
+    credits: 1,
+  },
+  "2": {
+    id: "646522c90d14b",
+    credits: 2,
+  },
+  "5": {
+    id: "646522edc9989",
+    credits: 5,
+  },
+};
+
 router.post("/pay", key, async (req: Request, res: Response) => {
-  let { productId, gateway, email, name, userId, serverId, credits, plan } =
-    req.body;
+  let {
+    productId,
+    gateway,
+    email,
+    name,
+    userId,
+    serverId,
+    credits,
+    plan,
+    subType,
+  } = req.body;
   console.log(req.body);
   const Sellix = sellix(process.env.SELLIX_KEY);
   let customer;
@@ -38,6 +62,7 @@ router.post("/pay", key, async (req: Request, res: Response) => {
       userId: userId,
       serverId: serverId,
       plan: plan,
+      subType: subType,
     },
   };
   if (userId) {
@@ -77,9 +102,33 @@ router.post("/pay", key, async (req: Request, res: Response) => {
   }
   if (credits && plan == "credits") {
     data.custom_fields.credits = credits;
-    // change price
-    data.value = credits;
-    data.currency = "USD";
+    // make a list of credit products
+    let products = [];
+    let creditsBy5 = Math.floor(credits / 5);
+    let creditsBy2 = Math.floor((credits - creditsBy5 * 5) / 2);
+    let creditsBy1 = Math.floor(credits - creditsBy5 * 5 - creditsBy2 * 2);
+    if (creditsBy5 > 0) {
+      products.push({
+        uniqid: creditProducts["5"].id,
+        unit_quantity: creditsBy5,
+      });
+    }
+    if (creditsBy2 > 0) {
+      products.push({
+        uniqid: creditProducts["2"].id,
+        unit_quantity: creditsBy2,
+      });
+    }
+    if (creditsBy1 > 0) {
+      products.push({
+        uniqid: creditProducts["1"].id,
+        unit_quantity: creditsBy1,
+      });
+    }
+    data.cart = {
+      products: products,
+    };
+    data.quantity = 1;
   } else {
     data.product_id = productId;
   }
@@ -118,77 +167,166 @@ router.post("/webhook", async (req: Request, res: Response) => {
   console.log(payload.data.product_id, "645fb8d0eb031");
   if (
     payload.data.product_id != "645fb8d0eb031" &&
-    payload.data.product_id != "64627207b5a95"
+    payload.data.product_id != "64627207b5a95" &&
+    payload.data.custom_fields.plan != "credits"
   ) {
     return res.status(400).send("Invalid product");
     return;
   }
-  let subType = payload.data.product_id == "645fb8d0eb031" ? "user" : "server";
+  let subType = payload.data.custom_fields.subType;
+  let plan = payload.data.custom_fields.plan;
+  let credits = parseInt(payload.data.custom_fields.credits);
+
   console.log(`payload`, payload);
   console.log(`subType`, subType);
 
   const orderId = payload.data.id;
-  if (subType == "user") {
-    let userId = payload.data.custom_fields.userId;
-    let { data } = await supabase
-      .from("users_new")
-      .select("*")
-      .eq("id", userId);
-    let user = data[0];
-    await supabase
-      .from("users_new")
-      .update({
-        subscription: {
-          since: user.subscription?.since || new Date(),
-          expires: new Date(
-            user.subscription?.expires + ms("30d") || Date.now() + ms("30d")
-          ),
-        },
-      })
-      .eq("id", userId);
-    let { data: userObj }: any = await supabase
-      .from("users_new")
-      .select("*")
-      .eq("id", userId);
-    userObj = userObj[0];
-    redisClient.set(`users:${userId}`, JSON.stringify(userObj));
-  } else {
-    let serverId = payload.data.custom_fields.serverId;
-    console.log(`serverId`, serverId);
-    let { data } = await supabase
-      .from("guilds_new")
-      .select("*")
-      .eq("id", serverId);
-    let server = data[0];
-    console.log(`server`, server);
-    if (!server) {
-      await supabase.from("guilds_new").insert({
-        id: serverId,
-        subscription: {
-          since: new Date(),
-          expires: new Date(Date.now() + ms("30d")),
-        },
-      });
-    } else {
+  if (plan == "credits") {
+    if (subType == "user") {
+      let userId = payload.data.custom_fields.userId;
+      let { data } = await supabase
+        .from("users_new")
+        .select("*")
+        .eq("id", userId);
+      let user = data[0];
       await supabase
-        .from("guilds_new")
+        .from("users_new")
         .update({
-          subscription: {
-            since: server.subscription?.since || new Date(),
-            expires:
-              new Date(server.subscription?.expires + ms("30d")) ||
-              new Date(Date.now() + ms("30d")),
+          plan: {
+            total: user.plan?.total + credits || credits,
+            history: [
+              ...(user.plan?.history || []),
+              {
+                time: Date.now(),
+                type: "web",
+                amount: credits,
+                gateway: payload.data.gateway,
+              },
+            ],
           },
         })
-        .eq("id", serverId);
+        .eq("id", userId);
+      let { data: userObj }: any = await supabase
+        .from("users_new")
+        .select("*")
+        .eq("id", userId);
+      userObj = userObj[0];
+      redisClient.set(`users:${userId}`, JSON.stringify(userObj));
     }
+    if (subType == "server") {
+      let serverId = payload.data.custom_fields.serverId;
+      let { data } = await supabase
+        .from("guilds_new")
+        .select("*")
+        .eq("id", serverId);
+      let server = data[0];
+      if (!server) {
+        await supabase.from("guilds_new").insert([
+          {
+            id: serverId,
+            plan: {
+              total: credits,
+              history: [
+                {
+                  time: Date.now(),
+                  type: "web",
+                  amount: credits,
+                  gateway: payload.data.gateway,
+                },
+              ],
+            },
+          },
+        ]);
+      } else {
+        await supabase
+          .from("guilds_new")
+          .update({
+            plan: {
+              total: server.plan?.total + credits || credits,
+              history: [
+                ...(server.plan?.history || []),
+                {
+                  time: Date.now(),
+                  type: "web",
+                  amount: credits,
+                  gateway: payload.data.gateway,
+                },
+              ],
+            },
+          })
+          .eq("id", serverId);
+      }
 
-    let { data: serverObj }: any = await supabase
-      .from("guilds_new")
-      .select("*")
-      .eq("id", serverId);
-    serverObj = serverObj[0];
-    redisClient.set(`guilds:${serverId}`, JSON.stringify(serverObj));
+      let { data: serverObj }: any = await supabase
+        .from("guilds_new")
+        .select("*")
+        .eq("id", serverId);
+      serverObj = serverObj[0];
+      redisClient.set(`guilds:${serverId}`, JSON.stringify(serverObj));
+    }
+  } else {
+    if (subType == "user") {
+      let userId = payload.data.custom_fields.userId;
+      let { data } = await supabase
+        .from("users_new")
+        .select("*")
+        .eq("id", userId);
+      let user = data[0];
+      await supabase
+        .from("users_new")
+        .update({
+          subscription: {
+            since: user.subscription?.since || new Date(),
+            expires: new Date(
+              user.subscription?.expires + ms("30d") || Date.now() + ms("30d")
+            ),
+          },
+        })
+        .eq("id", userId);
+      let { data: userObj }: any = await supabase
+        .from("users_new")
+        .select("*")
+        .eq("id", userId);
+      userObj = userObj[0];
+      redisClient.set(`users:${userId}`, JSON.stringify(userObj));
+    } else {
+      let serverId = payload.data.custom_fields.serverId;
+      console.log(`serverId`, serverId);
+      let { data } = await supabase
+        .from("guilds_new")
+        .select("*")
+        .eq("id", serverId);
+      let server = data[0];
+      console.log(`server`, server);
+      if (!server) {
+        await supabase.from("guilds_new").insert({
+          id: serverId,
+          subscription: {
+            since: new Date(),
+            expires: new Date(Date.now() + ms("30d")),
+          },
+        });
+      } else {
+        await supabase
+          .from("guilds_new")
+          .update({
+            subscription: {
+              since: server.subscription?.since || new Date(),
+              expires:
+                new Date(server.subscription?.expires + ms("30d")) ||
+                new Date(Date.now() + ms("30d")),
+            },
+          })
+          .eq("id", serverId);
+      }
+
+      let { data: serverObj }: any = await supabase
+        .from("guilds_new")
+        .select("*")
+        .eq("id", serverId);
+      serverObj = serverObj[0];
+      redisClient.set(`guilds:${serverId}`, JSON.stringify(serverObj));
+    }
   }
   let stats: any = await redisClient.get("payment-stats");
   console.log(`stats`, stats);

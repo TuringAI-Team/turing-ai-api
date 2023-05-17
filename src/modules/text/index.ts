@@ -146,6 +146,7 @@ export async function saveAlan(model, input, output, fulloutput, id) {
       modifiedImage: output.multimedia.modifiedImage,
     },
     fullOutput: fulloutput,
+    credits: output.credits,
   };
   if (!conversation || !conversation[0]) {
     let { error } = await supabase.from("conversations_new").insert({
