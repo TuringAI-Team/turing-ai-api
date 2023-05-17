@@ -12,7 +12,8 @@ import redisClient from "../modules/cache/redis.js";
 const router = express.Router();
 
 router.post("/pay", key, async (req: Request, res: Response) => {
-  let { productId, gateway, email, name, userId, serverId } = req.body;
+  let { productId, gateway, email, name, userId, serverId, credits, plan } =
+    req.body;
   console.log(req.body);
   const Sellix = sellix(process.env.SELLIX_KEY);
   let customer;
@@ -27,8 +28,7 @@ router.post("/pay", key, async (req: Request, res: Response) => {
   } else {
     customer = customer.id;
   }
-  const payment = await Sellix.payments.create({
-    product_id: productId,
+  let data: any = {
     return_url: `https://app.turing.sh/pay/success`,
     email: email,
     white_label: false,
@@ -37,8 +37,54 @@ router.post("/pay", key, async (req: Request, res: Response) => {
     custom_fields: {
       userId: userId,
       serverId: serverId,
+      plan: plan,
     },
-  });
+  };
+  if (userId) {
+    let { data: user }: any = await supabase
+      .from("users_new")
+      .select("*")
+      .eq("id", userId);
+    user = user[0];
+    if (!user) {
+      await supabase.from("users_new").insert([
+        {
+          id: userId,
+          metadata: {
+            email: email,
+          },
+        },
+      ]);
+      user = {
+        id: userId,
+        metadata: {
+          email: email,
+        },
+      };
+      redisClient.set(`users:${userId}`, JSON.stringify(user));
+    } else {
+      await supabase
+        .from("users_new")
+        .update({
+          metadata: {
+            ...(user.metadata || {}),
+            email: email,
+          },
+        })
+        .eq("id", userId);
+      redisClient.set(`users:${userId}`, JSON.stringify(user));
+    }
+  }
+  if (credits && plan == "credits") {
+    data.custom_fields.credits = credits;
+    // change price
+    data.value = credits;
+    data.currency = "USD";
+  } else {
+    data.product_id = productId;
+  }
+  console.log(`data`, data);
+  const payment = await Sellix.payments.create(data);
 
   res.status(200).json(payment);
 });
