@@ -16,7 +16,6 @@ export default async function bard(message, conversationId) {
   let acc = await getAcc();
   if (!acc) return;
   await addMsg(acc);
-  console.log(acc.id);
   let cookies = `__Secure-1PSID=${acc.token}`;
   let bot = new Bard(cookies, {
     inMemory: false, // optional: if true, it will not save conversations to disk
@@ -86,7 +85,6 @@ export default async function bard(message, conversationId) {
 
   await removeMsg(acc);
 
-  console.log(response);
   return { response };
 }
 
