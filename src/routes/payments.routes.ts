@@ -39,6 +39,7 @@ router.post("/pay", key, async (req: Request, res: Response) => {
     subType,
   } = req.body;
   console.log(req.body);
+  credits = parseInt(credits);
   const Sellix = sellix(process.env.SELLIX_KEY);
   let customer;
   let customers = await Sellix.customers.list();
