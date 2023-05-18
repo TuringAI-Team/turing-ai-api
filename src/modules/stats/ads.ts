@@ -27,7 +27,7 @@ export async function saveMetrics() {
   let newMetrics = {
     id: uuidv4(),
     type: "campaigns",
-    time: new Date().toISOString(),
+    time: new Date(),
     data: data,
   };
   let { error } = await supabase.from("metrics").insert([newMetrics]);

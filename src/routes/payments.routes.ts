@@ -197,6 +197,8 @@ router.post("/webhook", async (req: Request, res: Response) => {
         .update({
           plan: {
             total: user.plan?.total + credits || credits,
+            expenses: user.plan?.expenses || 0,
+            used: user.plan?.used || 0,
             history: [
               ...(user.plan?.history || []),
               {
@@ -229,6 +231,8 @@ router.post("/webhook", async (req: Request, res: Response) => {
             id: serverId,
             plan: {
               total: credits,
+              expenses: 0,
+              used: 0,
               history: [
                 {
                   time: Date.now(),
@@ -246,6 +250,8 @@ router.post("/webhook", async (req: Request, res: Response) => {
           .update({
             plan: {
               total: server.plan?.total + credits || credits,
+              expenses: server.plan?.expenses || 0,
+              used: server.plan?.used || 0,
               history: [
                 ...(server.plan?.history || []),
                 {
@@ -305,8 +311,8 @@ router.post("/webhook", async (req: Request, res: Response) => {
         await supabase.from("guilds_new").insert({
           id: serverId,
           subscription: {
-            since: new Date(),
-            expires: new Date(Date.now() + ms("30d")),
+            since: Date.now(),
+            expires: Date.now() + ms("30d"),
           },
         });
       } else {
@@ -314,10 +320,10 @@ router.post("/webhook", async (req: Request, res: Response) => {
           .from("guilds_new")
           .update({
             subscription: {
-              since: server.subscription?.since || new Date(),
+              since: server.subscription?.since || Date.now(),
               expires:
-                new Date(server.subscription?.expires + ms("30d")) ||
-                new Date(Date.now() + ms("30d")),
+                server.subscription?.expires + ms("30d") ||
+                Date.now() + ms("30d"),
             },
           })
           .eq("id", serverId);

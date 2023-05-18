@@ -408,7 +408,7 @@ export default class Alan {
               if (lastCheck.done) {
                 images = lastCheck.generations.map((i) => i.img);
                 done = true;
-                credits += lastCheck.kudos / 2000;
+                credits += lastCheck.kudos / 4000;
               }
             }
           }

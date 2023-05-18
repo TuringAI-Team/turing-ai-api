@@ -10,7 +10,7 @@ export default async function SavePaymentMetrics() {
     await supabase.from("metrics").insert([
       {
         id: uuidv4(),
-        time: new Date().toISOString(),
+        time: new Date(),
         type: "payments",
         data: stats,
       },
