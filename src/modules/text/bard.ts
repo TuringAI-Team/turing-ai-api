@@ -14,7 +14,7 @@ export async function getAcc() {
 export default async function bard(message, conversationId) {
   conversationId = `bard-${conversationId}`;
   let acc = await getAcc();
-  if (!acc) return;
+  if (!acc) return { error: "max-accs-reached" };
   await addMsg(acc);
   let cookies = `__Secure-1PSID=${acc.token}`;
   let bot = new Bard(cookies, {
