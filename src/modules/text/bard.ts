@@ -105,8 +105,7 @@ async function addMsg(acc) {
     .eq("id", acc.id);
 }
 async function removeMsg(acc) {
-  await supabase
-    .from("g_accs")
-    .update({ messages: acc.messages - 1 })
-    .eq("id", acc.id);
+  let newMsgs = acc.messages - 1;
+  if (newMsgs < 0) newMsgs = 0;
+  await supabase.from("g_accs").update({ messages: newMsgs }).eq("id", acc.id);
 }
