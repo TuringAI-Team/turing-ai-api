@@ -11,6 +11,50 @@ export async function getAcc() {
   let acc = accs[0];
   return acc;
 }
+export async function resetBard(conversationId) {
+  conversationId = `bard-${conversationId}`;
+  let acc = await getAcc();
+  if (!acc) return { error: "max-accs-reached" };
+  await addMsg(acc);
+  let cookies = `__Secure-1PSID=${acc.token}`;
+  try {
+    let bot = new Bard(cookies, {
+      inMemory: false, // optional: if true, it will not save conversations to disk
+      savePath: "./temp/conversations.json", // optional: path to save conversations
+      proxy: {
+        // optional: proxy configuration
+        host: process.env.PROXY_HOST,
+        port: 80,
+        auth: {
+          username: process.env.PROXY_USERNAME,
+          password: process.env.PROXY_PASSWORD,
+        },
+        protocol: "http",
+      },
+    });
+    await bot.resetConversation(conversationId);
+    let { data: conversation } = await supabase
+      .from("conversations_new")
+      .select("*")
+      .eq("id", conversationId)
+      .single();
+    await supabase.from("conversations_new").update({
+      history: {
+        messages: [
+          ...(conversation.history?.messages || []),
+          {
+            action: "reset",
+            role: "user",
+          },
+        ],
+      },
+    });
+    await removeMsg(acc);
+  } catch (error) {
+    console.log(error);
+    await removeMsg(acc);
+  }
+}
 export default async function bard(message, conversationId) {
   conversationId = `bard-${conversationId}`;
   let acc = await getAcc();

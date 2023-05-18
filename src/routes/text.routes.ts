@@ -20,7 +20,7 @@ import key from "../middlewares/key.js";
 import LangChain from "../modules/text/langchain.js";
 import RedPajama from "../modules/text/redpajama.js";
 import { MPlugOwl } from "../modules/text/mplug-owl.js";
-import bard from "../modules/text/bard.js";
+import bard, { resetBard } from "../modules/text/bard.js";
 
 const router = express.Router();
 
@@ -334,6 +334,23 @@ router.post(`/:m`, key, turnstile, async (req: Request, res: Response) => {
       });
       let result = { response: response.data.choices[0].text };
       res.json(result).status(200);
+    }
+  } catch (error: any) {
+    res.json({ success: false, error: error }).status(500);
+  }
+});
+router.delete(`/:m`, key, turnstile, async (req: Request, res: Response) => {
+  try {
+    let { m } = req.params;
+    let { conversationId } = req.body;
+    let availableModels = ["bard"];
+    if (!availableModels.includes(m)) {
+      res.json({ success: false, error: "Model not found" }).status(404);
+      return;
+    }
+    if (m == "bard") {
+      await resetBard(conversationId);
+      res.json({ message: "Conversation deleted" }).status(200);
     }
   } catch (error: any) {
     res.json({ success: false, error: error }).status(500);
