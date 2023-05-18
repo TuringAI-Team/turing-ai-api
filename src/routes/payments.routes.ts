@@ -180,6 +180,8 @@ router.post("/webhook", async (req: Request, res: Response) => {
 
   console.log(`payload`, payload);
   console.log(`subType`, subType);
+  console.log(`plan`, plan);
+  console.log(`credits`, credits);
 
   const orderId = payload.data.id;
   if (plan == "credits") {
