@@ -17,6 +17,7 @@ export async function resetBard(conversationId) {
   if (!acc) return { error: "max-accs-reached" };
   await addMsg(acc);
   let cookies = `__Secure-1PSID=${acc.token}`;
+  console.log(acc.id);
   try {
     let bot = new Bard(cookies, {
       inMemory: false, // optional: if true, it will not save conversations to disk
