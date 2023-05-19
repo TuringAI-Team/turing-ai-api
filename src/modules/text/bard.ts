@@ -137,6 +137,7 @@ export default async function bard(message, conversationId) {
     return { response };
   } catch (e) {
     await removeMsg(acc);
+    return { error: "max-accs-reached" };
   }
 }
 
