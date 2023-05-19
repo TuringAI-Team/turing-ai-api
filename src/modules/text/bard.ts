@@ -8,7 +8,7 @@ export async function getAcc() {
   // sort by messages
   accs.sort((a, b) => a.messages - b.messages);
   // sort by total messages
-  accs.sort((a, b) => a.totalMessages - b.totalMessages);
+  // accs.sort((a, b) => a.totalMessages - b.totalMessages);
   // get the first one
   // get one of the first 3
   accs = accs.slice(0, 3);
