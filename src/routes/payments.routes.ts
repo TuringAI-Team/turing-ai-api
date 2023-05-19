@@ -197,7 +197,7 @@ router.post("/webhook", async (req: Request, res: Response) => {
         .update({
           plan: {
             total: user.plan?.total + credits || credits,
-            expenses: user.plan?.expenses || 0,
+            expenses: user.plan?.expenses || [],
             used: user.plan?.used || 0,
             history: [
               ...(user.plan?.history || []),
@@ -231,7 +231,7 @@ router.post("/webhook", async (req: Request, res: Response) => {
             id: serverId,
             plan: {
               total: credits,
-              expenses: 0,
+              expenses: [],
               used: 0,
               history: [
                 {
@@ -250,7 +250,7 @@ router.post("/webhook", async (req: Request, res: Response) => {
           .update({
             plan: {
               total: server.plan?.total + credits || credits,
-              expenses: server.plan?.expenses || 0,
+              expenses: server.plan?.expenses || [],
               used: server.plan?.used || 0,
               history: [
                 ...(server.plan?.history || []),
