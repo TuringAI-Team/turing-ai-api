@@ -131,12 +131,15 @@ export default async function bard(message, conversationId) {
         model: "bard",
       });
     }
-
-    await removeMsg(acc);
-
+    setTimeout(async () => {
+      await removeMsg(acc);
+    }, 5000);
     return { response };
   } catch (e) {
-    await removeMsg(acc);
+    setTimeout(async () => {
+      await removeMsg(acc);
+    }, 5000);
+
     return { error: "max-accs-reached" };
   }
 }
