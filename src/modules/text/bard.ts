@@ -8,9 +8,11 @@ export async function getAcc() {
   // sort by messages
   accs.sort((a, b) => a.messages - b.messages);
   // sort by total messages
-  //accs.sort((a, b) => a.totalMessages - b.totalMessages);
+  accs.sort((a, b) => a.totalMessages - b.totalMessages);
   // get the first one
-  let acc = accs[0];
+  // get one of the first 3
+  accs = accs.slice(0, 3);
+  let acc = accs[Math.floor(Math.random() * accs.length)];
   return acc;
 }
 export async function resetBard(conversationId) {
