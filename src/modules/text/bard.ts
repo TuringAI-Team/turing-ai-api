@@ -69,8 +69,8 @@ export default async function bard(message, conversationId, retried = 0) {
   console.log(acc.id);
   try {
     let bot = new Bard(cookies, {
-      inMemory: false, // optional: if true, it will not save conversations to disk
-      savePath: "./temp/conversations.json", // optional: path to save conversations
+      inMemory: true, // optional: if true, it will not save conversations to disk
+      //    savePath: "./temp/conversations.json", // optional: path to save conversations
       proxy: {
         // optional: proxy configuration
         host: process.env.PROXY_HOST,
