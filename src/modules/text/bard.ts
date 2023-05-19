@@ -23,8 +23,8 @@ export async function resetBard(conversationId) {
   let cookies = `__Secure-1PSID=${acc.token}`;
   try {
     let bot = new Bard(cookies, {
-      inMemory: false, // optional: if true, it will not save conversations to disk
-      savePath: "./temp/conversations.json", // optional: path to save conversations
+      inMemory: true, // optional: if true, it will not save conversations to disk
+      //  savePath: "./temp/conversations.json", // optional: path to save conversations
       proxy: {
         // optional: proxy configuration
         host: process.env.PROXY_HOST,
