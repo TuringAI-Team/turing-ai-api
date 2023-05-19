@@ -17,7 +17,6 @@ export async function resetBard(conversationId) {
   if (!acc) return { error: "max-accs-reached" };
   await addMsg(acc);
   let cookies = `__Secure-1PSID=${acc.token}`;
-  console.log(acc.id);
   try {
     let bot = new Bard(cookies, {
       inMemory: false, // optional: if true, it will not save conversations to disk
@@ -39,6 +38,7 @@ export async function resetBard(conversationId) {
       .select("*")
       .eq("id", conversationId)
       .single();
+    if (!conversation) return { error: "no-conversation" };
     await supabase.from("conversations_new").update({
       history: {
         messages: [
@@ -62,6 +62,7 @@ export default async function bard(message, conversationId) {
   if (!acc) return { error: "max-accs-reached" };
   await addMsg(acc);
   let cookies = `__Secure-1PSID=${acc.token}`;
+  console.log(acc.id);
   try {
     let bot = new Bard(cookies, {
       inMemory: false, // optional: if true, it will not save conversations to disk
