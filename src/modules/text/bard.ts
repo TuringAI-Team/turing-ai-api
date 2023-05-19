@@ -60,7 +60,7 @@ export async function resetBard(conversationId) {
     await removeMsg(acc);
   }
 }
-export default async function bard(message, conversationId) {
+export default async function bard(message, conversationId, retried = 0) {
   conversationId = `bard-${conversationId}`;
   let acc = await getAcc();
   if (!acc) return { error: "max-accs-reached" };
@@ -140,6 +140,10 @@ export default async function bard(message, conversationId) {
     }, 5000);
     return { response };
   } catch (e) {
+    if (retried < 3) {
+      retried++;
+      return await bard(message, conversationId, retried);
+    }
     setTimeout(async () => {
       await removeMsg(acc);
     }, 5000);
