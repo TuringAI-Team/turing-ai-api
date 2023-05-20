@@ -15,6 +15,7 @@ import CacheRoutes from "./routes/cache.routes.js";
 import VideoRoutes from "./routes/video.routes.js";
 import ChartRoutes from "./routes/chart.routes.js";
 import PaymentRoutes from "./routes/payments.routes.js";
+import DataRoutes from "./routes/data.routes.js";
 
 const app: Application = express();
 
@@ -57,6 +58,7 @@ app.use("/cache", CacheRoutes);
 app.use("/video", VideoRoutes);
 app.use("/chart", ChartRoutes);
 app.use("/payments", PaymentRoutes);
+app.use("/data", DataRoutes);
 
 const options = {
   definition: {

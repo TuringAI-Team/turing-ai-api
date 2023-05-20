@@ -135,18 +135,15 @@ export default async function bard(message, conversationId, retried = 0) {
         model: "bard",
       });
     }
-    setTimeout(async () => {
-      await removeMsg(acc);
-    }, 5000);
+    await removeMsg(acc);
     return { response };
   } catch (e) {
+    await removeMsg(acc);
+
     if (retried < 3) {
       retried++;
       return await bard(message, conversationId, retried);
     }
-    setTimeout(async () => {
-      await removeMsg(acc);
-    }, 5000);
 
     return { error: "max-accs-reached" };
   }

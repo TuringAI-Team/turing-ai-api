@@ -26,6 +26,7 @@ import plugins from "./plugins.js";
 import { ChatOpenAI } from "langchain/chat_models/openai";
 import { initializeAgentExecutorWithOptions } from "langchain/agents";
 import { PromptTemplate } from "langchain/prompts";
+import { OpenAIExt } from "openai-ext";
 
 import {
   RequestsGetTool,
@@ -54,6 +55,7 @@ export default class Alan {
   imageModificator?: string;
   pluginList?: string[];
   event: EventEmitter;
+  maxTokens: number;
 
   constructor(
     userName: string = "Anonymous",
@@ -69,7 +71,8 @@ export default class Alan {
     videoGenerator?: string,
     audioGenerator?: string,
     imageModificator?: string,
-    pluginList?: string[]
+    pluginList?: string[],
+    maxTokens: number = 200
   ) {
     let event = new EventEmitter();
     this.userName = userName;
@@ -86,6 +89,7 @@ export default class Alan {
     this.audioGenerator = audioGenerator;
     this.imageModificator = imageModificator;
     this.pluginList = pluginList;
+    this.maxTokens = maxTokens;
 
     this.event = event;
   }
@@ -105,6 +109,7 @@ export default class Alan {
     let searchEngine = this.searchEngine;
     let event = this.event;
     let pluginList = this.pluginList;
+    let maxTokens = this.maxTokens;
     if (!pluginList) {
       pluginList = [];
     }
@@ -187,13 +192,13 @@ export default class Alan {
           }` +
           `${
             photo
-              ? `\nThe user can request imaged to be modified. (like \"modify me this image of ...\" or \"modify this image of ...\"). You MAY add 'MOD_IMG=Image modification prompt with fitting & descriptive keywords' to the end of your response to display the modified image, keep the description below 70 characters. Do not refer to sources inside the MOD_IMG= tag. IF ASKED FOR, DO NOT GENERATE UNLESS ASKED.`
+              ? `\nThe user can request imaged to be modified. (like \"modify me this image of ...\" or \"modify this image of ...\"). You MAY add 'MOD_IMG=Image modification prompt with fitting & descriptive keywords' to the end of your response to display the modified image, keep the description below 70 characters. Do not refer to sources inside the MOD_IMG= tag. IF ASKED FOR, DO NOT MODIFY UNLESS ASKED.`
               : ""
           }` +
           /*   `The user can request to share the conversation or get a link of the conversation. (like \"share this conversation\" or  \" give me a link of this conversation\"). You MAY add 'SHARE_CONVERSATION' to disaply a link that redirects to the conversation. Refer to 'SHARE_CONVERSATION' as the conversation link. IF ASKED FOR, DO NOT SHARE CONVERSATION UNLESS ASKED` +*/
           `${
             imageDescription
-              ? `\nThe user can request information related with an image, here you have a description of the image. REFER AS THIS DESCRIPTION AS THE IMAGE. Image: ${imageDescription}`
+              ? `\nThe user can request information related with an image, here you have a description of the image. REFER AS THIS DESCRIPTION AS THE IMAGE. Image: ${imageDescription}\nThe user can request you to modify the image. (like \"modify me this image of ...\" or \"modify this image of ...\"). You MAY add 'MOD_IMG=Image modification prompt with fitting & descriptive keywords' to the end of your response to display the modified image, keep the description below 70 characters. Do not refer to sources inside the MOD_IMG= tag. IF ASKED FOR, DO NOT MODIFY UNLESS ASKED.`
               : ""
           }\nConsider the following in your responses:
           - Be conversational 
@@ -284,8 +289,9 @@ export default class Alan {
 
         const completion = await openai.createChatCompletion({
           model: model == "chatgpt" ? "gpt-3.5-turbo" : "gpt-4",
-          max_tokens: 200,
+          max_tokens: maxTokens,
           messages: messages,
+          temperature: 0.3,
         });
         let totalTokens = completion.data.usage.total_tokens;
         credits += (totalTokens / 1000) * 0.002;

@@ -151,6 +151,7 @@ router.post(
       audioGenerator,
       imageModificator,
       pluginList,
+      maxTokens,
     } = req.body;
     let conversation = await getAlanConversation(
       conversationId,
@@ -170,7 +171,8 @@ router.post(
       videoGenerator,
       audioGenerator,
       imageModificator,
-      pluginList
+      pluginList,
+      maxTokens
     );
     result.msg();
     res.setHeader("Content-Type", "text/html; charset=utf-8");
