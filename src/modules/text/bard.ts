@@ -135,10 +135,15 @@ export default async function bard(message, conversationId, retried = 0) {
         model: "bard",
       });
     }
-    await removeMsg(acc);
+
+    setTimeout(async () => {
+      await removeMsg(acc);
+    }, 5000);
     return { response };
   } catch (e) {
-    await removeMsg(acc);
+    setTimeout(async () => {
+      await removeMsg(acc);
+    }, 5000);
 
     if (retried < 3) {
       retried++;
