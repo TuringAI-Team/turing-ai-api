@@ -818,6 +818,7 @@ async function chatgpt(messages, maxtokens, options?) {
 }
 
 export async function getImageDescription(image) {
+  console.log(image);
   let start = Date.now();
   const prediction = await predict({
     model: "salesforce/blip-2", // The model name
