@@ -192,6 +192,7 @@ router.post("/:chart", key, turnstile, async (req: Request, res: Response) => {
   chartImage.setWidth(width);
   let image = await chartImage.toDataUrl();
   res.json({
+    image: image,
     url: await chartImage.getShortUrl(),
   });
 });
