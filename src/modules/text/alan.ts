@@ -148,6 +148,10 @@ export default class Alan {
       return;
     }
     var credits = 0;
+
+    if (photo) {
+      if (Array.isArray(photo)) photo = photo[0];
+    }
     if (photo && !imageDescription) {
       console.log("Getting image description");
       imageDescription = await getImageDescription(photo);
