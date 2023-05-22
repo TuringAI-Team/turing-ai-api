@@ -61,7 +61,9 @@ export async function resetBard(conversationId) {
   }
 }
 export default async function bard(message, conversationId, retried = 0) {
-  conversationId = `bard-${conversationId}`;
+  if (retried == 0) {
+    conversationId = `bard-${conversationId}`;
+  }
   let acc = await getAcc();
   if (!acc) return { error: "max-accs-reached" };
   await addMsg(acc);

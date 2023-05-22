@@ -21,6 +21,7 @@ import LangChain from "../modules/text/langchain.js";
 import RedPajama from "../modules/text/redpajama.js";
 import { MPlugOwl } from "../modules/text/mplug-owl.js";
 import bard, { resetBard } from "../modules/text/bard.js";
+import Palm2 from "../modules/text/palm2.js";
 
 const router = express.Router();
 
@@ -310,6 +311,9 @@ router.post(`/:m`, key, turnstile, async (req: Request, res: Response) => {
       );
       res.json(result).status(200);
     } else if (m == "palm2") {
+      let { conversationId } = req.body;
+      let result = await Palm2(conversationId, prompt);
+      res.json(result).status(200);
     } else if (m == "bard") {
       let { conversationId } = req.body;
       let result = await bard(prompt, conversationId);

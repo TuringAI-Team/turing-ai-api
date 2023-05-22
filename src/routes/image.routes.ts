@@ -15,6 +15,10 @@ import key from "../middlewares/key.js";
 import { Configuration, OpenAIApi } from "openai";
 
 const router = express.Router();
+let configuration = new Configuration({
+  apiKey: process.env.OPENAI_API_KE,
+});
+const openai = new OpenAIApi(configuration);
 
 // Filter
 router.post("/filter", key, turnstile, async (req: Request, res: Response) => {
@@ -29,11 +33,6 @@ router.post("/filter", key, turnstile, async (req: Request, res: Response) => {
 router.post("/dalle", key, turnstile, async (req: Request, res: Response) => {
   try {
     var { prompt, n = 1, size = "512x512" } = req.body;
-    let key = process.env.OPENAI_API_KEY;
-    let configuration = new Configuration({
-      apiKey: key,
-    });
-    const openai = new OpenAIApi(configuration);
 
     const response = await openai.createImage({
       prompt: prompt,
@@ -61,11 +60,6 @@ router.post(
         n?: number;
         size?: string;
       } = req.body;
-      let key = process.env.OPENAI_API_KEY;
-      let configuration = new Configuration({
-        apiKey: key,
-      });
-      const openai = new OpenAIApi(configuration);
 
       const response = await openai.createImageVariation(image, n, size);
       let result = { response: response.data };
@@ -275,7 +269,7 @@ router.post(
         await delay(15000);
       }
       lastCheck = await checkGeneration(result.id);
-      res.write(`${JSON.stringify(lastCheck)}\n`);
+      res.write(`data: ${JSON.stringify(lastCheck)}\n\n`);
       if (lastCheck.done) {
         images = lastCheck.generations.map((i) => i.img);
         done = true;
