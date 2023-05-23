@@ -4,7 +4,11 @@ import supabase from "../supabase.js";
 var videosGenerating = 0;
 import filter from "../filter/index.js";
 
-export default async function Gen2(prompt: string) {
+export default async function Gen2(
+  prompt: string,
+  interpolate = false,
+  upscale = false
+) {
   let emitter = new EventEmitter();
   try {
     // just 8 generations per minute
@@ -20,7 +24,11 @@ export default async function Gen2(prompt: string) {
       emitter.emit("data", { error: "channel not found", end: true });
       return emitter;
     }
-    await channel.send(`<@1093334543265693786> ${prompt} --interpolate`);
+    await channel.send(
+      `<@1093334543265693786> ${prompt} ${interpolate ? "--interpolate" : ""} ${
+        upscale ? "--upscale" : ""
+      }`
+    );
     videosGenerating++;
     let collector = channel.createMessageCollector({
       filter: (m: any) => m.author.id == "1093334543265693786",
