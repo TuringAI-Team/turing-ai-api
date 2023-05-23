@@ -35,6 +35,7 @@
     "mathjs": "^11.8.0",
     "openai": "^3.2.1",
     "openai-ext": "^1.2.4",
+    "poe-node-api": "^0.0.5",
     "puppeteer": "^19.11.1",
     "redis": "^4.6.5",
     "replicate-api": "^0.4.4",

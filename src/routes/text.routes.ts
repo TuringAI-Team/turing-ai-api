@@ -23,6 +23,7 @@ import { MPlugOwl } from "../modules/text/mplug-owl.js";
 import bard, { resetBard } from "../modules/text/bard.js";
 import Palm2 from "../modules/text/palm2.js";
 import Bing from "../modules/text/bing.js";
+import Poe, { initPoeClient } from "../modules/text/poe.js";
 
 const router = express.Router();
 
@@ -229,6 +230,7 @@ router.post(`/:m`, key, turnstile, async (req: Request, res: Response) => {
       "mplug-owl",
       "bard",
       "bing",
+      "claude",
     ];
     let { m } = req.params;
     let {
@@ -328,6 +330,18 @@ router.post(`/:m`, key, turnstile, async (req: Request, res: Response) => {
       let { conversationId, tone = "balanced" } = req.body;
       let result = await Bing(prompt, conversationId, tone);
       res.json(result).status(200);
+    } else if (m == "claude") {
+      res.setHeader("Content-Type", "text/html; charset=utf-8");
+      res.setHeader("Transfer-Encoding", "chunked");
+      let c = await initPoeClient();
+      console.log(c);
+      let result = Poe(prompt, c);
+      result.on("data", (data) => {
+        res.write(`data: ${JSON.stringify(data)}\n\n`);
+        if (data.done) {
+          res.end();
+        }
+      });
     } else {
       let { maxTokens = 500 } = req.body;
       let key = process.env.PAWAN_API_KEY;
