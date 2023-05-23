@@ -10,6 +10,7 @@ export async function initPoeClient() {
   });
   await addMsg(acc);
   await client.init();
+  await client.purgeAllMessage();
   return { client, acc };
 }
 export default function Poe(prompt: string, c, model: string = "claude") {
@@ -50,7 +51,7 @@ export default function Poe(prompt: string, c, model: string = "claude") {
 
 async function getAcc() {
   let { data, error } = await supabase.from("poe_accs").select("*");
-  let accs = data.filter((acc) => acc.messages < 5);
+  let accs = data.filter((acc) => acc.messages < 1);
   // sort by messages
   accs = accs.sort((a, b) => a.messages - b.messages);
   // random one from the top 3
