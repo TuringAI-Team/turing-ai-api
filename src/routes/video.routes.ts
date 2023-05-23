@@ -4,7 +4,7 @@ import turnstile from "../middlewares/captchas/turnstile.js";
 import key from "../middlewares/key.js";
 import generateVideo from "../modules/video/damo.js";
 import generateVideo2 from "../modules/video/videocrafter.js";
-import Gen2 from "src/modules/video/gen2.js";
+import Gen2 from "../modules/video/gen2.js";
 
 const router = express.Router();
 
