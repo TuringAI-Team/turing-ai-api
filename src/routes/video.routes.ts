@@ -36,13 +36,9 @@ router.post("/:m", key, turnstile, async (req: Request, res: Response) => {
     if (m == "gen2") {
       let { prompt } = req.body;
       if (!prompt) return res.json({ error: "No prompt provided" }).status(400);
-      let result = await Gen2(prompt);
-      res.setHeader("Content-Type", "text/html; charset=utf-8");
-      res.setHeader("Transfer-Encoding", "chunked");
-      result.on("data", (chunk) => {
-        if (chunk) res.write("data: " + JSON.stringify(chunk) + "\n\n");
-        if (chunk.end) res.end();
-      });
+      let result: any = await Gen2(prompt);
+      if (result.error) return res.json(result).status(400);
+      res.json(result).status(200);
     }
   } catch (err: any) {
     console.log(`err video: ${JSON.stringify(err)}}`);
