@@ -40,7 +40,7 @@ router.post("/:m", key, turnstile, async (req: Request, res: Response) => {
       res.setHeader("Content-Type", "text/html; charset=utf-8");
       res.setHeader("Transfer-Encoding", "chunked");
       result.on("data", (chunk) => {
-        if (chunk) res.write(chunk);
+        if (chunk) res.write("data: " + JSON.stringify(chunk) + "\n\n");
         if (chunk.end) res.end();
       });
     }
