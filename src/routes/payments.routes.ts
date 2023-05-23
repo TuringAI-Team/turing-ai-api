@@ -389,7 +389,7 @@ router.post("/webhook", async (req: Request, res: Response) => {
 router.post("/guilds", async (req: Request, res: Response) => {
   let accessToken = req.body.accessToken;
   let response = await axios({
-    url: `https://discord.com/api/v8/users/@me/guilds?limit=100`,
+    url: `https://discord.com/api/v8/users/@me/guilds?limit=200`,
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },
