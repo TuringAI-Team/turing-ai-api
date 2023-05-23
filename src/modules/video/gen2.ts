@@ -1,10 +1,11 @@
 import client from "../../selfbot.js";
 import supabase from "../supabase.js";
 var videosGenerating = 0;
+import filter from "../filter/index.js";
 
 export default async function Gen2(prompt: string) {
   // just 8 generations per minute
-  if (videosGenerating >= 3) {
+  if (videosGenerating >= 4) {
     return { error: "Too many videos generating, try again later" };
   }
   let channel: any = client.channels.cache.get("1098719904556929064");

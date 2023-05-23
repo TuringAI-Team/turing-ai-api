@@ -22,6 +22,7 @@ import RedPajama from "../modules/text/redpajama.js";
 import { MPlugOwl } from "../modules/text/mplug-owl.js";
 import bard, { resetBard } from "../modules/text/bard.js";
 import Palm2 from "../modules/text/palm2.js";
+import Bing from "../modules/text/bing.js";
 
 const router = express.Router();
 
@@ -227,6 +228,7 @@ router.post(`/:m`, key, turnstile, async (req: Request, res: Response) => {
       "palm2",
       "mplug-owl",
       "bard",
+      "bing",
     ];
     let { m } = req.params;
     let {
@@ -321,6 +323,10 @@ router.post(`/:m`, key, turnstile, async (req: Request, res: Response) => {
     } else if (m == "mplug-owl") {
       let { maxTokens = 500, img } = req.body;
       let result: any = await MPlugOwl(prompt, maxTokens, img, temperature);
+      res.json(result).status(200);
+    } else if (m == "bing") {
+      let { conversationId, tone = "balanced" } = req.body;
+      let result = await Bing(prompt, conversationId, tone);
       res.json(result).status(200);
     } else {
       let { maxTokens = 500 } = req.body;
