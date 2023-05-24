@@ -35,6 +35,7 @@ router.post("/:m", key, turnstile, async (req: Request, res: Response) => {
     }
     if (m == "gen2") {
       let { prompt, upscale, interpolate } = req.body;
+      console.log(prompt);
       if (!prompt) return res.json({ error: "No prompt provided" }).status(400);
       let result = await Gen2(prompt, interpolate, upscale);
       result.on("data", (chunk) => {
