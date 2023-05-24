@@ -39,9 +39,11 @@ export default async function Gen2(
     emitter.emit("data", { generationg: true, end: false, requestId });
     collector.on("collect", (m: any) => {
       let content = m.content;
+      console.log(content);
       if (content.includes(`${prompt}`)) {
         requestId = content.split("request id ")[1].split(")")[0];
         console.log(requestId);
+        emitter.emit("data", { generationg: true, end: false, requestId });
       }
       if (m.content.includes("Generated video")) {
         // get attachment
@@ -58,8 +60,6 @@ export default async function Gen2(
         setTimeout(() => {
           videosGenerating--;
         }, (60 - timeInSecs) * 1000);
-      } else {
-        emitter.emit("data", { generationg: true, end: false, requestId });
       }
     });
     return emitter;
