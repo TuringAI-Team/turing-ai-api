@@ -76,11 +76,11 @@ export default async function bard(message, conversationId, retried = 0) {
       proxy: {
         // optional: proxy configuration
         host: process.env.PROXY_HOST,
-        port: 9999,
-        /*auth: {
+        port: 80,
+        auth: {
           username: process.env.PROXY_USERNAME,
           password: process.env.PROXY_PASSWORD,
-        },*/
+        },
         protocol: "http",
       },
     });
