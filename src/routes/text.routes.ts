@@ -24,6 +24,8 @@ import bard, { resetBard } from "../modules/text/bard.js";
 import Palm2 from "../modules/text/palm2.js";
 import Bing from "../modules/text/bing.js";
 import Poe, { initPoeClient } from "../modules/text/poe.js";
+import redisClient from "../modules/cache/redis.js";
+import { getPlugins } from "../modules/text/plugins.js";
 
 const router = express.Router();
 
@@ -231,6 +233,8 @@ router.post(`/:m`, key, turnstile, async (req: Request, res: Response) => {
       "bard",
       "bing",
       "claude",
+      "chatgpt-plugins",
+      "gpt4-plugins",
     ];
     let { m } = req.params;
     let {
@@ -314,6 +318,16 @@ router.post(`/:m`, key, turnstile, async (req: Request, res: Response) => {
         temperature
       );
       res.json(result).status(200);
+    } else if (m == "chatgpt-plugins" || m == "gpt4-plugins") {
+      let { maxTokens = 500, pluginList } = req.body;
+      let result: any = await LangChain(
+        m,
+        messages,
+        maxTokens,
+        temperature,
+        pluginList
+      );
+      res.json(result).status(200);
     } else if (m == "palm2") {
       let { conversationId } = req.body;
       let result = await Palm2(conversationId, prompt);
@@ -361,6 +375,14 @@ router.post(`/:m`, key, turnstile, async (req: Request, res: Response) => {
       let result = { response: response.data.choices[0].text };
       res.json(result).status(200);
     }
+  } catch (error: any) {
+    res.json({ success: false, error: error }).status(500);
+  }
+});
+router.get("/plugins", key, async (req, res) => {
+  try {
+    let result = await getPlugins();
+    res.json(result).status(200);
   } catch (error: any) {
     res.json({ success: false, error: error }).status(500);
   }

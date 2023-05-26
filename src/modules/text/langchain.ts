@@ -80,6 +80,8 @@ export default async function langchain(
     const result = await agent.call({
       input: input,
     });
+    console.log(result);
     let response = result.output;
+    return response;
   }
 }

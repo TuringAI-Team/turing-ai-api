@@ -26,7 +26,7 @@
     "express": "^4.18.2",
     "firebase": "^9.22.0",
     "get-urls": "^11.0.0",
-    "googlebard": "^1.0.5",
+    "googlebard": "^1.0.6",
     "googlethis": "^1.7.1",
     "hcaptcha": "^0.1.1",
     "helmet": "^6.0.1",
