@@ -11,11 +11,13 @@ const router = express.Router();
 
 router.get("/user/:id", key, async (req, res) => {
   let { id } = req.params;
+
   let { data: user, error } = await supabase
     .from("users_new")
     .select("*")
     .eq("id", id);
   if (error) return res.json({ error: error.message }).status(400);
+  if (!user[0]) return res.json({ error: "user not found" }).status(400);
   res.json(user[0]).status(200);
 });
 router.put("/user/:id", key, async (req, res) => {
