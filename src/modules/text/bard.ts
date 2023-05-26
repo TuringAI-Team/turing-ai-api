@@ -75,7 +75,7 @@ export default async function bard(message, conversationId, retried = 0) {
       //    savePath: "./temp/conversations.json", // optional: path to save conversations
       proxy: {
         // optional: proxy configuration
-        host: process.env.PROXY_HOST,
+        host: "p.webshare.io",
         port: 9999,
         /*auth: {
           username: process.env.PROXY_USERNAME,
