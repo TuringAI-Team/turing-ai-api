@@ -30,4 +30,17 @@ router.put("/user/:id", key, async (req, res) => {
   res.json(user[0]).status(200);
 });
 
+router.post("/user/:id", key, async (req, res) => {
+  let { id } = req.params;
+  let { data: user, error } = await supabase
+
+    .from("users_new")
+    .insert({
+      id,
+      ...req.body,
+    })
+    .select("*");
+  if (error) return res.json({ error: error.message }).status(400);
+  res.json(user[0]).status(200);
+});
 export default router;
