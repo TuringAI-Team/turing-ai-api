@@ -147,12 +147,12 @@ async function checkStatus(channel, user, data) {
   let attachments = messages.attachments;
   // get url
   let url = attachments.first()?.url;
-  let status = content.split("(")[1].split(")")[0];
+  let status = content.split("(")[1].split("%)")[0];
   data.image = url;
-  if (status == "fast") {
+  if (content.includes("(fast)")) {
     data.status = 1;
     data.done = true;
-  } else if (status == "Waiting to start") {
+  } else if (content.includes("(Waiting to start)")) {
     data.status = 0;
   } else {
     status = status.replace("%", "");
