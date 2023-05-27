@@ -164,7 +164,10 @@ async function checkStatus(channel, user, data) {
   let attachments = messages.attachments;
   // get url
   let url = attachments.first()?.url;
-  let status = content.split("(")[1]?.split("%)")[0];
+  let status;
+  if (!data.action || data.action != "upscale") {
+    status = content.split("(")[1].split("%)")[0];
+  }
   data.image = url;
   console.log(status);
   if (
