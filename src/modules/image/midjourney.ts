@@ -239,7 +239,7 @@ export async function buttons(id, action, number = 1) {
   // use application command
   const user = botClient.users.cache.get("936929561302675456");
   let data = {
-    prompt: message.content.split(" - ")[0],
+    prompt: message.content.split(" - ")[0].replaceAll("**", ""),
     action: action,
     image: null,
     status: null,
