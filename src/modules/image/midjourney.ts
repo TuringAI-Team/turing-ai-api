@@ -229,6 +229,8 @@ export async function buttons(id: string, action, number = 1) {
     status: null,
     done: false,
     credits: 0,
+    id: "",
+    messageId: "",
   };
 
   let startTime = Date.now();
@@ -241,9 +243,9 @@ export async function buttons(id: string, action, number = 1) {
   });
   let interval = setInterval(() => {
     checkStatus(channel, user, data).then((x) => {
-      x.id = `${x.id}-${channelid}`;
       data = x;
-      event.emit("data", data);
+      data.id = `${data.messageId}-${channelid}`;
+
       console.log(data);
 
       if (data.done) {
@@ -252,7 +254,10 @@ export async function buttons(id: string, action, number = 1) {
         let credits = timeInS * 0.001;
         data.credits = credits;
         generating.push(channelid);
+        event.emit("data", data);
         clearInterval(interval);
+      } else {
+        event.emit("data", data);
       }
     });
   }, 1000 * 3);
