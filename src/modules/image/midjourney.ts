@@ -36,6 +36,7 @@ export async function imagine(prompt: string, model?: string) {
     status: null,
     done: false,
     credits: 0,
+    action: null,
     id: "",
     messageId: null,
   };
