@@ -9,6 +9,7 @@
     "git": "git fetch && git stash && git pull"
   },
   "dependencies": {
+    "@dqbd/tiktoken": "^1.0.7",
     "@huggingface/inference": "^2.0.0",
     "@sellix/node-sdk": "^1.0.9",
     "@supabase/supabase-js": "^2.10.0",

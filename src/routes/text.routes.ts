@@ -26,6 +26,7 @@ import Bing from "../modules/text/bing.js";
 import Poe, { initPoeClient } from "../modules/text/poe.js";
 import redisClient from "../modules/cache/redis.js";
 import { getPlugins } from "../modules/text/plugins.js";
+import EventEmitter from "events";
 
 const router = express.Router();
 
@@ -214,6 +215,34 @@ router.delete(
     res.json({ message: "Conversation deleted" }).status(200);
   }
 );
+router.post(
+  `/plugins/:m`,
+  key,
+  turnstile,
+  async (req: Request, res: Response) => {
+    let { m } = req.params;
+    let model = `${m}-plugins`;
+    res.setHeader("Content-Type", "text/html; charset=utf-8");
+    res.setHeader("Transfer-Encoding", "chunked");
+    let { maxTokens = 500, pluginList, messages, temperature } = req.body;
+    let event: any = await LangChain(
+      model,
+      messages,
+      maxTokens,
+      temperature,
+      pluginList
+    );
+
+    event.on("data", (data) => {
+      data.credits = data.credits * 1.15;
+      console.log(data.credits);
+      res.write("data: " + JSON.stringify(data) + "\n\n");
+      if (data.done) {
+        res.end();
+      }
+    });
+  }
+);
 
 router.post(`/:m`, key, turnstile, async (req: Request, res: Response) => {
   try {
@@ -233,8 +262,6 @@ router.post(`/:m`, key, turnstile, async (req: Request, res: Response) => {
       "bard",
       "bing",
       "claude",
-      "chatgpt-plugins",
-      "gpt4-plugins",
     ];
     let { m } = req.params;
     let {
@@ -316,16 +343,6 @@ router.post(`/:m`, key, turnstile, async (req: Request, res: Response) => {
         messages,
         maxTokens,
         temperature
-      );
-      res.json(result).status(200);
-    } else if (m == "chatgpt-plugins" || m == "gpt4-plugins") {
-      let { maxTokens = 500, pluginList } = req.body;
-      let result: any = await LangChain(
-        m,
-        messages,
-        maxTokens,
-        temperature,
-        pluginList
       );
       res.json(result).status(200);
     } else if (m == "palm2") {

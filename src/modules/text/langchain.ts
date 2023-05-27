@@ -53,6 +53,7 @@ export default async function langchain(
     return response;
   }
   if (model == "chatgpt-plugins" || model == "gpt4-plugins") {
+    let event = new EventEmitter();
     let modelName = "gpt-3.5-turbo";
     if (model == "gpt4-plugins") {
       modelName = "gpt-4";
@@ -62,26 +63,126 @@ export default async function langchain(
     for (let i = 0; i < pluginsUrls.length; i++) {
       tools.push(await AIPluginTool.fromPluginUrl(pluginsUrls[i]));
     }
-    const agent = await initializeAgentExecutorWithOptions(
+    event.emit("data", {
+      message: "Initializing agent...",
+      done: false,
+    });
+    initializeAgentExecutorWithOptions(
       tools,
       new ChatOpenAI({
         modelName: modelName,
         openAIApiKey: process.env.OPENAI_API_KEY,
+        temperature: 0.2,
       }),
-      { agentType: "chat-zero-shot-react-description", verbose: true }
-    );
-    // remove last message
-    let lastMessage = messages.pop();
+      { agentType: "chat-zero-shot-react-description", verbose: false }
+    ).then(async (agent) => {
+      try {
+        let lastMessage = messages.pop();
+        let input =
+          `${
+            messages.length > 0
+              ? `Current conversation: ${messages
+                  .map((x) => `${x.role}: ${x.content}`)
+                  .join(`\n`)}\n`
+              : ""
+          }user: ${lastMessage.content}\n` +
+          ` 
+          assistant:`;
 
-    let input = `Current conversation: ${messages
-      .map((x) => `${x.role}: ${x.content}`)
-      .join(`\n`)}\nuser: ${lastMessage.content}\nassistant:`;
-    console.log(input);
-    const result = await agent.call({
-      input: input,
+        //  \n is not working
+        console.log({ input });
+        let response = {
+          result: "",
+          done: false,
+          extra: {},
+          tool: null,
+          thought: null,
+          credits: 0,
+        };
+        let pricePerK = 0.002;
+        if (model == "gpt4-plugins") {
+          pricePerK = 0.06;
+        }
+        let credits = 0;
+        credits += ((await getChatMessageLength(messages)) / 1000) * pricePerK;
+        credits += (getPromptLength(lastMessage.content) / 1000) * pricePerK;
+        response.credits = credits;
+        const result = await agent.run(input, [
+          {
+            handleAgentAction(action, runId) {
+              credits += (getPromptLength(action.log) / 1000) * pricePerK;
+              response.credits = credits;
+              if (action.tool != "requests_get") {
+                console.log("\nhandleAgentAction", action, runId);
+
+                response.thought = action.log
+                  .split(".\n")[0]
+                  .replace("Thought: ", "");
+                response.tool = action.tool;
+                event.emit("data", response);
+              }
+            },
+            handleToolEnd(output, runId) {
+              if (
+                !output.includes("401") &&
+                !output.includes("Authorization") &&
+                !output.includes("Usage Guide:")
+              ) {
+                console.log("\nhandleToolEnd", output, runId);
+                response.extra = output;
+                event.emit("data", response);
+              }
+            },
+          },
+        ]);
+        credits += (getPromptLength(result) / 1000) * pricePerK;
+        response.credits = credits;
+        response.result = result;
+        response.done = true;
+        event.emit("data", response);
+        console.log(result);
+      } catch (e) {
+        event.emit("data", { error: e, done: true });
+      }
     });
-    console.log(result);
-    let response = result.output;
-    return response;
+    // remove last message
+
+    return event;
   }
 }
+
+import { get_encoding } from "@dqbd/tiktoken";
+export const encoder = get_encoding("cl100k_base");
+
+/**
+ * Get the length of a prompt.
+ * @param content Prompt to check
+ *
+ * @returns Length of the prompt, in tokens
+ */
+export const getPromptLength = (content: string): number => {
+  content = content
+    .replaceAll("<|endoftext|>", "<|im_end|>")
+    .replaceAll("<|endofprompt|>", "<|im_end|>");
+  return encoder.encode(content).length;
+};
+
+export const getChatMessageLength = (messages: []): number => {
+  /* Total tokens used for the messages */
+  let total: number = 0;
+
+  for (const message of messages) {
+    /* Map each property of the message to the number of tokens it contains. */
+    const propertyTokenCounts = Object.entries(message).map(
+      ([_, value]: any) => {
+        /* Count the number of tokens in the property value. */
+        return getPromptLength(value);
+      }
+    );
+
+    /* Sum the number of tokens in all properties and add 4 for metadata. */
+    total += propertyTokenCounts.reduce((a, b) => a + b, 4);
+  }
+
+  return total + 2;
+};
