@@ -198,8 +198,8 @@ async function checkStatusDescribe(channel, user, data) {
   return data;
 }
 
-export async function buttons(id: string, action, number = 1) {
-  console.log(id, action, number);
+export async function buttons(id, action, number = 1) {
+  console.log(id);
   let messageId = id.split("-")[0];
   let channelid = parseInt(id.split("-")[1]);
   let event = new EventEmitter();

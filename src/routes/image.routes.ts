@@ -343,7 +343,7 @@ router.post(
     } else if (action == "variation" || action == "upscale") {
       let { id, number } = req.body;
       res.set("content-type", "text/event-stream");
-
+      console.log(id, number);
       let event = await buttons(id, action, number);
       event.on("data", (data) => {
         res.write("data: " + JSON.stringify(data) + "\n\n");
