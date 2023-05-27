@@ -222,8 +222,8 @@ router.post(
   async (req: Request, res: Response) => {
     let { m } = req.params;
     let model = `${m}-plugins`;
-    res.setHeader("Content-Type", "text/html; charset=utf-8");
-    res.setHeader("Transfer-Encoding", "chunked");
+    res.set("content-type", "text/event-stream");
+
     let { maxTokens = 500, pluginList, messages, temperature } = req.body;
     let event: any = await LangChain(
       model,

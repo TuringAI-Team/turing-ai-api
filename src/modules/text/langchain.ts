@@ -72,7 +72,6 @@ export default async function langchain(
       new ChatOpenAI({
         modelName: modelName,
         openAIApiKey: process.env.OPENAI_API_KEY,
-        temperature: 0.2,
       }),
       { agentType: "chat-zero-shot-react-description", verbose: false }
     ).then(async (agent) => {
@@ -94,7 +93,7 @@ export default async function langchain(
         let response = {
           result: "",
           done: false,
-          extra: {},
+          extra: null,
           tool: null,
           thought: null,
           credits: 0,
