@@ -295,7 +295,7 @@ export async function buttons(id, action, number = 1) {
         event.emit("data", data);
       }
     });
-  }, 1000 * (action == "upscale" ? 10 : 40));
+  }, 1000 * (action == "upscale" ? 15 : 40));
 
   return event;
 }
