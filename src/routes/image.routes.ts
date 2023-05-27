@@ -13,6 +13,7 @@ import delay from "delay";
 import { controlnet } from "../modules/image/controlnet.js";
 import key from "../middlewares/key.js";
 import { Configuration, OpenAIApi } from "openai";
+import { describe, imagine } from "../modules/image/midjourney.js";
 
 const router = express.Router();
 let configuration = new Configuration({
@@ -306,6 +307,39 @@ router.get(
       res.json(status).status(200);
     } catch (e: any) {
       res.json({ error: e.rawError.message }).status(400);
+    }
+  }
+);
+
+// Midjourney
+router.post(
+  "/mj/:action",
+  key,
+  turnstile,
+  async (req: Request, res: Response) => {
+    let action = req.params.action;
+    if (action == "imagine") {
+      var { prompt, model } = req.body;
+      res.set("content-type", "text/event-stream");
+
+      let event = await imagine(prompt);
+      event.on("data", (data) => {
+        res.write("data: " + JSON.stringify(data) + "\n\n");
+        if (data.done) {
+          res.end();
+        }
+      });
+    } else if (action == "describe") {
+      var { image, model } = req.body;
+      res.set("content-type", "text/event-stream");
+
+      let event = await describe(image);
+      event.on("data", (data) => {
+        res.write("data: " + JSON.stringify(data) + "\n\n");
+        if (data.done) {
+          res.end();
+        }
+      });
     }
   }
 );
