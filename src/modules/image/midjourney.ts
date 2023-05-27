@@ -130,6 +130,7 @@ async function checkStatusDescribe(channel, user, data) {
     d = d.replace(/\[.*\]\(.*\)/g, (x) => {
       return x.split("[")[1].split("]")[0];
     });
+    d = d.strip();
     if (d == "") return null;
     return d;
   });
