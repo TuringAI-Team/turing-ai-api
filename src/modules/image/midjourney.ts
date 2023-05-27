@@ -143,6 +143,7 @@ async function checkStatus(channel, user, data) {
   data.messageId = `${messages.id}`;
   // get message content
   let content = messages.content;
+  console.log(content);
   // get attachments
   let attachments = messages.attachments;
   // get url
@@ -219,13 +220,15 @@ export async function buttons(id, action, number = 1) {
   let message = await channel.messages.fetch(messageId);
   let actionRows = message.components;
   let variationRow: any = actionRows[action == "upscale" ? 0 : 1];
-  console.log(variationRow.components, number - 1);
   let button = variationRow.components[number];
-  console.log(button);
   // use application command
   const user = botClient.users.cache.get("936929561302675456");
   let data = {
-    prompt: message.content.split(" - ")[0],
+    prompt: `${
+      action == "upscale"
+        ? `${message.content.split(" - ")[0]} - Image #${number}`
+        : ``
+    }`,
     image: null,
     status: null,
     done: false,
