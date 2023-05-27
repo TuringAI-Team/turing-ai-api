@@ -199,7 +199,6 @@ async function checkStatusDescribe(channel, user, data) {
 }
 
 export async function buttons(id, action, number = 1) {
-  console.log(id);
   let messageId = id.split("-")[0];
   let channelid = parseInt(id.split("-")[1]);
   let event = new EventEmitter();
@@ -219,8 +218,11 @@ export async function buttons(id, action, number = 1) {
   if (!channel.isText()) return;
   let message = await channel.messages.fetch(messageId);
   let actionRows = message.components;
+  console.log(actionRows);
   let variationRow = actionRows[action == "upscale" ? 0 : 1];
+  console.log(variationRow);
   let button = variationRow.components[number - 1] as MessageButton;
+  console.log(button);
   // use application command
   const user = botClient.users.cache.get("936929561302675456");
   let data = {
