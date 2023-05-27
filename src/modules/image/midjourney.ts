@@ -218,10 +218,12 @@ export async function buttons(id, action, number = 1) {
   if (!channel.isText()) return;
   let message = await channel.messages.fetch(messageId);
   let actionRows = message.components;
-  console.log(actionRows);
-  let variationRow = actionRows[action == "upscale" ? 0 : 1];
-  console.log(variationRow);
-  let button = variationRow.components[number - 1] as MessageButton;
+  let variationRow: any = actionRows[action == "upscale" ? 0 : 1];
+  console.log(
+    variationRow,
+    variationRow.components.find((x: any) => x.label == `U${number}`)
+  );
+  let button = variationRow.components[number - 1];
   console.log(button);
   // use application command
   const user = botClient.users.cache.get("936929561302675456");
