@@ -186,7 +186,7 @@ router.post(
     result.event.on("data", (data) => {
       // add 15% extra into data.credits
       console.log(data.credits);
-      data.credits = data.credits * 1.15;
+      data.credits = data.credits;
       res.write("data: " + JSON.stringify(data) + "\n\n");
 
       if (data.done) {
@@ -234,7 +234,7 @@ router.post(
     );
 
     event.on("data", (data) => {
-      data.credits = data.credits * 1.15;
+      data.credits = data.credits;
       console.log(data.credits);
       res.write("data: " + JSON.stringify(data) + "\n\n");
       if (data.done) {

@@ -67,7 +67,7 @@ export async function imagine(prompt: string, model?: string) {
         let timeInS = (Date.now() - startTime) / 1000;
         //  each second is 0.001 credits
         let credits = timeInS * 0.001;
-        data.credits = credits * 1.15;
+        data.credits = credits;
         generating--;
         clearInterval(interval);
       }
@@ -125,9 +125,8 @@ async function checkStatus(channel, user, data) {
   let attachments = messages.attachments;
   // get url
   let url = attachments.first()?.url;
-  let status = content.split("(")[1].split("%)")[0];
+  let status = content.split("(")[1].split(")")[0];
   data.image = url;
-  console.log(status);
   if (status == "fast") {
     data.status = 1;
     data.done = true;
@@ -135,6 +134,7 @@ async function checkStatus(channel, user, data) {
   } else if (status == "Waiting to start") {
     data.status = 0;
   } else {
+    status = status.replace("%", "");
     data.status = parseInt(status) / 100;
   }
   return data;
