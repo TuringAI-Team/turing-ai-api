@@ -137,8 +137,21 @@ async function checkStatus(channel, user, data) {
   let x = await channel.messages.fetch();
   let messages = x
     .filter((x) => x.author.id == user.id)
-    .filter((x) => x.content.includes(data.prompt))
-    .first();
+    .filter((x) => x.content.includes(data.prompt));
+  if (data.action) {
+    if (data.action == "upscale") {
+      messages = messages.filter(
+        (x) => x.content.includes("Upscaling") && x.content.includes("Image #")
+      );
+    } else {
+      messages = messages.filter(
+        (x) =>
+          x.content.includes("Making variations") &&
+          x.content.includes("Variations")
+      );
+    }
+  }
+  messages = messages.first();
   if (!messages) return;
   data.messageId = `${messages.id}`;
   // get message content
@@ -224,11 +237,8 @@ export async function buttons(id, action, number = 1) {
   // use application command
   const user = botClient.users.cache.get("936929561302675456");
   let data = {
-    prompt: `${
-      action == "upscale"
-        ? `${message.content.split(" - ")[0]} - Image #${number}`
-        : ``
-    }`,
+    prompt: message.content.split(" - ")[0],
+    action: action,
     image: null,
     status: null,
     done: false,
