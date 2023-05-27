@@ -69,10 +69,7 @@ export async function imagine(prompt: string, model?: string) {
   let reply = await channel.sendSlash(user, "imagine", prompt);
   // get last message from bot in channel
 
-  checkStatus(channel, user, data).then((x) => {
-    data = x;
-    event.emit("data", data);
-  });
+  let startTime = Date.now();
   let interval = setInterval(() => {
     checkStatus(channel, user, data).then((x) => {
       data = x;
@@ -81,7 +78,8 @@ export async function imagine(prompt: string, model?: string) {
       console.log(data);
 
       if (data.done) {
-        let timeInS = (Date.now() - data.startTime) / 1000;
+        if (data.startTime) startTime = data.startTime;
+        let timeInS = (Date.now() - startTime) / 1000;
         //  each second is 0.001 credits
         let credits = timeInS * 0.001;
         data.credits = credits;
@@ -272,11 +270,8 @@ export async function buttons(id, action, number = 1) {
 
   // get last message from bot in channel
   await button.click(message);
+  let startTime = Date.now();
 
-  checkStatus(channel, user, data).then((x) => {
-    data = x;
-    event.emit("data", data);
-  });
   let interval = setInterval(() => {
     checkStatus(channel, user, data).then((x) => {
       data = x;
@@ -285,7 +280,8 @@ export async function buttons(id, action, number = 1) {
       console.log(data);
 
       if (data.done) {
-        let timeInS = (Date.now() - data.startTime) / 1000;
+        if (data.startTime) startTime = data.startTime;
+        let timeInS = (Date.now() - startTime) / 1000;
         //  each second is 0.001 credits
         let credits = timeInS * 0.001;
         data.credits = credits;
