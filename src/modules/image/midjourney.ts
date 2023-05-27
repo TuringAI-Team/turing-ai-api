@@ -157,6 +157,7 @@ async function checkStatus(channel, user, data) {
   }
   messages = messages.first();
   if (!messages) return data;
+  if (messages.author.id == "1111700194904510534") return data;
   data.messageId = `${messages.id}`;
   // get message content
   let content = messages.content;
@@ -250,6 +251,7 @@ export async function buttons(id, action, number = 1) {
   // remove channelid from generating array
   generating = generating.filter((x) => x != channelid);
   if (!channel.isText()) return;
+
   let message = await channel.messages.fetch(messageId);
   let actionRows = message.components;
   let variationRow: any = actionRows[action == "upscale" ? 0 : 1];
@@ -268,12 +270,16 @@ export async function buttons(id, action, number = 1) {
     messageId: "",
     startTime: null,
   };
-
+  await channel.send({
+    content: `Variations by ${message.content
+      .split(" - ")[0]
+      .replaceAll("**", "")} Image #${data.number + 1}`,
+  });
   // get last message from bot in channel
   let r = await button.click(message);
   let startTime = Date.now();
   console.log(r);
-  let interval = setTimeout(() => {
+  let interval = setInterval(() => {
     checkStatus(channel, user, data).then((x) => {
       data = x;
       data.id = `${data.messageId}-${channelid}`;
@@ -295,7 +301,7 @@ export async function buttons(id, action, number = 1) {
         event.emit("data", data);
       }
     });
-  }, 1000 * (action == "upscale" ? 15 : 40));
+  }, 1000 * 5);
 
   return event;
 }
