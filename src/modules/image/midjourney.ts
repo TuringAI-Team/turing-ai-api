@@ -271,7 +271,7 @@ export async function buttons(id, action, number = 1) {
   let r = await button.click(message);
   let startTime = Date.now();
   console.log(r);
-  let interval = setInterval(() => {
+  let interval = setTimeout(() => {
     checkStatus(channel, user, data).then((x) => {
       data = x;
       data.id = `${data.messageId}-${channelid}`;
@@ -293,7 +293,7 @@ export async function buttons(id, action, number = 1) {
         event.emit("data", data);
       }
     });
-  }, 1000 * 3);
+  }, 1000 * (action == "upscale" ? 5 : 10));
 
   return event;
 }
