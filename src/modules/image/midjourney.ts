@@ -8,8 +8,8 @@ import {
 } from "discord.js-selfbot-v13";
 import EventEmitter from "events";
 
-let generating = [0, 1, 2];
-let describing = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
+let generating = [1, 2, 3];
+let describing = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
 const botClient: Client = client;
 
 export async function imagine(prompt: string, model?: string) {
