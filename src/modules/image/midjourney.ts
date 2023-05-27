@@ -7,6 +7,7 @@ import {
   TextChannel,
 } from "discord.js-selfbot-v13";
 import EventEmitter from "events";
+import redisClient from "../cache/redis.js";
 
 let generating = [1, 2, 3];
 let describing = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
@@ -139,6 +140,7 @@ async function checkStatus(channel, user, data) {
   let messages = x
     .filter((x) => x.author.id == user.id)
     .filter((x) => x.content.includes(data.prompt));
+  console.log(messages);
   if (data.action) {
     if (data.action == "upscale") {
       console.log(messages.length);
