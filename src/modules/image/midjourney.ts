@@ -150,10 +150,10 @@ async function checkStatus(channel, user, data) {
   let status = content.split("(")[1].split("%)")[0];
   data.image = url;
   console.log(status);
-  if (content.includes("(fast)") && !status) {
+  if (content.includes("(fast)") && !status.includes("%")) {
     data.status = 1;
     data.done = true;
-  } else if (content.includes("(Waiting to start)") && !status) {
+  } else if (content.includes("(Waiting to start)") && !status.includes("%")) {
     data.status = 0;
   } else {
     status = status.replace("%", "");
