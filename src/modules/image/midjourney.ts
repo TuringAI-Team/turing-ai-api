@@ -66,6 +66,7 @@ export async function imagine(prompt: string, model?: string) {
   });
   let interval = setInterval(() => {
     checkStatus(channel, user, data).then((x) => {
+      x.id = `${x.id}-${genAt}`;
       data = x;
       event.emit("data", data);
       console.log(data);
@@ -128,6 +129,7 @@ async function checkStatus(channel, user, data) {
     .filter((x) => x.author.id == user.id && x.content.includes(data.prompt))
     .first();
   if (!messages) return;
+  data.id = `${messages.id}`;
   // get message content
   let content = messages.content;
   // get attachments
@@ -221,6 +223,7 @@ export async function variation(id: string, number = 1) {
   });
   let interval = setInterval(() => {
     checkStatus(channel, user, data).then((x) => {
+      x.id = `${x.id}-${channelid}`;
       data = x;
       event.emit("data", data);
       console.log(data);
