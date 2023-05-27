@@ -128,7 +128,8 @@ export async function describe(image: string) {
 async function checkStatus(channel, user, data) {
   let x = await channel.messages.fetch();
   let messages = x
-    .filter((x) => x.author.id == user.id && x.content.includes(data.prompt))
+    .filter((x) => x.author.id == user.id)
+    .filter((x) => x.content.includes(data.prompt))
     .first();
   if (!messages) return;
   data.messageId = `${messages.id}`;
