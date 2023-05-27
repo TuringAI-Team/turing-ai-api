@@ -18,6 +18,13 @@ export async function imagine(prompt: string, model?: string) {
   if (!channel.isText()) return;
   // use application command
   const user = botClient.users.cache.get("936929561302675456");
+  let data = {
+    prompt: prompt,
+    image: null,
+    status: null,
+    done: false,
+    credits: 0,
+  };
   switch (model) {
     case "5.1":
       prompt = `${prompt} --v 5.1`;
@@ -42,14 +49,10 @@ export async function imagine(prompt: string, model?: string) {
       prompt = `${prompt} --v 1`;
       break;
   }
+  let startTime = Date.now();
   let reply = await channel.sendSlash(user, "imagine", prompt);
   // get last message from bot in channel
-  let data = {
-    prompt: prompt,
-    image: null,
-    status: null,
-    done: false,
-  };
+
   checkStatus(channel, user, data).then((x) => {
     data = x;
     event.emit("data", data);
@@ -58,12 +61,18 @@ export async function imagine(prompt: string, model?: string) {
     checkStatus(channel, user, data).then((x) => {
       data = x;
       event.emit("data", data);
+      console.log(data);
+
       if (data.done) {
+        let timeInS = (Date.now() - startTime) / 1000;
+        //  each second is 0.001 credits
+        let credits = timeInS * 0.001;
+        data.credits = credits * 1.15;
         generating--;
         clearInterval(interval);
       }
     });
-  }, 1000 * 5);
+  }, 1000 * 3);
 
   return event;
   //await command.sendSlashCommand();
@@ -118,6 +127,7 @@ async function checkStatus(channel, user, data) {
   let url = attachments.first()?.url;
   let status = content.split("(")[1].split("%)")[0];
   data.image = url;
+  console.log(status);
   if (status == "fast") {
     data.status = 1;
     data.done = true;
