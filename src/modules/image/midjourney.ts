@@ -40,6 +40,7 @@ export async function imagine(prompt: string, model?: string) {
     action: null,
     id: "",
     messageId: null,
+    startTime: null,
   };
   switch (model) {
     case "5.1":
@@ -65,7 +66,6 @@ export async function imagine(prompt: string, model?: string) {
       prompt = `${prompt} --v 1`;
       break;
   }
-  let startTime = Date.now();
   let reply = await channel.sendSlash(user, "imagine", prompt);
   // get last message from bot in channel
 
@@ -81,7 +81,7 @@ export async function imagine(prompt: string, model?: string) {
       console.log(data);
 
       if (data.done) {
-        let timeInS = (Date.now() - startTime) / 1000;
+        let timeInS = (Date.now() - data.startTime) / 1000;
         //  each second is 0.001 credits
         let credits = timeInS * 0.001;
         data.credits = credits;
@@ -169,13 +169,17 @@ async function checkStatus(channel, user, data) {
   console.log(status);
   if (
     (content.includes("(fast)") && !content.includes("%")) ||
-    (content.includes(`Image #${data.number}`) && url)
+    (content.includes(`Image #${data.number}`) && url) ||
+    (content.includes("Variations by") && !content.includes("%"))
   ) {
     data.status = 1;
     data.done = true;
   } else if (content.includes("(Waiting to start)") && !content.includes("%")) {
     data.status = 0;
   } else {
+    if (!data.startTime) {
+      data.startTime = Date.now();
+    }
     status = status.replace("%", "");
     data.status = parseInt(status) / 100;
   }
@@ -259,10 +263,10 @@ export async function buttons(id, action, number = 1) {
     credits: 0,
     id: "",
     messageId: "",
+    startTime: null,
   };
   console.log(data.prompt);
 
-  let startTime = Date.now();
   // get last message from bot in channel
   await button.click(message);
 
@@ -278,7 +282,7 @@ export async function buttons(id, action, number = 1) {
       console.log(data);
 
       if (data.done) {
-        let timeInS = (Date.now() - startTime) / 1000;
+        let timeInS = (Date.now() - data.startTime) / 1000;
         //  each second is 0.001 credits
         let credits = timeInS * 0.001;
         data.credits = credits;
