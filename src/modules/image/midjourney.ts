@@ -293,7 +293,7 @@ export async function buttons(id, action, number = 1) {
         event.emit("data", data);
       }
     });
-  }, 1000 * (action == "upscale" ? 5 : 10));
+  }, 1000 * (action == "upscale" ? 10 : 30));
 
   return event;
 }
