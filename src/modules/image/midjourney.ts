@@ -219,10 +219,7 @@ export async function buttons(id, action, number = 1) {
   let message = await channel.messages.fetch(messageId);
   let actionRows = message.components;
   let variationRow: any = actionRows[action == "upscale" ? 0 : 1];
-  console.log(
-    variationRow,
-    variationRow.components.find((x: any) => x.label == `U${number}`)
-  );
+
   let button = variationRow.components[number - 1];
   console.log(button);
   // use application command
