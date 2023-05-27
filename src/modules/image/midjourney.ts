@@ -122,6 +122,8 @@ async function checkStatus(channel, user, data) {
     data.status = 1;
     data.done = true;
     generating--;
+  } else if (status == "Waiting to start") {
+    data.status = 0;
   } else {
     data.status = parseInt(status) / 100;
   }
