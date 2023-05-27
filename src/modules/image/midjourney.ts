@@ -141,9 +141,11 @@ async function checkStatus(channel, user, data) {
     .filter((x) => x.content.includes(data.prompt));
   if (data.action) {
     if (data.action == "upscale") {
+      console.log(messages.length);
       messages = messages.filter(
         (x) => x.content.includes("Upscaling") && x.content.includes("Image #")
       );
+      console.log(messages.length);
     } else {
       messages = messages.filter(
         (x) =>
