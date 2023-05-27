@@ -232,6 +232,7 @@ export async function buttons(id, action, number = 1) {
   generating = generating.filter((x) => x != channelid);
   if (!channel.isText()) return;
   let message = await channel.messages.fetch(messageId);
+  console.log(message);
   let actionRows = message.components;
   let variationRow: any = actionRows[action == "upscale" ? 0 : 1];
   let button = variationRow.components[number];
@@ -247,6 +248,7 @@ export async function buttons(id, action, number = 1) {
     id: "",
     messageId: "",
   };
+  console.log(data.prompt);
 
   let startTime = Date.now();
   // get last message from bot in channel
