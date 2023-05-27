@@ -14,6 +14,8 @@ import { controlnet } from "../modules/image/controlnet.js";
 import key from "../middlewares/key.js";
 import { Configuration, OpenAIApi } from "openai";
 import { buttons, describe, imagine } from "../modules/image/midjourney.js";
+import supabase from "../modules/supabase.js";
+import redisClient from "../modules/cache/redis.js";
 
 const router = express.Router();
 let configuration = new Configuration({
@@ -344,9 +346,26 @@ router.post(
       let { id, number } = req.body;
       res.set("content-type", "text/event-stream");
       let event = await buttons(id, action, number);
-      event.on("data", (data) => {
+      event.on("data", async (data) => {
         res.write("data: " + JSON.stringify(data) + "\n\n");
         if (data.done) {
+          if (action == "upscale") {
+            let data: any = await redisClient.get(id);
+            data = JSON.parse(data);
+            await supabase.from("dataset").insert([
+              {
+                id: id,
+                model: data.model,
+                dataset: "0-turingjourney",
+                data: {
+                  id: id,
+                  prompt: data.prompt,
+                  image: data.image,
+                  rating: 3,
+                },
+              },
+            ]);
+          }
           res.end();
         }
       });

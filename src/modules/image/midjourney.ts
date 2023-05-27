@@ -41,6 +41,7 @@ export async function imagine(prompt: string, model?: string) {
     id: "",
     messageId: null,
     startTime: null,
+    model: model,
   };
   switch (model) {
     case "5.1":
@@ -85,6 +86,7 @@ export async function imagine(prompt: string, model?: string) {
         data.credits = credits;
         generating.push(genAt);
         event.emit("data", data);
+        redisClient.set(data.id, JSON.stringify(data));
         clearInterval(interval);
       } else {
         event.emit("data", data);
@@ -143,7 +145,7 @@ async function checkStatus(channel, user, data) {
       messages = messages.filter(
         (x) =>
           x.content.includes("Upscaling") ||
-          x.content.includes(`Image #${data.number}`)
+          x.content.includes(`Image #${data.number + 1}`)
       );
     } else {
       messages = messages.filter(
@@ -170,7 +172,7 @@ async function checkStatus(channel, user, data) {
   console.log(status);
   if (
     (content.includes("(fast)") && !content.includes("%")) ||
-    (content.includes(`Image #${data.number}`) && url) ||
+    (content.includes(`Image #${data.number + 1}`) && url) ||
     (content.includes("Variations by") && !content.includes("%"))
   ) {
     data.status = 1;
@@ -260,7 +262,7 @@ export async function buttons(id, action, number = 1) {
     image: null,
     status: null,
     done: false,
-    number: number + 1,
+    number: number,
     credits: 0,
     id: "",
     messageId: "",
