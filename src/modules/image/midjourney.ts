@@ -6,7 +6,7 @@ let generating = 0;
 let describing = 0;
 const botClient: Client = client;
 
-export async function imagine(prompt: string) {
+export async function imagine(prompt: string, model?: string) {
   let event = new EventEmitter();
   let guild = botClient.guilds.cache.get("1111700862868406383");
   if (!guild) return;
@@ -18,6 +18,30 @@ export async function imagine(prompt: string) {
   if (!channel.isText()) return;
   // use application command
   const user = botClient.users.cache.get("936929561302675456");
+  switch (model) {
+    case "5.1":
+      prompt = `${prompt} --v 5.1`;
+      break;
+
+    case "5":
+      prompt = `${prompt} --v 5`;
+      break;
+    case "niji":
+      prompt = `${prompt} --niji 5 `;
+      break;
+    case "4":
+      prompt = `${prompt} --v 4`;
+      break;
+    case "3":
+      prompt = `${prompt} --v 3`;
+      break;
+    case "2":
+      prompt = `${prompt} --v 2`;
+      break;
+    case "1":
+      prompt = `${prompt} --v 1`;
+      break;
+  }
   let reply = await channel.sendSlash(user, "imagine", prompt);
   // get last message from bot in channel
   let data = {

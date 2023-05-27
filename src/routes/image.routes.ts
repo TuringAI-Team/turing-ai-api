@@ -319,10 +319,10 @@ router.post(
   async (req: Request, res: Response) => {
     let action = req.params.action;
     if (action == "imagine") {
-      var { prompt, model } = req.body;
+      let { prompt, model } = req.body;
       res.set("content-type", "text/event-stream");
 
-      let event = await imagine(prompt);
+      let event = await imagine(prompt, model);
       event.on("data", (data) => {
         res.write("data: " + JSON.stringify(data) + "\n\n");
         if (data.done) {
@@ -330,7 +330,7 @@ router.post(
         }
       });
     } else if (action == "describe") {
-      var { image, model } = req.body;
+      let { image } = req.body;
       res.set("content-type", "text/event-stream");
 
       let event = await describe(image);
