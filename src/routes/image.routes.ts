@@ -361,7 +361,7 @@ router.post(
                   id: id,
                   prompt: data.prompt,
                   image: data.image,
-                  rating: 3,
+                  rating: null,
                 },
               },
             ]);
