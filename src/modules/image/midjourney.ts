@@ -199,6 +199,7 @@ async function checkStatusDescribe(channel, user, data) {
 }
 
 export async function buttons(id: string, action, number = 1) {
+  console.log(id, action, number);
   let messageId = id.split("-")[0];
   let channelid = parseInt(id.split("-")[1]);
   let event = new EventEmitter();
@@ -215,7 +216,6 @@ export async function buttons(id: string, action, number = 1) {
   ) as TextChannel;
   // remove channelid from generating array
   generating = generating.filter((x) => x != channelid);
-  if (!channel.isText()) return;
   if (!channel.isText()) return;
   let message = await channel.messages.fetch(messageId);
   let actionRows = message.components;
