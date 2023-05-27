@@ -8,7 +8,7 @@ import {
 } from "discord.js-selfbot-v13";
 import EventEmitter from "events";
 
-let generating = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
+let generating = [0, 1, 2];
 let describing = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
 const botClient: Client = client;
 
@@ -16,6 +16,12 @@ export async function imagine(prompt: string, model?: string) {
   let event = new EventEmitter();
   let guild = botClient.guilds.cache.get("1111700862868406383");
   if (!guild) return;
+  if (generating.length <= 0) {
+    event.emit("data", {
+      error: "Too many images generating, try again later",
+      done: true,
+    });
+  }
   let genAt = generating.pop();
   // get channel by name
   let channel = guild.channels.cache.find(
@@ -196,6 +202,12 @@ export async function buttons(id: string, action, number = 1) {
   let channelid = parseInt(id.split("-")[1]);
   let event = new EventEmitter();
   let guild = botClient.guilds.cache.get("1111700862868406383");
+  if (generating.length <= 0) {
+    event.emit("data", {
+      error: "Too many images generating, try again later",
+      done: true,
+    });
+  }
   if (!guild) return;
   let channel = guild.channels.cache.find(
     (x) => x.name == channelid.toString()
