@@ -140,18 +140,17 @@ async function checkStatus(channel, user, data) {
   let messages = x
     .filter((x) => x.author.id == user.id)
     .filter((x) => x.content.includes(data.prompt));
-  console.log(messages);
   if (data.action) {
     if (data.action == "upscale") {
-      console.log(messages.length);
       messages = messages.filter(
-        (x) => x.content.includes("Upscaling") && x.content.includes("Image #")
+        (x) =>
+          x.content.includes("Upscaling") ||
+          x.content.includes(`Image #${data.number}`)
       );
-      console.log(messages.length);
     } else {
       messages = messages.filter(
         (x) =>
-          x.content.includes("Making variations") &&
+          x.content.includes("Making variations") ||
           x.content.includes("Variations")
       );
     }
@@ -161,15 +160,17 @@ async function checkStatus(channel, user, data) {
   data.messageId = `${messages.id}`;
   // get message content
   let content = messages.content;
-  console.log(content);
   // get attachments
   let attachments = messages.attachments;
   // get url
   let url = attachments.first()?.url;
-  let status = content.split("(")[1].split("%)")[0];
+  let status = content.split("(")[1]?.split("%)")[0];
   data.image = url;
   console.log(status);
-  if (content.includes("(fast)") && !content.includes("%")) {
+  if (
+    (content.includes("(fast)") && !content.includes("%")) ||
+    (content.includes(`Image #${data.number}`) && url)
+  ) {
     data.status = 1;
     data.done = true;
   } else if (content.includes("(Waiting to start)") && !content.includes("%")) {
@@ -220,7 +221,14 @@ async function checkStatusDescribe(channel, user, data) {
 export async function buttons(id, action, number = 1) {
   let messageId = id.split("-")[0];
   let channelid = parseInt(id.split("-")[1]);
+  let jobId = `${id}-${action}-${number}`;
   let event = new EventEmitter();
+  let job = await redisClient.get(jobId);
+  if (job) {
+    event.emit("data", {
+      ...JSON.parse(job),
+    });
+  }
   let guild = botClient.guilds.cache.get("1111700862868406383");
   if (generating.length <= 0) {
     event.emit("data", {
@@ -247,6 +255,7 @@ export async function buttons(id, action, number = 1) {
     image: null,
     status: null,
     done: false,
+    number: number + 1,
     credits: 0,
     id: "",
     messageId: "",
@@ -275,6 +284,8 @@ export async function buttons(id, action, number = 1) {
         data.credits = credits;
         generating.push(channelid);
         event.emit("data", data);
+
+        redisClient.set(jobId, JSON.stringify(data));
         clearInterval(interval);
       } else {
         event.emit("data", data);
