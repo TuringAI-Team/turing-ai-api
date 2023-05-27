@@ -266,12 +266,11 @@ export async function buttons(id, action, number = 1) {
     messageId: "",
     startTime: null,
   };
-  console.log(data.prompt);
 
   // get last message from bot in channel
-  await button.click(message);
+  let r = await button.click(message);
   let startTime = Date.now();
-
+  console.log(r);
   let interval = setInterval(() => {
     checkStatus(channel, user, data).then((x) => {
       data = x;
