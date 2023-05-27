@@ -30,7 +30,8 @@ export async function imagine(prompt: string, model?: string) {
     status: null,
     done: false,
     credits: 0,
-    id: null,
+    id: "",
+    messageId: null,
   };
   switch (model) {
     case "5.1":
@@ -66,8 +67,9 @@ export async function imagine(prompt: string, model?: string) {
   });
   let interval = setInterval(() => {
     checkStatus(channel, user, data).then((x) => {
-      x.id = `${x.id}-${genAt}`;
       data = x;
+      data.id = `${data.messageId}-${genAt}`;
+
       event.emit("data", data);
       console.log(data);
 
@@ -129,7 +131,7 @@ async function checkStatus(channel, user, data) {
     .filter((x) => x.author.id == user.id && x.content.includes(data.prompt))
     .first();
   if (!messages) return;
-  data.id = `${messages.id}`;
+  data.messageId = `${messages.id}`;
   // get message content
   let content = messages.content;
   // get attachments
@@ -186,7 +188,7 @@ async function checkStatusDescribe(channel, user, data) {
   return data;
 }
 
-export async function variation(id: string, number = 1) {
+export async function buttons(id: string, action, number = 1) {
   let messageId = id.split("-")[0];
   let channelid = parseInt(id.split("-")[1]);
   let event = new EventEmitter();
@@ -201,7 +203,7 @@ export async function variation(id: string, number = 1) {
   if (!channel.isText()) return;
   let message = await channel.messages.fetch(messageId);
   let actionRows = message.components;
-  let variationRow = actionRows[1];
+  let variationRow = actionRows[action == "upscale" ? 0 : 1];
   let button = variationRow.components[number - 1] as MessageButton;
   // use application command
   const user = botClient.users.cache.get("936929561302675456");

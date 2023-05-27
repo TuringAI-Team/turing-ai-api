@@ -13,7 +13,7 @@ import delay from "delay";
 import { controlnet } from "../modules/image/controlnet.js";
 import key from "../middlewares/key.js";
 import { Configuration, OpenAIApi } from "openai";
-import { describe, imagine } from "../modules/image/midjourney.js";
+import { buttons, describe, imagine } from "../modules/image/midjourney.js";
 
 const router = express.Router();
 let configuration = new Configuration({
@@ -334,6 +334,17 @@ router.post(
       res.set("content-type", "text/event-stream");
 
       let event = await describe(image);
+      event.on("data", (data) => {
+        res.write("data: " + JSON.stringify(data) + "\n\n");
+        if (data.done) {
+          res.end();
+        }
+      });
+    } else if (action == "variation" || action == "upscale") {
+      let { id, number } = req.body;
+      res.set("content-type", "text/event-stream");
+
+      let event = await buttons(id, action, number);
       event.on("data", (data) => {
         res.write("data: " + JSON.stringify(data) + "\n\n");
         if (data.done) {
