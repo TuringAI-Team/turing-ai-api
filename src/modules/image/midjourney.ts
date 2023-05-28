@@ -267,7 +267,7 @@ export async function buttons(id, action, number = 1) {
       .split("--v")[0]
       .replaceAll("**", ""),
     action: action,
-    model: message.content.split(" - ")[0].split("--v")[1],
+    model: message.content.split(" - ")[0].split("--v")[1].replaceAll("**", ""),
     image: null,
     status: null,
     done: false,
