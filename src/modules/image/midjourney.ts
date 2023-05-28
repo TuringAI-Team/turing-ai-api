@@ -288,8 +288,6 @@ export async function buttons(id, action, number = 1) {
       data = x;
       data.id = `${data.messageId}-${channelid}`;
 
-      console.log(data);
-
       if (data.done) {
         if (data.startTime) startTime = data.startTime;
         let timeInS = (Date.now() - startTime) / 1000;
