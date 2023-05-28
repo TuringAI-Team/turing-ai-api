@@ -8,6 +8,7 @@ import {
 } from "discord.js-selfbot-v13";
 import EventEmitter from "events";
 import redisClient from "../cache/redis.js";
+import { randomUUID } from "crypto";
 
 let generating = [1, 2, 3];
 let describing = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
@@ -271,7 +272,7 @@ export async function buttons(id, action, number = 1) {
     id: "",
     messageId: "",
     startTime: null,
-    jobId: jobId,
+    jobId: randomUUID(),
   };
   await channel.send({
     content: `Variations by ${message.content

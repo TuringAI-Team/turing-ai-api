@@ -353,7 +353,7 @@ router.post(
         if (data.done) {
           if (action == "upscale") {
             console.log(data.prompt.split("--v")[1].split(" ")[0]);
-            await supabase.from("dataset").insert([
+            let { error } = await supabase.from("dataset").insert([
               {
                 id: data.jobId,
                 model: data.prompt.split("--v")[1].split(" ")[0],
