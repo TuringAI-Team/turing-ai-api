@@ -25,7 +25,7 @@ export async function imagineAsync(prompt: string, model = "5.1") {
   });
 }
 
-export async function imagine(prompt: string, model = "5.1") {
+export async function imagine(prompt: string, mode = "relax", model = "5.1") {
   let event = new EventEmitter();
   let guild = botClient.guilds.cache.get("1111700862868406383");
   if (!guild) return;
@@ -81,6 +81,11 @@ export async function imagine(prompt: string, model = "5.1") {
       prompt = `${prompt} --v 1`;
       break;
   }
+  if (mode == "relax") {
+    await channel.sendSlash(user, "relax");
+  } else {
+    await channel.sendSlash(user, "fast");
+  }
   let reply = await channel.sendSlash(user, "imagine", prompt);
   // get last message from bot in channel
 
@@ -99,7 +104,9 @@ export async function imagine(prompt: string, model = "5.1") {
         if (data.startTime) startTime = data.startTime;
         let timeInS = (Date.now() - startTime) / 1000;
         //  each second is 0.001 credits
-        let credits = timeInS * 0.001;
+        let pricePerSecond = 0.001;
+        if (mode == "relax") pricePerSecond = 0.0005;
+        let credits = timeInS * pricePerSecond;
         data.credits = credits;
         generating.push(genAt);
         redisClient.set(data.id, JSON.stringify(data));
@@ -203,6 +210,7 @@ async function checkStatus(channel, user, data, prompt) {
   data.image = url;
   if (
     (content.includes("(fast)") && !content.includes("%")) ||
+    (content.includes("(relaxed)") && !content.includes("%")) ||
     (content.includes(`Image #${data.number + 1}`) && url) ||
     (content.includes("Variations by") && !content.includes("%"))
   ) {
