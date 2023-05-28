@@ -14,6 +14,17 @@ let generating = [1, 2, 3];
 let describing = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
 const botClient: Client = client;
 
+export async function imagineAsync(prompt: string, model = "5.1") {
+  let event = await imagine(prompt, model);
+  return new Promise((resolve, reject) => {
+    event.on("data", (data) => {
+      if (data.done) {
+        resolve(data);
+      }
+    });
+  });
+}
+
 export async function imagine(prompt: string, model = "5.1") {
   let event = new EventEmitter();
   let guild = botClient.guilds.cache.get("1111700862868406383");
@@ -171,8 +182,11 @@ async function checkStatus(channel, user, data, prompt) {
       data.error = "Flagged";
       data.id = null;
       data.credits = 0;
+      return data;
     }
-    return data;
+    data.error = "No message found";
+    data.done = true;
+    if (!messages) return data;
   }
   console.log(messages.content);
   if (messages.author.id != user.id) return data;

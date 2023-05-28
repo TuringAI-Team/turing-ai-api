@@ -38,6 +38,7 @@ import {
   SystemChatMessage,
   AIChatMessage,
 } from "langchain/schema";
+import { imagine, imagineAsync } from "../image/midjourney.js";
 
 export default class Alan {
   userName: string;
@@ -428,6 +429,15 @@ export default class Alan {
             images = [images];
             let time = Date.now() - start;
             credits += (time / 1000) * 0.0023;
+          }
+          if (imageGenerator == "midjourney") {
+            // nsfwfilter to boolean
+
+            let result: any = await imagineAsync(imagePrompt); // this returns de generation id that need to be checked to get images
+
+            credits += result.credits;
+            images = result.image;
+            done = true;
           }
           event.emit("data", {
             result: response,
