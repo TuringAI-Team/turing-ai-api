@@ -326,6 +326,7 @@ router.post(
 
       let event = await imagine(prompt, model);
       event.on("data", (data) => {
+        console.log(data);
         res.write("data: " + JSON.stringify(data) + "\n\n");
         if (data.done) {
           res.end();
@@ -352,6 +353,7 @@ router.post(
         if (data.done) {
           if (action == "upscale") {
             let rd: any = await redisClient.get(id);
+            console.log(rd);
             if (rd) {
               rd = JSON.parse(data);
               await supabase.from("dataset").insert([

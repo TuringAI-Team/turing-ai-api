@@ -77,8 +77,6 @@ export async function imagine(prompt: string, model?: string) {
       data = x;
       data.id = `${data.messageId}-${genAt}`;
 
-      console.log(data);
-
       if (data.done) {
         if (data.startTime) startTime = data.startTime;
         let timeInS = (Date.now() - startTime) / 1000;
@@ -86,8 +84,8 @@ export async function imagine(prompt: string, model?: string) {
         let credits = timeInS * 0.001;
         data.credits = credits;
         generating.push(genAt);
-        event.emit("data", data);
         redisClient.set(data.id, JSON.stringify(data));
+        event.emit("data", data);
         clearInterval(interval);
       } else {
         event.emit("data", data);
