@@ -264,13 +264,15 @@ export async function buttons(id, action, number = 1) {
   let data = {
     prompt: message.content
       .split(" - ")[0]
-      .split("--v")[0]
+      .split(message.content.includes("niji") ? "--niji" : "--v")[0]
       .replaceAll("**", "")
       .trim(),
     action: action,
-    model: `mj-${message.content
+    model: `mj-${
+      message.content.includes("niji") ? "niji" : ""
+    }-${message.content
       .split(" - ")[0]
-      .split("--v")[1]
+      .split(message.content.includes("niji") ? "--niji" : "--v")[1]
       .replaceAll("**", "")
       .replaceAll(" ", "")}`,
     image: null,
