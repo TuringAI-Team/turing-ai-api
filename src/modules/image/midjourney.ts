@@ -232,7 +232,6 @@ export async function buttons(id, action, number = 1) {
   let jobId = `${id}-${action}-${number}`;
   let event = new EventEmitter();
   let job = await redisClient.get(jobId);
-  console.log(job);
   if (job) {
     event.emit("data", {
       ...JSON.parse(job),
@@ -272,6 +271,7 @@ export async function buttons(id, action, number = 1) {
     id: "",
     messageId: "",
     startTime: null,
+    jobId: jobId,
   };
   await channel.send({
     content: `Variations by ${message.content
