@@ -265,7 +265,8 @@ export async function buttons(id, action, number = 1) {
     prompt: message.content
       .split(" - ")[0]
       .split("--v")[0]
-      .replaceAll("**", ""),
+      .replaceAll("**", "")
+      .trim(),
     action: action,
     model: `mj-${message.content
       .split(" - ")[0]
