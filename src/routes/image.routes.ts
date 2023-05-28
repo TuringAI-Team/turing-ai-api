@@ -350,21 +350,23 @@ router.post(
         res.write("data: " + JSON.stringify(data) + "\n\n");
         if (data.done) {
           if (action == "upscale") {
-            let data: any = await redisClient.get(id);
-            data = JSON.parse(data);
-            await supabase.from("dataset").insert([
-              {
-                id: id,
-                model: data.model,
-                dataset: "0-turingjourney",
-                data: {
+            let rd: any = await redisClient.get(id);
+            if (rd) {
+              rd = JSON.parse(data);
+              await supabase.from("dataset").insert([
+                {
                   id: id,
-                  prompt: data.prompt,
-                  image: data.image,
-                  rating: null,
+                  model: rd.model,
+                  dataset: "0-turingjourney",
+                  data: {
+                    id: id,
+                    prompt: rd.prompt,
+                    image: data.image,
+                    rating: null,
+                  },
                 },
-              },
-            ]);
+              ]);
+            }
           }
           res.end();
         }

@@ -22,6 +22,7 @@ export async function imagine(prompt: string, model?: string) {
       error: "Too many images generating, try again later",
       done: true,
     });
+    return event;
   }
   let genAt = generating.pop();
   // get channel by name
@@ -157,6 +158,7 @@ async function checkStatus(channel, user, data) {
   }
   messages = messages.first();
   if (!messages) return data;
+  console.log(messages.content);
   if (messages.author.id == "1111700194904510534") return data;
   data.messageId = `${messages.id}`;
   // get message content
@@ -232,10 +234,12 @@ export async function buttons(id, action, number = 1) {
   let jobId = `${id}-${action}-${number}`;
   let event = new EventEmitter();
   let job = await redisClient.get(jobId);
+  console.log(job);
   if (job) {
     event.emit("data", {
       ...JSON.parse(job),
     });
+    return event;
   }
   let guild = botClient.guilds.cache.get("1111700862868406383");
   if (generating.length <= 0) {
@@ -243,6 +247,7 @@ export async function buttons(id, action, number = 1) {
       error: "Too many images generating, try again later",
       done: true,
     });
+    return event;
   }
   if (!guild) return;
   let channel = guild.channels.cache.find(
@@ -278,7 +283,6 @@ export async function buttons(id, action, number = 1) {
   // get last message from bot in channel
   let r = await button.click(message);
   let startTime = Date.now();
-  console.log(r);
   let interval = setInterval(() => {
     checkStatus(channel, user, data).then((x) => {
       data = x;
@@ -293,9 +297,8 @@ export async function buttons(id, action, number = 1) {
         let credits = timeInS * 0.001;
         data.credits = credits;
         generating.push(channelid);
-        event.emit("data", data);
-
         redisClient.set(jobId, JSON.stringify(data));
+        event.emit("data", data);
         clearInterval(interval);
       } else {
         event.emit("data", data);
