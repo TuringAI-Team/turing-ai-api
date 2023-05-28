@@ -95,7 +95,9 @@ export async function imagine(prompt: string, mode = "relax", model = "5.1") {
       data = x;
       data.id = `${data.messageId}-${genAt}`;
       let timeInS = (Date.now() - startTime) / 1000;
-      if (timeInS > 60 * 2) {
+      let timeToOut = 60 * 2;
+      if (mode == "relax") timeToOut = 60 * 5;
+      if (timeInS > timeToOut) {
         data.error = "Took too long to generate image, try again later";
         data.done = true;
         clearInterval(interval);
@@ -264,7 +266,7 @@ async function checkStatusDescribe(channel, user, data) {
   return data;
 }
 
-export async function buttons(id, action, number = 1) {
+export async function buttons(id, action, number = 1, mode = "relax") {
   let messageId = id.split("-")[0];
   let channelid = parseInt(id.split("-")[1]);
   let jobId = `${id}-${action}-${number}`;
@@ -328,6 +330,11 @@ export async function buttons(id, action, number = 1) {
       .split(" - ")[0]
       .replaceAll("**", "")} Image #${data.number + 1}`,
   });
+  if (mode == "relax") {
+    await channel.sendSlash(user, "relax");
+  } else {
+    await channel.sendSlash(user, "fast");
+  }
   // get last message from bot in channel
   let r = await button.click(message);
   let startTime = Date.now();
@@ -337,7 +344,9 @@ export async function buttons(id, action, number = 1) {
         data = x;
         data.id = `${data.messageId}-${channelid}`;
         let timeInS = (Date.now() - startTime) / 1000;
-        if (timeInS > 60 * 2) {
+        let timeToOut = 60 * 2;
+        if (mode == "relax") timeToOut = 60 * 5;
+        if (timeInS > timeToOut) {
           data.error = "Took too long to generate image, try again later";
           data.done = true;
           clearInterval(interval);
@@ -346,7 +355,9 @@ export async function buttons(id, action, number = 1) {
           if (data.startTime) startTime = data.startTime;
           let timeInS = (Date.now() - startTime) / 1000;
           //  each second is 0.001 credits
-          let credits = timeInS * 0.001;
+          let pricePerSecond = 0.001;
+          if (mode == "relax") pricePerSecond = 0.0005;
+          let credits = timeInS * pricePerSecond;
           data.credits = credits;
           generating.push(channelid);
           redisClient.set(jobId, JSON.stringify(data));
