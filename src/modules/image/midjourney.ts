@@ -14,7 +14,7 @@ let generating = [1, 2, 3];
 let describing = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
 const botClient: Client = client;
 
-export async function imagine(prompt: string, model?: string) {
+export async function imagine(prompt: string, model = "5.1") {
   let event = new EventEmitter();
   let guild = botClient.guilds.cache.get("1111700862868406383");
   if (!guild) return;
@@ -74,7 +74,7 @@ export async function imagine(prompt: string, model?: string) {
 
   let startTime = Date.now();
   let interval = setInterval(() => {
-    checkStatus(channel, user, data).then((x) => {
+    checkStatus(channel, user, data, prompt).then((x) => {
       data = x;
       data.id = `${data.messageId}-${genAt}`;
 
@@ -135,11 +135,12 @@ export async function describe(image: string) {
   return event;
   //await command.sendSlashCommand();
 }
-async function checkStatus(channel, user, data) {
+async function checkStatus(channel, user, data, prompt) {
   let x = await channel.messages.fetch();
-  let messages = x
-    .filter((x) => x.author.id == user.id)
-    .filter((x) => x.content.includes(data.prompt));
+  let messages = x.filter((x) => {
+    x.content.includes(data.prompt) ||
+      x.embeds[0]?.footer?.text?.includes(data.prompt);
+  });
   if (data.action) {
     if (data.action == "upscale") {
       messages = messages.filter(
@@ -156,7 +157,18 @@ async function checkStatus(channel, user, data) {
     }
   }
   messages = messages.first();
-  if (!messages) return data;
+  if (!messages) {
+    let checkFlagged = await redisClient.get(`imagine:${prompt}`);
+    console.log(checkFlagged);
+    if (checkFlagged) {
+      data.status = 1;
+      data.done = true;
+      data.error = "Flagged";
+      data.id = null;
+      data.credits = 0;
+    }
+    return data;
+  }
   console.log(messages.content);
   if (messages.author.id == "1111700194904510534") return data;
   data.messageId = `${messages.id}`;
@@ -294,24 +306,26 @@ export async function buttons(id, action, number = 1) {
   let r = await button.click(message);
   let startTime = Date.now();
   let interval = setInterval(() => {
-    checkStatus(channel, user, data).then((x) => {
-      data = x;
-      data.id = `${data.messageId}-${channelid}`;
+    checkStatus(channel, user, data, message.content.split(" - ")[0]).then(
+      (x) => {
+        data = x;
+        data.id = `${data.messageId}-${channelid}`;
 
-      if (data.done) {
-        if (data.startTime) startTime = data.startTime;
-        let timeInS = (Date.now() - startTime) / 1000;
-        //  each second is 0.001 credits
-        let credits = timeInS * 0.001;
-        data.credits = credits;
-        generating.push(channelid);
-        redisClient.set(jobId, JSON.stringify(data));
-        event.emit("data", data);
-        clearInterval(interval);
-      } else {
-        event.emit("data", data);
+        if (data.done) {
+          if (data.startTime) startTime = data.startTime;
+          let timeInS = (Date.now() - startTime) / 1000;
+          //  each second is 0.001 credits
+          let credits = timeInS * 0.001;
+          data.credits = credits;
+          generating.push(channelid);
+          redisClient.set(jobId, JSON.stringify(data));
+          event.emit("data", data);
+          clearInterval(interval);
+        } else {
+          event.emit("data", data);
+        }
       }
-    });
+    );
   }, 1000 * 5);
 
   return event;
