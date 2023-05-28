@@ -138,8 +138,7 @@ export async function describe(image: string) {
 async function checkStatus(channel, user, data, prompt) {
   let x = await channel.messages.fetch();
   let messages = x.filter((x) => {
-    x.content.includes(data.prompt) ||
-      x.embeds[0]?.footer?.text?.includes(data.prompt);
+    x.content.includes(data.prompt);
   });
   if (data.action) {
     if (data.action == "upscale") {
@@ -170,7 +169,7 @@ async function checkStatus(channel, user, data, prompt) {
     return data;
   }
   console.log(messages.content);
-  if (messages.author.id == "1111700194904510534") return data;
+  if (messages.author.id != user.id) return data;
   data.messageId = `${messages.id}`;
   // get message content
   let content = messages.content;
