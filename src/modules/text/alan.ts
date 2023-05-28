@@ -434,7 +434,7 @@ export default class Alan {
             // nsfwfilter to boolean
 
             let result: any = await imagineAsync(imagePrompt); // this returns de generation id that need to be checked to get images
-
+            console.log(result);
             credits += result.credits;
             images = result.image;
             done = true;

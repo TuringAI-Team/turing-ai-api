@@ -188,7 +188,6 @@ async function checkStatus(channel, user, data, prompt) {
     data.done = true;
     if (!messages) return data;
   }
-  console.log(messages.content);
   if (messages.author.id != user.id) return data;
   data.messageId = `${messages.id}`;
   // get message content
@@ -202,7 +201,6 @@ async function checkStatus(channel, user, data, prompt) {
     status = content.split("(")[1].split("%)")[0];
   }
   data.image = url;
-  console.log(status);
   if (
     (content.includes("(fast)") && !content.includes("%")) ||
     (content.includes(`Image #${data.number + 1}`) && url) ||
