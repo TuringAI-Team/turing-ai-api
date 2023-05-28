@@ -352,17 +352,17 @@ router.post(
         res.write("data: " + JSON.stringify(data) + "\n\n");
         if (data.done) {
           if (action == "upscale") {
-            console.log(data.prompt.split("--v")[1].split(" ")[0]);
             let { error } = await supabase.from("dataset").insert([
               {
                 id: data.jobId,
-                model: data.prompt.split("--v")[1].split(" ")[0],
+                model: data.model,
                 dataset: "0-turingjourney",
                 data: {
                   id: id,
                   jobId: data.jobId,
                   prompt: data.prompt,
                   image: data.image,
+                  model: data.model,
                   rating: null,
                 },
               },
