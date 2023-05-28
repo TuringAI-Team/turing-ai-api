@@ -134,9 +134,17 @@ router.post("/pay", key, async (req: Request, res: Response) => {
     data.product_id = productId;
   }
   console.log(`data`, data);
-  const payment = await Sellix.payments.create(data);
+  try {
+    const payment = await Sellix.payments.create(data);
 
-  res.status(200).json(payment);
+    res.status(200).json(payment);
+  } catch (e: any) {
+    console.log(e);
+    res.status(500).json({
+      error: e.error,
+      url: `https://app.turing.sh/pay`,
+    });
+  }
 });
 router.post("/webhook", async (req: Request, res: Response) => {
   const payload = req.body;
