@@ -270,7 +270,8 @@ export async function buttons(id, action, number = 1) {
     model: `mj-${message.content
       .split(" - ")[0]
       .split("--v")[1]
-      .replaceAll("**", "")}`,
+      .replaceAll("**", "")
+      .replaceAll(" ", "")}`,
     image: null,
     status: null,
     done: false,
