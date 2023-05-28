@@ -44,6 +44,7 @@ export async function imagine(prompt: string, model = "5.1") {
     messageId: null,
     startTime: null,
     model: model,
+    error: null,
   };
   switch (model) {
     case "5.1":
@@ -77,7 +78,12 @@ export async function imagine(prompt: string, model = "5.1") {
     checkStatus(channel, user, data, prompt).then((x) => {
       data = x;
       data.id = `${data.messageId}-${genAt}`;
-
+      let timeInS = (Date.now() - startTime) / 1000;
+      if (timeInS > 60 * 2) {
+        data.error = "Took too long to generate image, try again later";
+        data.done = true;
+        clearInterval(interval);
+      }
       if (data.done) {
         if (data.startTime) startTime = data.startTime;
         let timeInS = (Date.now() - startTime) / 1000;
@@ -138,7 +144,7 @@ export async function describe(image: string) {
 async function checkStatus(channel, user, data, prompt) {
   let x = await channel.messages.fetch();
   let messages = x.filter((x) => {
-    x.content.includes(data.prompt);
+    return x.content.includes(prompt);
   });
   if (data.action) {
     if (data.action == "upscale") {
@@ -295,6 +301,7 @@ export async function buttons(id, action, number = 1) {
     messageId: "",
     startTime: null,
     jobId: randomUUID(),
+    error: null,
   };
   await channel.send({
     content: `Variations by ${message.content
@@ -309,7 +316,12 @@ export async function buttons(id, action, number = 1) {
       (x) => {
         data = x;
         data.id = `${data.messageId}-${channelid}`;
-
+        let timeInS = (Date.now() - startTime) / 1000;
+        if (timeInS > 60 * 2) {
+          data.error = "Took too long to generate image, try again later";
+          data.done = true;
+          clearInterval(interval);
+        }
         if (data.done) {
           if (data.startTime) startTime = data.startTime;
           let timeInS = (Date.now() - startTime) / 1000;
