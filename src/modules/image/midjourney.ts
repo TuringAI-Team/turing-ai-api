@@ -47,6 +47,7 @@ export async function imagineWithQueue(
   event.emit("data", {
     queued: queuePos,
     done: false,
+    prompt: prompt,
   });
   // check queue, if it is the first one, start it with imagine
   let interval = setInterval(async () => {
@@ -59,7 +60,7 @@ export async function imagineWithQueue(
     if (data.done) {
       clearInterval(interval);
       done = true;
-      queue.splice(queuePos, 1);
+      queue.splice(data.queuePos, 1);
     }
   });
   return event;
@@ -88,10 +89,11 @@ async function checkQueuePostion(queuePos, job, prompt, mode, model, event) {
 
     let data = await imagine(prompt, mode, model);
     data.on("data", (data) => {
-      event.emit("data", data);
+      event.emit("data", { ...data, queuePos: queuePos });
     });
   } else {
     event.emit("data", {
+      prompt: job.prompt,
       queued: queuePos,
       done: false,
     });
