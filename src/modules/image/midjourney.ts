@@ -60,7 +60,8 @@ export async function imagineWithQueue(
     if (data.done) {
       clearInterval(interval);
       done = true;
-      queue.splice(data.queuePos, 1);
+      queuePos = queue.findIndex((x) => x.id == job.id);
+      queue.splice(queuePos, 1);
     }
   });
   return event;
@@ -89,7 +90,7 @@ async function checkQueuePostion(queuePos, job, prompt, mode, model, event) {
 
     let data = await imagine(prompt, mode, model);
     data.on("data", (data) => {
-      event.emit("data", { ...data, queuePos: queuePos });
+      event.emit("data", data);
     });
   } else {
     event.emit("data", {
