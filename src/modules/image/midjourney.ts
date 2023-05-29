@@ -452,6 +452,7 @@ export async function buttons(id, action, number = 1, mode = "relax") {
       let attachments = message.attachments;
       // get url
       let url = attachments.first()?.url;
+      console.log(url);
       let status;
       if (!data.action || data.action != "upscale") {
         status = content1.split("(")[1]?.split("%)")[0];
@@ -471,6 +472,9 @@ export async function buttons(id, action, number = 1, mode = "relax") {
       generating.push(channelid);
       redisClient.set(jobId, JSON.stringify(data));
       event.emit("data", data);
+      // remove this listener
+      botClient.off("messageCreate", () => {});
+      botClient.off("messageUpdate", () => {});
     }
     if (
       (content1.includes(expectedContent) && content1.includes(data.prompt)) ||
@@ -532,6 +536,7 @@ export async function buttons(id, action, number = 1, mode = "relax") {
             generating.push(channelid);
             redisClient.set(jobId, JSON.stringify(data));
             event.emit("data", data);
+            botClient.off("messageUpdate", () => {});
           } else {
             event.emit("data", data);
           }
