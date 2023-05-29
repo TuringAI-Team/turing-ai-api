@@ -452,7 +452,6 @@ export async function buttons(id, action, number = 1, mode = "relax") {
       let attachments = message.attachments;
       // get url
       let url = attachments.first()?.url;
-      console.log(url);
       let status;
       if (!data.action || data.action != "upscale") {
         status = content1.split("(")[1]?.split("%)")[0];

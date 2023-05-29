@@ -354,6 +354,7 @@ router.post(
       res.set("content-type", "text/event-stream");
       let event = await buttons(id, action, number, mode);
       event.on("data", async (data) => {
+        console.log(data);
         res.write("data: " + JSON.stringify(data) + "\n\n");
         if (data.done) {
           if (action == "upscale") {
