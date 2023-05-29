@@ -107,7 +107,7 @@ export async function imagine(prompt: string, mode = "relax", model = "5.1") {
         let timeInS = (Date.now() - startTime) / 1000;
         //  each second is 0.001 credits
         let pricePerSecond = 0.001;
-        if (mode == "relax") pricePerSecond = 0.0005;
+        if (mode == "relax") pricePerSecond = 0;
         let credits = timeInS * pricePerSecond;
         data.credits = credits;
         generating.push(genAt);
@@ -356,7 +356,7 @@ export async function buttons(id, action, number = 1, mode = "relax") {
           let timeInS = (Date.now() - startTime) / 1000;
           //  each second is 0.001 credits
           let pricePerSecond = 0.001;
-          if (mode == "relax") pricePerSecond = 0.0005;
+          if (mode == "relax") pricePerSecond = 0;
           let credits = timeInS * pricePerSecond;
           data.credits = credits;
           generating.push(channelid);
