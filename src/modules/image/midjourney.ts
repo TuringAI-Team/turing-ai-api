@@ -167,12 +167,12 @@ export async function imagine(prompt: string, mode = "relax", model = "5.1") {
 
   if (mode == "relax") {
     if (actualMode != "relax") {
-      await channel.sendSlash(user, "relax");
+      // await channel.sendSlash(user, "relax");
       actualMode = "relax";
     }
   } else {
     if (actualMode != "fast") {
-      await channel.sendSlash(user, "fast");
+      //await channel.sendSlash(user, "fast");
       actualMode = "fast";
     }
   }
