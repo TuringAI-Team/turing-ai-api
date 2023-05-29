@@ -52,11 +52,11 @@ export async function imagineWithQueue(
   let promptsInQueue = queue.map((x) => {
     return { prompt: x.prompt, id: x.id, generating: x.generating };
   });
-  console.log(promptsInQueue);
+  //console.log(promptsInQueue);
   // check queue, if it is the first one, start it with imagine
   let interval = setInterval(async () => {
     await checkQueuePostion(queuePos, job, prompt, mode, model, event);
-  }, 4000);
+  }, 10000);
   event.on("data", (data) => {
     if (!data.queued) {
       clearInterval(interval);
@@ -64,7 +64,6 @@ export async function imagineWithQueue(
       promptsInQueue = queue.map((x) => {
         return { prompt: x.prompt, id: x.id, generating: x.generating };
       });
-      console.log(promptsInQueue);
     }
     if (data.done) {
       clearInterval(interval);
