@@ -1,35 +1,67 @@
 import { BingAIClient } from "@waylaidwanderer/chatgpt-api";
 import supabase from "../supabase.js";
+import EventEmitter from "events";
 
 export default async function Bing(
   prompt: string,
   conversationId: string,
   tone: string
 ) {
+  let event = new EventEmitter();
+  var data = {
+    prompt: prompt,
+    tone: tone,
+    response: "",
+    done: false,
+    suggestedResponse: [],
+    sourceAtrribution: [],
+    adaptiveCard: [],
+    error: null,
+  };
   try {
     conversationId = `bing-${conversationId}`;
     let bingAIClient = new BingAIClient({
       // "_U" cookie from bing.com
-      userToken: "",
       // A proxy string like "http://<ip>:<port>"
       proxy: `http://${process.env.PROXY_HOST}:9999`,
       // (Optional) Set to true to enable `console.debug()` logging
-      debug: true,
+      debug: false,
     });
     console.log(conversationId);
+    let previousMsg = "";
+    let tokens = 0;
     let conversation = await getConversation(conversationId);
-    let response = await bingAIClient.sendMessage(prompt, {
-      onProgress: (token) => {
-        console.log(token);
-        process.stdout.write(token);
-      },
-    });
-    console.log(response);
-    await setConversation(conversationId, response);
-    return response;
+    bingAIClient
+      .sendMessage(prompt, {
+        conversationId: conversation.conversationId,
+        conversationSignature: conversation.conversationSignature,
+        clientId: conversation.clientId,
+        invocationId: conversation.invocationId,
+        toneStyle: tone, // or creative, precise, fast
+        onProgress: (token) => {
+          previousMsg += token;
+          tokens++;
+          data.response = previousMsg;
+          if (tokens > 15) {
+            event.emit("data", data);
+            tokens = 0;
+          }
+        },
+      })
+      .then(async (response) => {
+        data.response = response.response;
+        data.suggestedResponse = response.details.suggestedResponses;
+        data.sourceAtrribution = response.details.sourceAttributions;
+        data.adaptiveCard = response.details.adaptiveCards;
+        data.done = true;
+        event.emit("data", data);
+        await setConversation(conversationId, response);
+      });
+    return event;
   } catch (error) {
-    console.log(error);
-    return { error: "error" };
+    data.error = error;
+    event.emit("data", data);
+    return event;
   }
 }
 
@@ -42,6 +74,11 @@ async function getConversation(conversationId: string) {
   if (!conversations) return {};
   return conversations.history;
 }
+
+export async function resetConversation(conversationId: string) {
+  await supabase.from("conversations_new").delete().eq("id", conversationId);
+}
+
 async function setConversation(conversationId: string, response) {
   let { data: conversations } = await supabase
     .from("conversations_new")

@@ -22,7 +22,7 @@ import RedPajama from "../modules/text/redpajama.js";
 import { MPlugOwl } from "../modules/text/mplug-owl.js";
 import bard, { resetBard } from "../modules/text/bard.js";
 import Palm2 from "../modules/text/palm2.js";
-import Bing from "../modules/text/bing.js";
+import Bing, { resetConversation } from "../modules/text/bing.js";
 import Poe, { initPoeClient } from "../modules/text/poe.js";
 import redisClient from "../modules/cache/redis.js";
 import { getPlugins } from "../modules/text/plugins.js";
@@ -358,9 +358,15 @@ router.post(`/:m`, key, turnstile, async (req: Request, res: Response) => {
       let result: any = await MPlugOwl(prompt, maxTokens, img, temperature);
       res.json(result).status(200);
     } else if (m == "bing") {
+      res.set("content-type", "text/event-stream");
       let { conversationId, tone = "balanced" } = req.body;
-      let result = await Bing(prompt, conversationId, tone);
-      res.json(result).status(200);
+      let event = await Bing(prompt, conversationId, tone);
+      event.on("data", (data) => {
+        res.write("data: " + JSON.stringify(data) + "\n\n");
+        if (data.done) {
+          res.end();
+        }
+      });
     } else if (m == "claude") {
       res.setHeader("Content-Type", "text/html; charset=utf-8");
       res.setHeader("Transfer-Encoding", "chunked");
@@ -408,13 +414,17 @@ router.delete(`/:m`, key, turnstile, async (req: Request, res: Response) => {
   try {
     let { m } = req.params;
     let { conversationId } = req.body;
-    let availableModels = ["bard"];
+    let availableModels = ["bard", "bing"];
     if (!availableModels.includes(m)) {
       res.json({ success: false, error: "Model not found" }).status(404);
       return;
     }
     if (m == "bard") {
       await resetBard(conversationId);
+      res.json({ message: "Conversation deleted" }).status(200);
+    }
+    if (m == "bing") {
+      await resetConversation(conversationId);
       res.json({ message: "Conversation deleted" }).status(200);
     }
   } catch (error: any) {
