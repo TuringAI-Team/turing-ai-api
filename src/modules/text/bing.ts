@@ -31,12 +31,18 @@ export default async function Bing(
     let previousMsg = "";
     let tokens = 0;
     let conversation = await getConversation(conversationId);
-    bingAIClient
-      .sendMessage(prompt, {
+    let conversationData;
+    if (conversation.conversationSignature) {
+      conversationData = {
         conversationId: conversation.conversationId,
         conversationSignature: conversation.conversationSignature,
         clientId: conversation.clientId,
         invocationId: conversation.invocationId,
+      };
+    }
+    bingAIClient
+      .sendMessage(prompt, {
+        ...conversationData,
         toneStyle: tone, // or creative, precise, fast
         onProgress: (token) => {
           previousMsg += token;
