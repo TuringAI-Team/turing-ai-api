@@ -179,9 +179,11 @@ router.post("/:chart", key, turnstile, async (req: Request, res: Response) => {
   }
 
   // if there more than 10 labels make the chart bigger
-  let height = labels.length * 20;
   let width = 1000;
-
+  if (labels.length > 10) {
+    let height = labels.length * 20;
+    chartImage.setHeight(height);
+  }
   chartImage.setConfig({
     type: type,
     data: {
@@ -189,7 +191,6 @@ router.post("/:chart", key, turnstile, async (req: Request, res: Response) => {
       datasets: datasets,
     },
   });
-  chartImage.setHeight(height);
   chartImage.setWidth(width);
   let image = await chartImage.toDataUrl();
   res.json({
