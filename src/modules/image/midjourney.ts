@@ -51,7 +51,7 @@ export async function imagineWithQueue(
     prompt: prompt,
   });
   let promptsGenerating = queue.filter((x) => x.generating);
-  console.log(promptsGenerating, queue.length);
+  console.log(promptsGenerating.length, queue.length);
   // check queue, if it is the first one, start it with imagine
   let interval = setInterval(async () => {
     await checkQueuePostion(queuePos, job, prompt, mode, model, event);
@@ -167,7 +167,7 @@ export async function imagine(prompt: string, mode = "relax", model = "5.1") {
       break;
   }
   jobQueue++;
-
+  /*
   if (mode == "relax") {
     if (actualMode != "relax") {
       // await channel.sendSlash(user, "relax");
@@ -178,7 +178,7 @@ export async function imagine(prompt: string, mode = "relax", model = "5.1") {
       //await channel.sendSlash(user, "fast");
       actualMode = "fast";
     }
-  }
+  }*/
   let reply = await channel.sendSlash(user, "imagine", prompt);
   // get last message from bot in channel
 
