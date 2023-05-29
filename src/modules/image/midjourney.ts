@@ -435,6 +435,8 @@ export async function buttons(id, action, number = 1, mode = "relax") {
   } else {
     //await channel.sendSlash(user, "fast");
   }
+  let startTime = Date.now();
+
   // get last message from bot in channel
   botClient.on("messageCreate", async (message) => {
     let content1 = message.content;
@@ -451,7 +453,7 @@ export async function buttons(id, action, number = 1, mode = "relax") {
       let url = attachments.first()?.url;
       let status;
       if (!data.action || data.action != "upscale") {
-        status = content1.split("(")[1].split("%)")[0];
+        status = content1.split("(")[1]?.split("%)")[0];
       }
       data.image = url;
       data.status = 1;
@@ -536,7 +538,6 @@ export async function buttons(id, action, number = 1, mode = "relax") {
     }
   });
   let r = await button.click(message);
-  let startTime = Date.now();
   return event;
   let interval = setInterval(() => {
     checkStatus(channel, user, data, message.content.split(" - ")[0]).then(
