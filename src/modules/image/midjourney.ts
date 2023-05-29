@@ -380,7 +380,7 @@ export async function buttons(id, action, number = 1, mode = "relax") {
     return event;
   }
   let guild = botClient.guilds.cache.get("1111700862868406383");
-  if (generating.length <= 0 || (jobQueue2 >= 3 && action != "upscale")) {
+  if (jobQueue2 >= 10 && action != "upscale") {
     event.emit("data", {
       error: "Too many images generating",
       done: true,
@@ -393,7 +393,6 @@ export async function buttons(id, action, number = 1, mode = "relax") {
     (x) => x.name == channelid.toString()
   ) as TextChannel;
   // remove channelid from generating array
-  generating = generating.filter((x) => x != channelid);
   if (!channel.isText()) return;
   let message = await channel.messages.fetch(messageId);
   let actionRows = message.components;
