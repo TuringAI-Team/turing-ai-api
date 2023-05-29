@@ -10,7 +10,7 @@ import EventEmitter from "events";
 import redisClient from "../cache/redis.js";
 import { randomUUID } from "crypto";
 
-let generating = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
+let generating = [1, 2, 3];
 let describing = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
 const botClient: Client = client;
 
@@ -24,11 +24,13 @@ export async function imagineAsync(prompt: string, model = "5.1") {
     });
   });
 }
+let actualMode = "relax";
 
 export async function imagine(prompt: string, mode = "relax", model = "5.1") {
   let event = new EventEmitter();
   let guild = botClient.guilds.cache.get("1111700862868406383");
   if (!guild) return;
+  console.log(generating.length);
   if (generating.length <= 0) {
     event.emit("data", {
       error: "Too many images generating, try again later",
@@ -82,9 +84,15 @@ export async function imagine(prompt: string, mode = "relax", model = "5.1") {
       break;
   }
   if (mode == "relax") {
-    await channel.sendSlash(user, "relax");
+    if (actualMode != "relax") {
+      await channel.sendSlash(user, "relax");
+      actualMode = "relax";
+    }
   } else {
-    await channel.sendSlash(user, "fast");
+    if (actualMode != "fast") {
+      await channel.sendSlash(user, "fast");
+      actualMode = "fast";
+    }
   }
   let reply = await channel.sendSlash(user, "imagine", prompt);
   // get last message from bot in channel
