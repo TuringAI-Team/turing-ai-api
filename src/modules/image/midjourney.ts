@@ -53,6 +53,7 @@ export async function imagineWithQueue(
   let promptsGenerating = queue.filter((x) => x.generating);
   console.log(promptsGenerating.length, queue.length);
   // check queue, if it is the first one, start it with imagine
+  await checkQueuePostion(queuePos, job, prompt, mode, model, event);
   let interval = setInterval(async () => {
     await checkQueuePostion(queuePos, job, prompt, mode, model, event);
   }, 10000);
@@ -72,7 +73,7 @@ export async function imagineWithQueue(
 async function checkQueuePostion(queuePos, job, prompt, mode, model, event) {
   queuePos = queue.findIndex((x) => x.id == job.id);
   job = queue[queuePos];
-  if (queuePos <= 2 && !job.generating && jobQueue >= 3) {
+  if (queuePos <= 3 && !job.generating && jobQueue <= 3) {
     event.emit("data", {
       prompt: prompt,
       image: null,
@@ -181,7 +182,6 @@ export async function imagine(prompt: string, mode = "relax", model = "5.1") {
   }*/
   let reply = await channel.sendSlash(user, "imagine", prompt);
   // get last message from bot in channel
-
   let startTime = Date.now();
   let interval = setInterval(() => {
     checkStatus(channel, user, data, prompt).then((x) => {
