@@ -10,7 +10,7 @@ import EventEmitter from "events";
 import redisClient from "../cache/redis.js";
 import { randomUUID } from "crypto";
 
-let generating = [1, 2, 3];
+let generating = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
 let describing = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
 const botClient: Client = client;
 
