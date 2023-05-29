@@ -12,6 +12,7 @@ import { randomUUID } from "crypto";
 
 let generating = [1, 2, 3];
 let jobQueue = 3;
+let jobQueue2 = 0;
 let queue = [];
 let describing = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
 const botClient: Client = client;
@@ -71,7 +72,7 @@ export async function imagineWithQueue(
 async function checkQueuePostion(queuePos, job, prompt, mode, model, event) {
   queuePos = queue.findIndex((x) => x.id == job.id);
   job = queue[queuePos];
-  if (queuePos <= 2 && !job.generating) {
+  if (queuePos <= 2 && !job.generating && jobQueue >= 3) {
     event.emit("data", {
       prompt: prompt,
       image: null,
@@ -379,14 +380,14 @@ export async function buttons(id, action, number = 1, mode = "relax") {
     return event;
   }
   let guild = botClient.guilds.cache.get("1111700862868406383");
-  if (generating.length <= 0 || (jobQueue >= 3 && action != "upscale")) {
+  if (generating.length <= 0 || (jobQueue2 >= 3 && action != "upscale")) {
     event.emit("data", {
       error: "Too many images generating",
       done: true,
     });
     return event;
   }
-  jobQueue++;
+  jobQueue2++;
   if (!guild) return;
   let channel = guild.channels.cache.find(
     (x) => x.name == channelid.toString()
@@ -447,13 +448,13 @@ export async function buttons(id, action, number = 1, mode = "relax") {
         let timeToOut = 60 * 2;
         if (mode == "relax") timeToOut = 60 * 5;
         if (timeInS > timeToOut) {
-          jobQueue--;
+          jobQueue2--;
           data.error = "Took too long to generate image";
           data.done = true;
           clearInterval(interval);
         }
         if (data.done) {
-          jobQueue--;
+          jobQueue2--;
           if (data.startTime) startTime = data.startTime;
           let timeInS = (Date.now() - startTime) / 1000;
           //  each second is 0.001 credits
