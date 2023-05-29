@@ -11,7 +11,7 @@ import redisClient from "../cache/redis.js";
 import { randomUUID } from "crypto";
 
 let generating = [1, 2, 3];
-let jobQueue = 0;
+let jobQueue = 3;
 let queue = [];
 let describing = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
 const botClient: Client = client;
@@ -49,10 +49,8 @@ export async function imagineWithQueue(
     done: false,
     prompt: prompt,
   });
-  let promptsInQueue = queue.map((x) => {
-    return { prompt: x.prompt, id: x.id, generating: x.generating };
-  });
-  console.log(promptsInQueue.length);
+  let promptsGenerating = queue.filter((x) => x.generating);
+  console.log(promptsGenerating, queue.length);
   // check queue, if it is the first one, start it with imagine
   let interval = setInterval(async () => {
     await checkQueuePostion(queuePos, job, prompt, mode, model, event);
@@ -60,10 +58,6 @@ export async function imagineWithQueue(
   event.on("data", (data) => {
     if (!data.queued) {
       clearInterval(interval);
-    } else {
-      promptsInQueue = queue.map((x) => {
-        return { prompt: x.prompt, id: x.id, generating: x.generating };
-      });
     }
     if (data.done) {
       clearInterval(interval);
