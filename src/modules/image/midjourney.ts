@@ -459,7 +459,6 @@ export async function buttons(id, action, number = 1, mode = "relax") {
       data.image = url;
       data.status = 1;
       data.done = true;
-
       jobQueue2--;
       if (data.startTime) startTime = data.startTime;
       let timeInS = (Date.now() - startTime) / 1000;
@@ -468,7 +467,6 @@ export async function buttons(id, action, number = 1, mode = "relax") {
       if (mode == "relax") pricePerSecond = 0;
       let credits = timeInS * pricePerSecond;
       data.credits = credits;
-      generating.push(channelid);
       redisClient.set(jobId, JSON.stringify(data));
       event.emit("data", data);
       // remove this listener
@@ -513,7 +511,6 @@ export async function buttons(id, action, number = 1, mode = "relax") {
             status = status.replace("%", "");
             data.status = parseInt(status) / 100;
           }
-          data.id = `${data.messageId}-${channelid}`;
           let timeInS = (Date.now() - startTime) / 1000;
           let timeToOut = 60 * 2;
           if (mode == "relax") timeToOut = 60 * 5;
@@ -521,7 +518,6 @@ export async function buttons(id, action, number = 1, mode = "relax") {
             jobQueue2--;
             data.error = "Took too long to generate image";
             data.done = true;
-            clearInterval(interval);
           }
           if (data.done) {
             jobQueue2--;
@@ -532,7 +528,6 @@ export async function buttons(id, action, number = 1, mode = "relax") {
             if (mode == "relax") pricePerSecond = 0;
             let credits = timeInS * pricePerSecond;
             data.credits = credits;
-            generating.push(channelid);
             redisClient.set(jobId, JSON.stringify(data));
             event.emit("data", data);
             botClient.off("messageUpdate", () => {});
@@ -545,6 +540,7 @@ export async function buttons(id, action, number = 1, mode = "relax") {
   });
   let r = await button.click(message);
   return event;
+  /*
   let interval = setInterval(() => {
     checkStatus(channel, user, data, message.content.split(" - ")[0]).then(
       (x) => {
@@ -579,5 +575,5 @@ export async function buttons(id, action, number = 1, mode = "relax") {
     );
   }, 1000 * 5);
 
-  return event;
+  return event;*/
 }
