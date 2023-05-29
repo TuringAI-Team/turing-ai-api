@@ -196,11 +196,14 @@ async function checkStatus(channel, user, data, prompt) {
   messages = messages.first();
   if (!messages) {
     let checkFlagged = await redisClient.get(`imagine:${prompt}`);
-    console.log(checkFlagged);
     if (checkFlagged) {
       data.status = 1;
       data.done = true;
-      data.error = "Flagged";
+      if (checkFlagged == "Action needed to continue") {
+        data.error = "Flagged";
+      } else {
+        data.error = "Too many images generating, try again later";
+      }
       data.id = null;
       data.credits = 0;
       return data;
@@ -299,14 +302,13 @@ export async function buttons(id, action, number = 1, mode = "relax") {
     return event;
   }
   jobQueue++;
-  if (!guild) return jobQueue--;
+  if (!guild) return;
   let channel = guild.channels.cache.find(
     (x) => x.name == channelid.toString()
   ) as TextChannel;
   // remove channelid from generating array
   generating = generating.filter((x) => x != channelid);
-  if (!channel.isText()) return jobQueue--;
-
+  if (!channel.isText()) return;
   let message = await channel.messages.fetch(messageId);
   let actionRows = message.components;
   let variationRow: any = actionRows[action == "upscale" ? 0 : 1];
