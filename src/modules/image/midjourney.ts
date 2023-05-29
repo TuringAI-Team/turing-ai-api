@@ -436,9 +436,9 @@ export async function buttons(id, action, number = 1, mode = "relax") {
       .replaceAll("**", "")} Image #${data.number + 1}`,
   });
   if (mode == "relax") {
-    await channel.sendSlash(user, "relax");
+    //await channel.sendSlash(user, "relax");
   } else {
-    await channel.sendSlash(user, "fast");
+    //await channel.sendSlash(user, "fast");
   }
   // get last message from bot in channel
   let r = await button.click(message);
