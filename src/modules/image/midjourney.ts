@@ -52,7 +52,7 @@ export async function imagineWithQueue(
   let promptsInQueue = queue.map((x) => {
     return { prompt: x.prompt, id: x.id, generating: x.generating };
   });
-  //console.log(promptsInQueue);
+  console.log(promptsInQueue.length);
   // check queue, if it is the first one, start it with imagine
   let interval = setInterval(async () => {
     await checkQueuePostion(queuePos, job, prompt, mode, model, event);
@@ -77,7 +77,7 @@ export async function imagineWithQueue(
 async function checkQueuePostion(queuePos, job, prompt, mode, model, event) {
   queuePos = queue.findIndex((x) => x.id == job.id);
   job = queue[queuePos];
-  if (queuePos <= 3 && !job.generating) {
+  if (queuePos <= 2 && !job.generating) {
     event.emit("data", {
       prompt: prompt,
       image: null,
@@ -223,6 +223,7 @@ export async function imagine(prompt: string, mode = "relax", model = "5.1") {
   return event;
   //await command.sendSlashCommand();
 }
+
 export async function describe(image: string) {
   let event = new EventEmitter();
   let guild = botClient.guilds.cache.get("1111700862868406383");
