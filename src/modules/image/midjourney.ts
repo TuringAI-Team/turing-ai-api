@@ -448,6 +448,7 @@ export async function buttons(id, action, number = 1, mode = "relax") {
       (content1.includes(data.prompt) &&
         content1.includes(`Image #${data.number + 1}`))
     ) {
+      console.log("finished");
       let attachments = message.attachments;
       // get url
       let url = attachments.first()?.url;
@@ -475,6 +476,7 @@ export async function buttons(id, action, number = 1, mode = "relax") {
       (content1.includes(expectedContent) && content1.includes(data.prompt)) ||
       (content1.includes("Upscaling image") && content1.includes(data.prompt))
     ) {
+      console.log("started");
       let messageId = message.id;
       botClient.on("messageUpdate", async (oldMessage, newMessage) => {
         if (newMessage.id == messageId) {
