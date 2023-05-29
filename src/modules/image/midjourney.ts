@@ -437,8 +437,101 @@ export async function buttons(id, action, number = 1, mode = "relax") {
     //await channel.sendSlash(user, "fast");
   }
   // get last message from bot in channel
+  botClient.on("messageCreate", async (message) => {
+    let content1 = message.content;
+    let expectedContent = `Making variations for image #${
+      data.number + 1
+    } with prompt`;
+    if (content1.includes(data.prompt) && content1.includes("Variations by")) {
+      let attachments = message.attachments;
+      // get url
+      let url = attachments.first()?.url;
+      let status;
+      if (!data.action || data.action != "upscale") {
+        status = content1.split("(")[1].split("%)")[0];
+      }
+      data.image = url;
+      data.status = 1;
+      data.done = true;
+
+      jobQueue2--;
+      if (data.startTime) startTime = data.startTime;
+      let timeInS = (Date.now() - startTime) / 1000;
+      //  each second is 0.001 credits
+      let pricePerSecond = 0.001;
+      if (mode == "relax") pricePerSecond = 0;
+      let credits = timeInS * pricePerSecond;
+      data.credits = credits;
+      generating.push(channelid);
+      redisClient.set(jobId, JSON.stringify(data));
+      event.emit("data", data);
+    }
+    if (content1.includes(expectedContent) && content1.includes(data.prompt)) {
+      let messageId = message.id;
+      botClient.on("messageUpdate", async (oldMessage, newMessage) => {
+        if (newMessage.id == messageId) {
+          let content = newMessage.content;
+          // get attachments
+          let attachments = newMessage.attachments;
+          // get url
+          let url = attachments.first()?.url;
+          let status;
+          if (!data.action || data.action != "upscale") {
+            status = content.split("(")[1].split("%)")[0];
+          }
+          data.image = url;
+          if (
+            (content.includes("(fast)") && !content.includes("%")) ||
+            (content.includes("(relaxed)") && !content.includes("%")) ||
+            (content.includes(`Image #${data.number + 1}`) && url) ||
+            (content.includes("Variations by") && !content.includes("%"))
+          ) {
+            data.status = 1;
+            data.done = true;
+          } else if (
+            content.includes("(Waiting to start)") &&
+            !content.includes("%")
+          ) {
+            data.status = 0;
+          } else {
+            if (!data.startTime) {
+              data.startTime = Date.now();
+            }
+            status = status.replace("%", "");
+            data.status = parseInt(status) / 100;
+          }
+          data.id = `${data.messageId}-${channelid}`;
+          let timeInS = (Date.now() - startTime) / 1000;
+          let timeToOut = 60 * 2;
+          if (mode == "relax") timeToOut = 60 * 5;
+          if (timeInS > timeToOut) {
+            jobQueue2--;
+            data.error = "Took too long to generate image";
+            data.done = true;
+            clearInterval(interval);
+          }
+          if (data.done) {
+            jobQueue2--;
+            if (data.startTime) startTime = data.startTime;
+            let timeInS = (Date.now() - startTime) / 1000;
+            //  each second is 0.001 credits
+            let pricePerSecond = 0.001;
+            if (mode == "relax") pricePerSecond = 0;
+            let credits = timeInS * pricePerSecond;
+            data.credits = credits;
+            generating.push(channelid);
+            redisClient.set(jobId, JSON.stringify(data));
+            event.emit("data", data);
+          } else {
+            event.emit("data", data);
+          }
+        }
+      });
+    }
+  });
   let r = await button.click(message);
   let startTime = Date.now();
+  return event;
   let interval = setInterval(() => {
     checkStatus(channel, user, data, message.content.split(" - ")[0]).then(
       (x) => {

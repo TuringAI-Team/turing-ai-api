@@ -16,7 +16,6 @@ client.on("messageCreate", async (message) => {
       let footer = message.embeds[0].footer;
       let title = message.embeds[0].title;
       let prompt = footer?.text.split("/imagine")[1]?.trim();
-      console.log(prompt);
       if (prompt) {
         redisClient.set(`imagine:${prompt}`, title);
       }
