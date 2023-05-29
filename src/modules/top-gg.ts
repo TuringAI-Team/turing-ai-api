@@ -1,6 +1,7 @@
 import { VoteClient } from "topgg-votes";
 import fs from "fs";
 import redisClient from "./cache/redis.js";
+import supabase from "./supabase.js";
 
 const votesClient = new VoteClient()
   .setToken(process.env.TOPGG_TOKEN)
@@ -38,7 +39,22 @@ export async function hasVoted(userId) {
     return false;
   }
 }
-votesClient.on("botVote", ({ userId }) => {
+votesClient.on("botVote", async ({ userId }) => {
   console.log(`User ${userId} just voted!`);
-  redisClient.set(`voted:${userId}`, Date.now());
+  let user = await redisClient.get(`users:${userId}`);
+  if (user) {
+    let userData = JSON.parse(user);
+    userData.voted = new Date().toISOString();
+    redisClient.set(`users:${userId}`, userData);
+    let { data: userDB, error } = await supabase
+      .from("users_new")
+      .select("*")
+      .eq("id", userId)
+      .single();
+
+    if (userDB) {
+      userDB.voted = new Date().toISOString();
+      await supabase.from("users_new").update(userDB).eq("id", userId);
+    }
+  }
 });
