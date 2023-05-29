@@ -260,7 +260,6 @@ router.post(`/:m`, key, turnstile, async (req: Request, res: Response) => {
       "palm2",
       "mplug-owl",
       "bard",
-      "bing",
       "claude",
     ];
     let { m } = req.params;
