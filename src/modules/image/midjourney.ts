@@ -34,12 +34,11 @@ export async function imagine(prompt: string, mode = "relax", model = "5.1") {
   console.log(generating.length);
   if (generating.length <= 0 || jobQueue >= 3) {
     event.emit("data", {
-      error: "Too many images generating, try again later",
+      error: "Too many images generating",
       done: true,
     });
     return event;
   }
-  jobQueue++;
   let genAt = generating.pop();
   // get channel by name
   let channel = guild.channels.cache.find(
@@ -61,6 +60,7 @@ export async function imagine(prompt: string, mode = "relax", model = "5.1") {
     model: model,
     error: null,
   };
+
   switch (model) {
     case "5.1":
       prompt = `${prompt} --v 5.1`;
@@ -85,6 +85,12 @@ export async function imagine(prompt: string, mode = "relax", model = "5.1") {
       prompt = `${prompt} --v 1`;
       break;
   }
+  data.error = "Too many images generating";
+  data.done = true;
+  event.emit("data", data);
+  return event;
+  jobQueue++;
+
   if (mode == "relax") {
     if (actualMode != "relax") {
       await channel.sendSlash(user, "relax");
@@ -201,8 +207,10 @@ async function checkStatus(channel, user, data, prompt) {
       data.done = true;
       if (checkFlagged == "Action needed to continue") {
         data.error = "Flagged";
+      } else if (checkFlagged == "Invalid parameter") {
+        data.error = "Invalid parameter";
       } else {
-        data.error = "Too many images generating, try again later";
+        data.error = "Too many images generating";
       }
       data.id = null;
       data.credits = 0;
@@ -296,7 +304,7 @@ export async function buttons(id, action, number = 1, mode = "relax") {
   let guild = botClient.guilds.cache.get("1111700862868406383");
   if (generating.length <= 0 || (jobQueue >= 3 && action != "upscale")) {
     event.emit("data", {
-      error: "Too many images generating, try again later",
+      error: "Too many images generating",
       done: true,
     });
     return event;
