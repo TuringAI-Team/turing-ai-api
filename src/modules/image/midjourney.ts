@@ -197,7 +197,7 @@ export async function imagine(prompt: string, mode = "relax", model = "5.1") {
       if (mode == "relax") timeToOut = 60 * 5;
       if (timeInS > timeToOut) {
         jobQueue--;
-        data.error = "Took too long to generate image, try again later";
+        data.error = "Took too long to generate image";
         data.done = true;
         clearInterval(interval);
       }
@@ -453,7 +453,7 @@ export async function buttons(id, action, number = 1, mode = "relax") {
         if (mode == "relax") timeToOut = 60 * 5;
         if (timeInS > timeToOut) {
           jobQueue--;
-          data.error = "Took too long to generate image, try again later";
+          data.error = "Took too long to generate image";
           data.done = true;
           clearInterval(interval);
         }
