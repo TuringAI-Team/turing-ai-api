@@ -64,10 +64,8 @@ export default async function Bing(
         await setConversation(conversationId, response);
       });
     return event;
-  } catch (error) {
-    data.error = error;
-    event.emit("data", data);
-    return event;
+  } catch (error: any) {
+    return { error };
   }
 }
 

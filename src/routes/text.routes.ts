@@ -360,7 +360,11 @@ router.post(`/:m`, key, turnstile, async (req: Request, res: Response) => {
     } else if (m == "bing") {
       res.set("content-type", "text/event-stream");
       let { conversationId, tone = "balanced" } = req.body;
-      let event = await Bing(prompt, conversationId, tone);
+      let event: any = await Bing(prompt, conversationId, tone);
+      if (event.error) {
+        res.json(event).status(400);
+        return;
+      }
       event.on("data", (data) => {
         res.write("data: " + JSON.stringify(data) + "\n\n");
         if (data.done) {
