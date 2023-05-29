@@ -49,7 +49,10 @@ export async function imagineWithQueue(
     done: false,
     prompt: prompt,
   });
-  console.log(`${queuePos} in queue / ${queue.length} total - ${job.prompt}`);
+  let promptsInQueue = queue.map((x) => {
+    return { prompt: x.prompt, id: x.id, generating: x.generating };
+  });
+  console.log(promptsInQueue);
   // check queue, if it is the first one, start it with imagine
   let interval = setInterval(async () => {
     await checkQueuePostion(queuePos, job, prompt, mode, model, event);
@@ -58,9 +61,10 @@ export async function imagineWithQueue(
     if (!data.queued) {
       clearInterval(interval);
     } else {
-      console.log(
-        `${data.queued} in queue / ${queue.length} total - ${job.prompt}`
-      );
+      promptsInQueue = queue.map((x) => {
+        return { prompt: x.prompt, id: x.id, generating: x.generating };
+      });
+      console.log(promptsInQueue);
     }
     if (data.done) {
       clearInterval(interval);
