@@ -11,6 +11,7 @@ import redisClient from "../cache/redis.js";
 import { randomUUID } from "crypto";
 
 let generating = [1, 2, 3];
+let jobQueue = 0;
 let describing = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
 const botClient: Client = client;
 
@@ -31,13 +32,14 @@ export async function imagine(prompt: string, mode = "relax", model = "5.1") {
   let guild = botClient.guilds.cache.get("1111700862868406383");
   if (!guild) return;
   console.log(generating.length);
-  if (generating.length <= 0) {
+  if (generating.length <= 0 || jobQueue >= 3) {
     event.emit("data", {
       error: "Too many images generating, try again later",
       done: true,
     });
     return event;
   }
+  jobQueue++;
   let genAt = generating.pop();
   // get channel by name
   let channel = guild.channels.cache.find(
@@ -106,11 +108,13 @@ export async function imagine(prompt: string, mode = "relax", model = "5.1") {
       let timeToOut = 60 * 2;
       if (mode == "relax") timeToOut = 60 * 5;
       if (timeInS > timeToOut) {
+        jobQueue--;
         data.error = "Took too long to generate image, try again later";
         data.done = true;
         clearInterval(interval);
       }
       if (data.done) {
+        jobQueue--;
         if (data.startTime) startTime = data.startTime;
         let timeInS = (Date.now() - startTime) / 1000;
         //  each second is 0.001 credits
@@ -287,20 +291,21 @@ export async function buttons(id, action, number = 1, mode = "relax") {
     return event;
   }
   let guild = botClient.guilds.cache.get("1111700862868406383");
-  if (generating.length <= 0) {
+  if (generating.length <= 0 || (jobQueue >= 3 && action != "upscale")) {
     event.emit("data", {
       error: "Too many images generating, try again later",
       done: true,
     });
     return event;
   }
-  if (!guild) return;
+  jobQueue++;
+  if (!guild) return jobQueue--;
   let channel = guild.channels.cache.find(
     (x) => x.name == channelid.toString()
   ) as TextChannel;
   // remove channelid from generating array
   generating = generating.filter((x) => x != channelid);
-  if (!channel.isText()) return;
+  if (!channel.isText()) return jobQueue--;
 
   let message = await channel.messages.fetch(messageId);
   let actionRows = message.components;
@@ -355,11 +360,13 @@ export async function buttons(id, action, number = 1, mode = "relax") {
         let timeToOut = 60 * 2;
         if (mode == "relax") timeToOut = 60 * 5;
         if (timeInS > timeToOut) {
+          jobQueue--;
           data.error = "Took too long to generate image, try again later";
           data.done = true;
           clearInterval(interval);
         }
         if (data.done) {
+          jobQueue--;
           if (data.startTime) startTime = data.startTime;
           let timeInS = (Date.now() - startTime) / 1000;
           //  each second is 0.001 credits
