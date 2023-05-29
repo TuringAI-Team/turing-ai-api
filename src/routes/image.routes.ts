@@ -13,7 +13,12 @@ import delay from "delay";
 import { controlnet } from "../modules/image/controlnet.js";
 import key from "../middlewares/key.js";
 import { Configuration, OpenAIApi } from "openai";
-import { buttons, describe, imagine } from "../modules/image/midjourney.js";
+import {
+  buttons,
+  describe,
+  imagine,
+  imagineWithQueue,
+} from "../modules/image/midjourney.js";
 import supabase from "../modules/supabase.js";
 import redisClient from "../modules/cache/redis.js";
 import axios from "axios";
@@ -326,7 +331,7 @@ router.post(
       let { prompt, model, mode } = req.body;
       res.set("content-type", "text/event-stream");
 
-      let event = await imagine(prompt, mode, model);
+      let event = await imagineWithQueue(prompt, mode, model);
       event.on("data", (data) => {
         res.write("data: " + JSON.stringify(data) + "\n\n");
         if (data.done) {

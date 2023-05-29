@@ -12,6 +12,7 @@ import { randomUUID } from "crypto";
 
 let generating = [1, 2, 3];
 let jobQueue = 0;
+let queue = [];
 let describing = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
 const botClient: Client = client;
 
@@ -27,11 +28,85 @@ export async function imagineAsync(prompt: string, model = "5.1") {
 }
 let actualMode = "relax";
 
+export async function imagineWithQueue(
+  prompt: string,
+  mode = "relax",
+  model = "5.1"
+) {
+  let event = new EventEmitter();
+  let job = {
+    id: randomUUID(),
+    prompt: prompt,
+    mode: mode,
+    model: model,
+    generating: false,
+  };
+  let done = false;
+  queue.push(job);
+  let queuePos = queue.length;
+  event.emit("data", {
+    queued: queuePos,
+    done: false,
+  });
+  // check queue, if it is the first one, start it with imagine
+  let interval = setInterval(async () => {
+    await checkQueuePostion(queuePos, job, prompt, mode, model, event);
+  }, 4000);
+  event.on("data", (data) => {
+    if (!data.queued) {
+      clearInterval(interval);
+    }
+    if (data.done) {
+      clearInterval(interval);
+      done = true;
+      queue.splice(queuePos, 1);
+    }
+  });
+  return event;
+}
+async function checkQueuePostion(queuePos, job, prompt, mode, model, event) {
+  queuePos = queue.findIndex((x) => x.id == job.id);
+  job = queue[queuePos];
+  if (queuePos <= 3 && !job.generating) {
+    event.emit("data", {
+      prompt: prompt,
+      image: null,
+      status: null,
+      done: false,
+      credits: 0,
+      action: null,
+      id: "",
+      messageId: null,
+      startTime: null,
+      model: model,
+      error: null,
+    });
+    // change generating to true so it doesn't get called again
+    job.generating = true;
+    // update queue
+    queue[queuePos] = job;
+
+    let data = await imagine(prompt, mode, model);
+    data.on("data", (data) => {
+      event.emit("data", data);
+    });
+  } else {
+    event.emit("data", {
+      queued: queuePos,
+      done: false,
+    });
+  }
+  return {
+    queuePos: queuePos,
+    job: job,
+    event,
+  };
+}
+
 export async function imagine(prompt: string, mode = "relax", model = "5.1") {
   let event = new EventEmitter();
   let guild = botClient.guilds.cache.get("1111700862868406383");
   if (!guild) return;
-  console.log(generating.length);
   if (generating.length <= 0 || jobQueue >= 3) {
     event.emit("data", {
       error: "Too many images generating",
@@ -85,10 +160,6 @@ export async function imagine(prompt: string, mode = "relax", model = "5.1") {
       prompt = `${prompt} --v 1`;
       break;
   }
-  data.error = "Too many images generating";
-  data.done = true;
-  event.emit("data", data);
-  return event;
   jobQueue++;
 
   if (mode == "relax") {
