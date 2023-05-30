@@ -183,6 +183,88 @@ export async function imagine(prompt: string, mode = "relax", model = "5.1") {
   let reply = await channel.sendSlash(user, "imagine", prompt);
   // get last message from bot in channel
   let startTime = Date.now();
+  // get last message from bot in channel
+  botClient.on("messageCreate", async (message) => {
+    let content1 = message.content;
+    let channel: any = message.channel;
+    let activated = false;
+    let footer = message.embeds[0]?.footer?.text;
+    // prompt can have image urls they can be from a lot of domains and paths
+    let promptWithOutURL = prompt.replace(/(https?:\/\/[^\s]+)/g, "");
+    if (footer && footer.includes(promptWithOutURL)) {
+      let title = message.embeds[0]?.title;
+      if (title && title.includes("Action needed to continue")) {
+        data.error = "Flagged";
+        data.done = true;
+        event.emit("data", data);
+        botClient.off("messageCreate", () => {});
+      }
+      if (title && title.includes("Job queued")) {
+        activated = true;
+      }
+    }
+    if (
+      message.content.includes(promptWithOutURL) &&
+      channel.name == genAt.toString()
+    ) {
+      activated = true;
+    }
+    if (activated) {
+      console.log("found message");
+      data.messageId = `${message.id}`;
+      let newData = await checkContent(message, data);
+      data = newData;
+      data.id = `${data.messageId}-${genAt}`;
+      let timeInS = (Date.now() - startTime) / 1000;
+      let timeToOut = 60 * 2;
+      if (mode == "relax") timeToOut = 60 * 5;
+      if (timeInS > timeToOut) {
+        jobQueue--;
+        data.error = "Took too long to generate image";
+        data.done = true;
+        clearInterval(interval);
+      }
+      event.emit("data", data);
+      botClient.off("messageCreate", () => {});
+      botClient.on("messageUpdate", async (message) => {
+        if (
+          message.id != data.messageId ||
+          (channel.name != genAt.toString() &&
+            !message.content.includes(promptWithOutURL))
+        )
+          return;
+        console.log("message updated", message.content);
+        let newData = await checkContent(message, data);
+        data = newData;
+        data.id = `${data.messageId}-${genAt}`;
+        let timeInS = (Date.now() - startTime) / 1000;
+        let timeToOut = 60 * 2;
+        if (mode == "relax") timeToOut = 60 * 5;
+        if (timeInS > timeToOut) {
+          jobQueue--;
+          data.error = "Took too long to generate image";
+          data.done = true;
+        }
+        if (data.done) {
+          jobQueue--;
+          if (data.startTime) startTime = data.startTime;
+          let timeInS = (Date.now() - startTime) / 1000;
+          //  each second is 0.001 credits
+          let pricePerSecond = 0.001;
+          if (mode == "relax") pricePerSecond = 0;
+          let credits = timeInS * pricePerSecond;
+          data.credits = credits;
+          data.done = true;
+          generating.push(genAt);
+          redisClient.set(data.id, JSON.stringify(data));
+          botClient.off("messageUpdate", () => {});
+        }
+        event.emit("data", data);
+      });
+    }
+  });
+
+  return event;
   let interval = setInterval(() => {
     checkStatus(channel, user, data, prompt).then((x) => {
       data = x;
@@ -257,6 +339,42 @@ export async function describe(image: string) {
   return event;
   //await command.sendSlashCommand();
 }
+async function checkContent(message, data) {
+  let content = message.content;
+  if (!content) return data;
+  let attachments = message.attachments;
+  // get url
+  let url = attachments.first()?.url;
+  let status;
+  if (message.embeds.length <= 0) {
+    status = content?.split("(")[1]?.split("%)")[0];
+  } else {
+    data = {
+      queued: 3,
+      done: false,
+    };
+  }
+  data.image = url;
+  if (
+    (content.includes("(fast)") && !content.includes("%")) ||
+    (content.includes("(relaxed)") && !content.includes("%")) ||
+    (content.includes(`Image #${data.number + 1}`) && url) ||
+    (content.includes("Variations by") && !content.includes("%"))
+  ) {
+    data.status = 1;
+    data.done = true;
+  } else if (content.includes("(Waiting to start)") && !content.includes("%")) {
+    data.status = 0;
+  } else {
+    if (!data.startTime) {
+      data.startTime = Date.now();
+    }
+    status = status?.replace("%", "");
+    data.status = parseInt(status) / 100;
+  }
+  return data;
+}
+
 async function checkStatus(channel, user, data, prompt) {
   let x = await channel.messages.fetch();
   let messages = x.filter((x) => {
