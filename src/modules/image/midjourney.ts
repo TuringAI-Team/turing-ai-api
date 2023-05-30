@@ -199,7 +199,10 @@ export async function imagine(prompt: string, mode = "relax", model = "5.1") {
       if (title && title.includes("Action needed to continue")) {
         data.error = "Flagged";
         data.done = true;
+        data.queued = null;
         event.emit("data", data);
+        jobQueue--;
+        generating.push(genAt);
         botClient.off("messageCreate", () => {});
       }
       if (title && title.includes("Job queued")) {
@@ -223,6 +226,7 @@ export async function imagine(prompt: string, mode = "relax", model = "5.1") {
       if (mode == "relax") timeToOut = 60 * 5;
       if (timeInS > timeToOut) {
         jobQueue--;
+        generating.push(genAt);
         data.error = "Took too long to generate image";
         data.done = true;
         data.queued = null;
@@ -244,6 +248,7 @@ export async function imagine(prompt: string, mode = "relax", model = "5.1") {
         if (mode == "relax") timeToOut = 60 * 5;
         if (timeInS > timeToOut) {
           jobQueue--;
+          generating.push(genAt);
           data.error = "Took too long to generate image";
           data.done = true;
           data.queued = null;
