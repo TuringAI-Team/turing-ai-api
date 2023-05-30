@@ -142,6 +142,7 @@ export async function imagine(prompt: string, mode = "relax", model = "5.1") {
     startTime: null,
     model: model,
     error: null,
+    queued: null,
   };
 
   switch (model) {
@@ -223,6 +224,7 @@ export async function imagine(prompt: string, mode = "relax", model = "5.1") {
         jobQueue--;
         data.error = "Took too long to generate image";
         data.done = true;
+        data.queued = null;
         clearInterval(interval);
       }
       event.emit("data", data);
@@ -244,6 +246,7 @@ export async function imagine(prompt: string, mode = "relax", model = "5.1") {
           jobQueue--;
           data.error = "Took too long to generate image";
           data.done = true;
+          data.queued = null;
         }
         if (data.done) {
           jobQueue--;
@@ -255,6 +258,7 @@ export async function imagine(prompt: string, mode = "relax", model = "5.1") {
           let credits = timeInS * pricePerSecond;
           data.credits = credits;
           data.done = true;
+          data.queued = null;
           generating.push(genAt);
           redisClient.set(data.id, JSON.stringify(data));
           botClient.off("messageUpdate", () => {});
@@ -353,7 +357,9 @@ async function checkContent(message, data) {
       queued: 3,
       done: false,
     };
+    return data;
   }
+  data.queued = null;
   data.image = url;
   if (
     (content.includes("(fast)") && !content.includes("%")) ||
