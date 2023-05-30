@@ -36,6 +36,12 @@ export async function imagineWithQueue(
   model = "5.1"
 ) {
   let event = new EventEmitter();
+  event.emit("data", {
+    error:
+      "Sorry, this feature is currently disabled due to the high amount of requests.",
+    done: true,
+  });
+  return event;
   let job = {
     id: randomUUID(),
     prompt: prompt,
@@ -114,6 +120,7 @@ async function checkQueuePostion(queuePos, job, prompt, mode, model, event) {
 
 export async function imagine(prompt: string, mode = "relax", model = "5.1") {
   let event = new EventEmitter();
+
   let guild = botClient.guilds.cache.get("1111700862868406383");
   if (!guild) return;
   if (generating.length <= 0 || jobQueue >= 10) {
@@ -312,6 +319,12 @@ export async function imagine(prompt: string, mode = "relax", model = "5.1") {
 
 export async function describe(image: string) {
   let event = new EventEmitter();
+  event.emit("data", {
+    error:
+      "Sorry, this feature is currently disabled due to the high amount of requests.",
+    done: true,
+  });
+  return event;
   let guild = botClient.guilds.cache.get("1111700862868406383");
   if (!guild) return;
   let desAt = describing.pop();
@@ -372,6 +385,7 @@ async function checkContent(message, data) {
     data.done = true;
   } else if (content.includes("(Waiting to start)") && !content.includes("%")) {
     data.status = 0;
+    data.done = false;
   } else {
     if (!data.startTime) {
       data.startTime = Date.now();
