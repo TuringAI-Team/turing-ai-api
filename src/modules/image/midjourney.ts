@@ -16,6 +16,7 @@ let jobQueue2 = 0;
 let queue = [];
 let describing = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
 const botClient: Client = client;
+botClient.setMaxListeners(0);
 
 export async function imagineAsync(prompt: string, model = "5.1") {
   let event = await imagine(prompt, model);
@@ -233,7 +234,6 @@ export async function imagine(prompt: string, mode = "relax", model = "5.1") {
             !message.content.includes(promptWithOutURL))
         )
           return;
-        console.log("message updated", message.content);
         let newData = await checkContent(message, data);
         data = newData;
         data.id = `${data.messageId}-${genAt}`;
