@@ -74,6 +74,7 @@ export async function imagineWithQueue(
 async function checkQueuePostion(queuePos, job, prompt, mode, model, event) {
   queuePos = queue.findIndex((x) => x.id == job.id);
   job = queue[queuePos];
+  if (!job) return;
   if (queuePos <= 10 && !job.generating && jobQueue <= 10) {
     event.emit("data", {
       prompt: prompt,
@@ -225,7 +226,6 @@ export async function imagine(prompt: string, mode = "relax", model = "5.1") {
         data.error = "Took too long to generate image";
         data.done = true;
         data.queued = null;
-        clearInterval(interval);
       }
       event.emit("data", data);
       botClient.off("messageCreate", () => {});
