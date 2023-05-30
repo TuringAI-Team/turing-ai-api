@@ -350,18 +350,14 @@ export async function describe(image: string) {
 }
 async function checkContent(message, data) {
   let content = message.content;
-  if (!content) return data;
   let attachments = message.attachments;
   // get url
   let url = attachments.first()?.url;
   let status;
-  if (message.embeds.length <= 0) {
+  if (content) {
     status = content?.split("(")[1]?.split("%)")[0];
   } else {
-    data = {
-      queued: 3,
-      done: false,
-    };
+    data.queued = 10;
     return data;
   }
   data.queued = null;
@@ -637,7 +633,7 @@ export async function buttons(id, action, number = 1, mode = "relax") {
             if (!data.startTime) {
               data.startTime = Date.now();
             }
-            status = status.replace("%", "");
+            status = status?.replace("%", "");
             data.status = parseInt(status) / 100;
           }
           let timeInS = (Date.now() - startTime) / 1000;
