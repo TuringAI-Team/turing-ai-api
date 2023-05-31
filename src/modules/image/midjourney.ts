@@ -10,7 +10,6 @@ import EventEmitter from "events";
 import redisClient from "../cache/redis.js";
 import { randomUUID } from "crypto";
 
-let generating = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
 let jobQueue = 1;
 let jobQueue2 = 0;
 let queue = [];
@@ -128,6 +127,7 @@ export async function imagine(prompt: string, mode = "relax", model = "5.1") {
     return event;
   }
   let genAt = jobQueue;
+  jobQueue++;
   // get channel by name
   let channel = guild.channels.cache.find(
     (x) => x.name == genAt.toString()
@@ -174,7 +174,6 @@ export async function imagine(prompt: string, mode = "relax", model = "5.1") {
       prompt = `${prompt} --v 1`;
       break;
   }
-  jobQueue++;
   /*
   if (mode == "relax") {
     if (actualMode != "relax") {
@@ -235,7 +234,6 @@ export async function imagine(prompt: string, mode = "relax", model = "5.1") {
       }
       data = await checkContent(message, data);
       if (data.done) {
-        jobQueue--;
         if (data.startTime) startTime = data.startTime;
         let timeInS = (Date.now() - startTime) / 1000;
         //  each second is 0.001 credits
@@ -271,7 +269,6 @@ export async function imagine(prompt: string, mode = "relax", model = "5.1") {
           data.queued = null;
         }
         if (data.done) {
-          jobQueue--;
           if (data.startTime) startTime = data.startTime;
           let timeInS = (Date.now() - startTime) / 1000;
           //  each second is 0.001 credits
