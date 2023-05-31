@@ -62,88 +62,88 @@ router.post("/pay", key, async (req: Request, res: Response) => {
   } else {
     customer = customer.id;
   }
-  let data: any = {
-    return_url: `https://app.turing.sh/pay/success`,
-    email: email,
-    white_label: false,
-    gateway: gateway || "stripe",
-    customer_id: customer,
-    custom_fields: {
-      userId: userId,
-      serverId: serverId,
-      plan: plan,
-      subType: subType,
-    },
-  };
-  if (userId) {
-    let { data: user }: any = await supabase
-      .from("users_new")
-      .select("*")
-      .eq("id", userId);
-    user = user[0];
-    if (!user) {
-      await supabase.from("users_new").insert([
-        {
+  try {
+    let data: any = {
+      return_url: `https://app.turing.sh/pay/success`,
+      email: email,
+      white_label: false,
+      gateway: gateway || "stripe",
+      customer_id: customer,
+      custom_fields: {
+        userId: userId,
+        serverId: serverId,
+        plan: plan,
+        subType: subType,
+      },
+    };
+    if (userId) {
+      let { data: user }: any = await supabase
+        .from("users_new")
+        .select("*")
+        .eq("id", userId);
+      user = user[0];
+      if (!user) {
+        await supabase.from("users_new").insert([
+          {
+            id: userId,
+            metadata: {
+              email: email,
+            },
+          },
+        ]);
+        user = {
           id: userId,
           metadata: {
             email: email,
           },
-        },
-      ]);
-      user = {
-        id: userId,
-        metadata: {
-          email: email,
-        },
+        };
+        redisClient.set(`users:${userId}`, JSON.stringify(user));
+      } else {
+        await supabase
+          .from("users_new")
+          .update({
+            metadata: {
+              ...(user.metadata || {}),
+              email: email,
+            },
+          })
+          .eq("id", userId);
+        redisClient.set(`users:${userId}`, JSON.stringify(user));
+      }
+    }
+    if (credits && plan == "credits") {
+      data.custom_fields.credits = credits;
+      // make a list of credit products
+      let products = [];
+      let creditsBy5 = Math.floor(credits / 5);
+      let creditsBy2 = Math.floor((credits - creditsBy5 * 5) / 2);
+      let creditsBy1 = Math.floor(credits - creditsBy5 * 5 - creditsBy2 * 2);
+      if (creditsBy5 > 0) {
+        products.push({
+          uniqid: creditProducts["5"].id,
+          unit_quantity: creditsBy5,
+        });
+      }
+      if (creditsBy2 > 0) {
+        products.push({
+          uniqid: creditProducts["2"].id,
+          unit_quantity: creditsBy2,
+        });
+      }
+      if (creditsBy1 > 0) {
+        products.push({
+          uniqid: creditProducts["1"].id,
+          unit_quantity: creditsBy1,
+        });
+      }
+      data.cart = {
+        products: products,
       };
-      redisClient.set(`users:${userId}`, JSON.stringify(user));
+      data.quantity = 1;
     } else {
-      await supabase
-        .from("users_new")
-        .update({
-          metadata: {
-            ...(user.metadata || {}),
-            email: email,
-          },
-        })
-        .eq("id", userId);
-      redisClient.set(`users:${userId}`, JSON.stringify(user));
+      data.product_id = productId;
     }
-  }
-  if (credits && plan == "credits") {
-    data.custom_fields.credits = credits;
-    // make a list of credit products
-    let products = [];
-    let creditsBy5 = Math.floor(credits / 5);
-    let creditsBy2 = Math.floor((credits - creditsBy5 * 5) / 2);
-    let creditsBy1 = Math.floor(credits - creditsBy5 * 5 - creditsBy2 * 2);
-    if (creditsBy5 > 0) {
-      products.push({
-        uniqid: creditProducts["5"].id,
-        unit_quantity: creditsBy5,
-      });
-    }
-    if (creditsBy2 > 0) {
-      products.push({
-        uniqid: creditProducts["2"].id,
-        unit_quantity: creditsBy2,
-      });
-    }
-    if (creditsBy1 > 0) {
-      products.push({
-        uniqid: creditProducts["1"].id,
-        unit_quantity: creditsBy1,
-      });
-    }
-    data.cart = {
-      products: products,
-    };
-    data.quantity = 1;
-  } else {
-    data.product_id = productId;
-  }
-  console.log(`data`, data);
-  try {
+    console.log(`data`, data);
     const payment = await Sellix.payments.create(data);
 
     res.status(200).json(payment);
