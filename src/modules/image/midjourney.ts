@@ -237,7 +237,26 @@ export async function imagine(prompt: string, mode = "relax", model = "5.1") {
         data.done = true;
         data.queued = null;
       }
+      data = await checkContent(message, data);
+      if (data.done) {
+        jobQueue--;
+        if (data.startTime) startTime = data.startTime;
+        let timeInS = (Date.now() - startTime) / 1000;
+        //  each second is 0.001 credits
+        let pricePerSecond = 0.001;
+        if (mode == "relax") pricePerSecond = 0;
+        let credits = timeInS * pricePerSecond;
+        data.credits = credits;
+        data.done = true;
+        data.queued = null;
+        generating.push(genAt);
+        console.log("done", genAt);
+        console.log("generating", generating.length);
+        redisClient.set(data.id, JSON.stringify(data));
+        botClient.off("messageUpdate", () => {});
+      }
       event.emit("data", data);
+
       botClient.off("messageCreate", () => {});
       botClient.on("messageUpdate", async (message) => {
         if (
@@ -259,6 +278,7 @@ export async function imagine(prompt: string, mode = "relax", model = "5.1") {
           data.done = true;
           data.queued = null;
         }
+        console.log(data.done);
         if (data.done) {
           jobQueue--;
           if (data.startTime) startTime = data.startTime;
