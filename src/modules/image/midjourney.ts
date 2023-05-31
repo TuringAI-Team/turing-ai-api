@@ -290,8 +290,8 @@ export async function imagine(prompt: string, mode = "relax", model = "5.1") {
           data.credits = credits;
           data.done = true;
           data.queued = null;
+          console.log("length before", generating.length);
           generating.push(genAt);
-          console.log("done", genAt);
           console.log("generating", generating.length);
           redisClient.set(data.id, JSON.stringify(data));
           botClient.off("messageUpdate", () => {});
