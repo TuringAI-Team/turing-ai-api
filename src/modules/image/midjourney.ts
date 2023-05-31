@@ -249,8 +249,8 @@ export async function imagine(prompt: string, mode = "relax", model = "5.1") {
         data.credits = credits;
         data.done = true;
         data.queued = null;
+        console.log("generating before", generating.length);
         generating.push(genAt);
-        console.log("done", genAt);
         console.log("generating", generating.length);
         redisClient.set(data.id, JSON.stringify(data));
         botClient.off("messageUpdate", () => {});
@@ -278,7 +278,6 @@ export async function imagine(prompt: string, mode = "relax", model = "5.1") {
           data.done = true;
           data.queued = null;
         }
-        console.log(data.done);
         if (data.done) {
           jobQueue--;
           if (data.startTime) startTime = data.startTime;
