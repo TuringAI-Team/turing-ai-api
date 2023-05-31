@@ -125,6 +125,10 @@ async function checkQueuePostion(
     event,
   };
 }
+function reduceQueue() {
+  if (jobQueue > 0) jobQueue--;
+  else console.log("jobQueue is already 0");
+}
 
 export async function imagine(prompt: string, mode = "relax", model = "5.1") {
   let event = new EventEmitter();
@@ -144,7 +148,13 @@ export async function imagine(prompt: string, mode = "relax", model = "5.1") {
   let channel = guild.channels.cache.find(
     (x) => x.name == genAt.toString()
   ) as TextChannel;
-  if (!channel.isText()) return;
+  if (!channel) {
+    event.emit("data", {
+      error: "Channel not found",
+      done: true,
+    });
+    return event;
+  }
   // use application command
   const user = botClient.users.cache.get("936929561302675456");
   let data = {
@@ -216,7 +226,7 @@ export async function imagine(prompt: string, mode = "relax", model = "5.1") {
         data.done = true;
         data.queued = null;
         event.emit("data", data);
-        jobQueue--;
+        reduceQueue();
         botClient.off("messageCreate", () => {});
       }
       if (title && title.includes("Job queued")) {
@@ -239,7 +249,7 @@ export async function imagine(prompt: string, mode = "relax", model = "5.1") {
       let timeToOut = 60 * 2;
       if (mode == "relax") timeToOut = 60 * 10;
       if (timeInS > timeToOut) {
-        jobQueue--;
+        reduceQueue();
         data.error = "Took too long to generate image";
         data.done = true;
         data.queued = null;
@@ -254,7 +264,7 @@ export async function imagine(prompt: string, mode = "relax", model = "5.1") {
         let credits = timeInS * pricePerSecond;
         data.credits = credits;
         data.queued = null;
-        jobQueue--;
+        reduceQueue();
         redisClient.set(data.id, JSON.stringify(data));
         botClient.off("messageUpdate", () => {});
       }
@@ -275,7 +285,7 @@ export async function imagine(prompt: string, mode = "relax", model = "5.1") {
         let timeToOut = 60 * 2;
         if (mode == "relax") timeToOut = 60 * 10;
         if (timeInS > timeToOut) {
-          jobQueue--;
+          reduceQueue();
           data.error = "Took too long to generate image";
           data.done = true;
           data.queued = null;
@@ -288,7 +298,7 @@ export async function imagine(prompt: string, mode = "relax", model = "5.1") {
           if (mode == "relax") pricePerSecond = 0;
           let credits = timeInS * pricePerSecond;
           data.credits = credits;
-          jobQueue--;
+          reduceQueue();
           data.queued = null;
           redisClient.set(data.id, JSON.stringify(data));
           botClient.off("messageUpdate", () => {});
