@@ -54,8 +54,7 @@ export async function imagineWithQueue(
   let promptsGenerating = queue.filter((x) => x.generating);
   console.log(
     promptsGenerating.length,
-    queue.length - promptsGenerating.length,
-    generating.length
+    queue.length - promptsGenerating.length
   );
   // check queue, if it is the first one, start it with imagine
   await checkQueuePostion(queuePos, job, prompt, mode, model, event);
@@ -121,15 +120,14 @@ export async function imagine(prompt: string, mode = "relax", model = "5.1") {
 
   let guild = botClient.guilds.cache.get("1111700862868406383");
   if (!guild) return;
-  if (generating.length <= 0 || jobQueue >= 10) {
+  if (jobQueue >= 10) {
     event.emit("data", {
       error: "Too many images generating",
       done: true,
     });
     return event;
   }
-  let genAt = generating.pop();
-  console.log("generating at", genAt);
+  let genAt = jobQueue;
   // get channel by name
   let channel = guild.channels.cache.find(
     (x) => x.name == genAt.toString()
@@ -208,7 +206,6 @@ export async function imagine(prompt: string, mode = "relax", model = "5.1") {
         data.queued = null;
         event.emit("data", data);
         jobQueue--;
-        generating.push(genAt);
         botClient.off("messageCreate", () => {});
       }
       if (title && title.includes("Job queued")) {
@@ -232,7 +229,6 @@ export async function imagine(prompt: string, mode = "relax", model = "5.1") {
       if (mode == "relax") timeToOut = 60 * 5;
       if (timeInS > timeToOut) {
         jobQueue--;
-        generating.push(genAt);
         data.error = "Took too long to generate image";
         data.done = true;
         data.queued = null;
@@ -249,9 +245,6 @@ export async function imagine(prompt: string, mode = "relax", model = "5.1") {
         data.credits = credits;
         data.done = true;
         data.queued = null;
-        console.log("generating before", generating.length);
-        generating.push(genAt);
-        console.log("generating", generating.length);
         redisClient.set(data.id, JSON.stringify(data));
         botClient.off("messageUpdate", () => {});
       }
@@ -273,7 +266,6 @@ export async function imagine(prompt: string, mode = "relax", model = "5.1") {
         if (mode == "relax") timeToOut = 60 * 5;
         if (timeInS > timeToOut) {
           jobQueue--;
-          generating.push(genAt);
           data.error = "Took too long to generate image";
           data.done = true;
           data.queued = null;
@@ -289,9 +281,6 @@ export async function imagine(prompt: string, mode = "relax", model = "5.1") {
           data.credits = credits;
           data.done = true;
           data.queued = null;
-          console.log("length before", generating.length);
-          generating.push(genAt);
-          console.log("generating", generating.length);
           redisClient.set(data.id, JSON.stringify(data));
           botClient.off("messageUpdate", () => {});
         }
@@ -323,7 +312,6 @@ export async function imagine(prompt: string, mode = "relax", model = "5.1") {
         if (mode == "relax") pricePerSecond = 0;
         let credits = timeInS * pricePerSecond;
         data.credits = credits;
-        generating.push(genAt);
         redisClient.set(data.id, JSON.stringify(data));
         event.emit("data", data);
         clearInterval(interval);
