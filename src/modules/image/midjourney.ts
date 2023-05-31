@@ -52,7 +52,10 @@ export async function imagineWithQueue(
     prompt: prompt,
   });
   let promptsGenerating = queue.filter((x) => x.generating);
-  console.log(promptsGenerating.length, queue.length);
+  console.log(
+    promptsGenerating.length,
+    queue.length - promptsGenerating.length
+  );
   // check queue, if it is the first one, start it with imagine
   await checkQueuePostion(queuePos, job, prompt, mode, model, event);
   let interval = setInterval(async () => {
