@@ -328,10 +328,10 @@ router.post(
   async (req: Request, res: Response) => {
     let action = req.params.action;
     if (action == "imagine") {
-      let { prompt, model, mode } = req.body;
+      let { prompt, model, mode, premium = true } = req.body;
       res.set("content-type", "text/event-stream");
 
-      let event = await imagineWithQueue(prompt, mode, model);
+      let event = await imagineWithQueue(prompt, mode, model, premium);
       event.on("data", (data) => {
         res.write("data: " + JSON.stringify(data) + "\n\n");
         if (data.done) {
