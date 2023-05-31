@@ -54,7 +54,8 @@ export async function imagineWithQueue(
   let promptsGenerating = queue.filter((x) => x.generating);
   console.log(
     promptsGenerating.length,
-    queue.length - promptsGenerating.length
+    queue.length - promptsGenerating.length,
+    generating.length
   );
   // check queue, if it is the first one, start it with imagine
   await checkQueuePostion(queuePos, job, prompt, mode, model, event);
