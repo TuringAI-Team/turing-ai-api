@@ -27,6 +27,7 @@ import Poe, { initPoeClient } from "../modules/text/poe.js";
 import redisClient from "../modules/cache/redis.js";
 import { getPlugins } from "../modules/text/plugins.js";
 import EventEmitter from "events";
+import Falcon from "../modules/text/falcon.js";
 
 const router = express.Router();
 
@@ -261,6 +262,7 @@ router.post(`/:m`, key, turnstile, async (req: Request, res: Response) => {
       "mplug-owl",
       "bard",
       "claude",
+      "falcon",
     ];
     let { m } = req.params;
     let {
@@ -329,6 +331,12 @@ router.post(`/:m`, key, turnstile, async (req: Request, res: Response) => {
         prompt = `<human>:${prompt}\n<bot>:`;
       }
       let result = await RedPajama(prompt, model);
+      res.json(result).status(200);
+    } else if (m == "falcon") {
+      if (chat) {
+        prompt = `You are Falcon-7b, a large language model . You are designed to respond to user input in a conversational manner, Answer as concisely as possible. Your training data comes from a diverse range of internet text and You have been trained to generate human-like responses to various questions and prompts. You can provide information on a wide range of topics, but your knowledge is limited to what was present in your training data. You strive to provide accurate and helpful information to the best of your ability.\nUser: ${prompt}\nAI:`;
+      }
+      let result = await Falcon(prompt, model);
       res.json(result).status(200);
     } else if (m == "dolly") {
       let { maxTokens = 500 } = req.body;
