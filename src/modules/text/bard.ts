@@ -76,12 +76,12 @@ export default async function bard(message, conversationId, retried = 0) {
       proxy: {
         // optional: proxy configuration
         host: process.env.PROXY_HOST,
-        port: (process.env.PROXY_PORT as any) || 9999,
-        /* auth: {
+        port: 80,
+        auth: {
           username: process.env.PROXY_USERNAME,
           password: process.env.PROXY_PASSWORD,
-        },*/
-        protocol: "https",
+        },
+        protocol: "http",
       },
     });
     let { data: conversation }: any = await supabase
