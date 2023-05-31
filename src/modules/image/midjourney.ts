@@ -32,7 +32,8 @@ let actualMode = "relax";
 export async function imagineWithQueue(
   prompt: string,
   mode = "relax",
-  model = "5.1"
+  model = "5.1",
+  premium = false
 ) {
   let event = new EventEmitter();
   let job = {
@@ -53,9 +54,9 @@ export async function imagineWithQueue(
   let promptsGenerating = queue.filter((x) => x.generating);
   console.log(`${promptsGenerating.length} / ${queue.length} - ${jobQueue}`);
   // check queue, if it is the first one, start it with imagine
-  await checkQueuePostion(queuePos, job, prompt, mode, model, event);
+  await checkQueuePostion(queuePos, job, prompt, mode, model, event, premium);
   let interval = setInterval(async () => {
-    await checkQueuePostion(queuePos, job, prompt, mode, model, event);
+    await checkQueuePostion(queuePos, job, prompt, mode, model, event, premium);
   }, 5000);
   event.on("data", (data) => {
     if (!data.queued) {
@@ -70,11 +71,25 @@ export async function imagineWithQueue(
   });
   return event;
 }
-async function checkQueuePostion(queuePos, job, prompt, mode, model, event) {
+async function checkQueuePostion(
+  queuePos,
+  job,
+  prompt,
+  mode,
+  model,
+  event,
+  premium
+) {
   queuePos = queue.findIndex((x) => x.id == job.id);
+
   job = queue[queuePos];
+  // if  is premim give it priority
+
   if (!job) return;
-  if (queuePos <= 11 && !job.generating && jobQueue <= 11) {
+  if (
+    (queuePos <= 11 && !job.generating && jobQueue <= 11) ||
+    (premium && !job.generating && jobQueue <= 11)
+  ) {
     event.emit("data", {
       prompt: prompt,
       image: null,
@@ -222,7 +237,7 @@ export async function imagine(prompt: string, mode = "relax", model = "5.1") {
       data.id = `${data.messageId}-${genAt}`;
       let timeInS = (Date.now() - startTime) / 1000;
       let timeToOut = 60 * 2;
-      if (mode == "relax") timeToOut = 60 * 5;
+      if (mode == "relax") timeToOut = 60 * 10;
       if (timeInS > timeToOut) {
         jobQueue--;
         data.error = "Took too long to generate image";
@@ -238,8 +253,8 @@ export async function imagine(prompt: string, mode = "relax", model = "5.1") {
         if (mode == "relax") pricePerSecond = 0;
         let credits = timeInS * pricePerSecond;
         data.credits = credits;
-        data.done = true;
         data.queued = null;
+        jobQueue--;
         redisClient.set(data.id, JSON.stringify(data));
         botClient.off("messageUpdate", () => {});
       }
@@ -258,7 +273,7 @@ export async function imagine(prompt: string, mode = "relax", model = "5.1") {
         data.id = `${data.messageId}-${genAt}`;
         let timeInS = (Date.now() - startTime) / 1000;
         let timeToOut = 60 * 2;
-        if (mode == "relax") timeToOut = 60 * 5;
+        if (mode == "relax") timeToOut = 60 * 10;
         if (timeInS > timeToOut) {
           jobQueue--;
           data.error = "Took too long to generate image";
@@ -273,7 +288,7 @@ export async function imagine(prompt: string, mode = "relax", model = "5.1") {
           if (mode == "relax") pricePerSecond = 0;
           let credits = timeInS * pricePerSecond;
           data.credits = credits;
-          data.done = true;
+          jobQueue--;
           data.queued = null;
           redisClient.set(data.id, JSON.stringify(data));
           botClient.off("messageUpdate", () => {});
