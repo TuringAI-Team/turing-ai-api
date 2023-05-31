@@ -520,7 +520,13 @@ export async function buttons(id, action, number = 1, mode = "relax") {
     (x) => x.name == channelid.toString()
   ) as TextChannel;
   // remove channelid from generating array
-  if (!channel.isText()) return;
+  if (!channel) {
+    event.emit("data", {
+      error: "No channel found, report this at discord.gg/turing",
+      done: true,
+    });
+    return event;
+  }
   let message = await channel.messages.fetch(messageId);
   let actionRows = message.components;
   let variationRow: any = actionRows[action == "upscale" ? 0 : 1];
