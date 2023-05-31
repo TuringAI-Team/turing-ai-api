@@ -57,7 +57,7 @@ export async function imagineWithQueue(
   await checkQueuePostion(queuePos, job, prompt, mode, model, event);
   let interval = setInterval(async () => {
     await checkQueuePostion(queuePos, job, prompt, mode, model, event);
-  }, 10000);
+  }, 5000);
   event.on("data", (data) => {
     if (!data.queued) {
       clearInterval(interval);
