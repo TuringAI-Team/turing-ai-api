@@ -11,7 +11,7 @@ import redisClient from "../cache/redis.js";
 import { randomUUID } from "crypto";
 
 let generating = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
-let jobQueue = 0;
+let jobQueue = 1;
 let jobQueue2 = 0;
 let queue = [];
 let describing = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
@@ -78,7 +78,7 @@ async function checkQueuePostion(queuePos, job, prompt, mode, model, event) {
   queuePos = queue.findIndex((x) => x.id == job.id);
   job = queue[queuePos];
   if (!job) return;
-  if (queuePos <= 10 && !job.generating && jobQueue <= 10) {
+  if (queuePos <= 11 && !job.generating && jobQueue <= 11) {
     event.emit("data", {
       prompt: prompt,
       image: null,
@@ -120,7 +120,7 @@ export async function imagine(prompt: string, mode = "relax", model = "5.1") {
 
   let guild = botClient.guilds.cache.get("1111700862868406383");
   if (!guild) return;
-  if (jobQueue >= 10) {
+  if (jobQueue >= 11) {
     event.emit("data", {
       error: "Too many images generating",
       done: true,
