@@ -357,14 +357,15 @@ export async function actions(id, action, number) {
         }
       }, 1000 * 60 * 5);
     });
+    return event;
   } catch (e) {
     console.log(e);
     event.emit("data", {
       error: "Something went wrong",
       done: true,
     });
+    return event;
   }
-  return event;
 }
 
 function getChannel() {
