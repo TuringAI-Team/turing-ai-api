@@ -24,6 +24,7 @@ import redisClient from "../modules/cache/redis.js";
 import axios from "axios";
 import sharp from "sharp";
 import { queue, actions } from "../modules/image/mj.js";
+import { randomUUID } from "crypto";
 
 const router = express.Router();
 let configuration = new Configuration({
@@ -337,9 +338,49 @@ router.post(
         console.log("close");
         event.emit("close", {});
       });
-      event.on("data", (data) => {
+      event.on("data", async (data) => {
         res.write("data: " + JSON.stringify(data) + "\n\n");
         if (data.done) {
+          try {
+            // uploads image to storage, data.image is a url image
+            let image = await axios.get(data.image, {
+              responseType: "arraybuffer",
+            });
+            let buffer = Buffer.from(image.data, "base64");
+
+            // save it as png
+            let { error } = await supabase.storage
+              .from("mj")
+              .upload(`${data.id}.png`, buffer, {
+                cacheControl: "3600",
+                upsert: false,
+                contentType: "image/png",
+              });
+
+            if (error) {
+              console.log(error);
+            }
+            let { data: dimg } = await supabase.storage
+              .from("mj")
+              .getPublicUrl(`${data.id}.png`);
+            let publicUrl = dimg.publicUrl;
+            await supabase.from("dataset").insert([
+              {
+                id: randomUUID(),
+                model: data.model,
+                dataset: "1-turingjourney",
+                data: {
+                  id: data.id,
+                  prompt: data.prompt,
+                  image: publicUrl,
+                  model: data.model,
+                  rating: null,
+                },
+              },
+            ]);
+          } catch (e) {
+            console.log(e);
+          }
           res.end();
         }
       });

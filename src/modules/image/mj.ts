@@ -12,7 +12,7 @@ import { randomUUID } from "crypto";
 const botClient: Client = client;
 botClient.setMaxListeners(0);
 let generationQueue = [];
-let maxGenerations = -1;
+let maxGenerations = 8;
 
 export async function queue(prompt, mode, model = "5.1", premium = false) {
   let event = new EventEmitter();
