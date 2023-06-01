@@ -73,7 +73,7 @@ async function checkQueue(job, event, premium) {
     return;
   }
   let generating = generationQueue.filter((x) => x.generating == true).length;
-  if ((generating <= 6 && queued <= 6) || (premium && generating <= 12)) {
+  if ((generating <= 6 && queued <= 6) || (premium && generating <= 6)) {
     console.log("generating");
     generationQueue[queued].generating = true;
     await imagine(
