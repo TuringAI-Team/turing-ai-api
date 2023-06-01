@@ -160,7 +160,7 @@ export async function imagine(prompt, mode, model, event) {
       activated = true;
     }
     if (activated) {
-      data.startTime = Date.now();
+      if (!data.startTime) data.startTime = Date.now();
       data.messageId = message.id;
       data.id = `${message.id}-${channelName}`;
       data.status = 0;
@@ -229,7 +229,6 @@ export async function checkContent(newMessage, data, mode?) {
     let timeInS = (Date.now() - data.startTime) / 1000;
     //  each second is 0.001 credits
     let pricePerSecond = 0.001;
-    if (mode && mode == "relax") pricePerSecond = 0;
     let credits = timeInS * pricePerSecond;
     data.credits = credits;
     data.queued = null;
