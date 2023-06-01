@@ -12,6 +12,7 @@ import { randomUUID } from "crypto";
 const botClient: Client = client;
 botClient.setMaxListeners(0);
 let generationQueue = [];
+let maxGenerations = -1;
 
 export async function queue(prompt, mode, model = "5.1", premium = false) {
   let event = new EventEmitter();
@@ -68,12 +69,14 @@ async function checkQueue(job, event, premium) {
     });
     return;
   }
-  console.log(queued);
   if (generationQueue[queued].generating) {
     return;
   }
   let generating = generationQueue.filter((x) => x.generating == true).length;
-  if ((generating <= 6 && queued <= 6) || (premium && generating <= 6)) {
+  if (
+    (generating <= maxGenerations && queued <= maxGenerations) ||
+    (premium && generating <= maxGenerations)
+  ) {
     console.log("generating");
     generationQueue[queued].generating = true;
     await imagine(
