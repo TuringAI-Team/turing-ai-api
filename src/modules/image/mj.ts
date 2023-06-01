@@ -36,9 +36,17 @@ export async function queue(prompt, mode, model = "5.1", premium = false) {
   let interval = setInterval(async () => {
     await checkQueue(job, event, premium);
   }, 5000);
-
+  event.on("close", () => {
+    console.log("closed");
+    queued = generationQueue.findIndex((x) => x.id == job.id);
+    let job = generationQueue[queued];
+    if (!job.generating) {
+      clearInterval(interval);
+      generationQueue.splice(queued, 1);
+    }
+  });
   event.on("data", (data) => {
-    if (!data.queued) {
+    if (!data.queued && job.generating) {
       clearInterval(interval);
     }
     if (data.done) {
@@ -60,11 +68,13 @@ async function checkQueue(job, event, premium) {
     });
     return;
   }
+  console.log(queued);
   if (generationQueue[queued].generating) {
     return;
   }
   let generating = generationQueue.filter((x) => x.generating == true).length;
-  if ((generating <= 10 && queued <= 10) || (premium && generating <= 12)) {
+  if ((generating <= 6 && queued <= 6) || (premium && generating <= 12)) {
+    console.log("generating");
     generationQueue[queued].generating = true;
     await imagine(
       generationQueue[queued].prompt,
@@ -112,6 +122,14 @@ export async function imagine(prompt, mode, model, event) {
 
   const mjBot = botClient.users.cache.get("936929561302675456");
   await channel.sendSlash(mjBot, "imagine", `${prompt} ${parseModel(model)}`);
+  event.on("close", async () => {
+    console.log("closed");
+    botClient.off("messageCreate", () => {});
+    botClient.off("messageUpdate", () => {});
+    let message = await channel.messages.fetch(data.messageId);
+    console.log(message.content);
+    await message.contextMenu("936929561302675456", "Cancel Job");
+  });
   botClient.on("messageCreate", async (message) => {
     let content1 = message.content;
     let channel: any = message.channel;
@@ -143,52 +161,12 @@ export async function imagine(prompt, mode, model, event) {
       data.messageId = message.id;
       data.id = `${message.id}-${channelName}`;
       data.status = 0;
+      data = await checkContent(message, data, mode);
       event.emit("data", data);
+      if (data.done) return;
       botClient.on("messageUpdate", async (oldMessage, newMessage) => {
         if (oldMessage.id != message.id) return;
-        let content = newMessage.content;
-        let attachments = message.attachments;
-        // get url
-        let image = attachments.first()?.url;
-        let status = 0;
-        if (content) {
-          status =
-            parseInt(content?.split("(")[1]?.split("%)")[0]?.replace("%", "")) /
-            100;
-        } else {
-          data.queued = 10;
-        }
-        data.image = image;
-        if (
-          (content.includes("(fast)") && !content.includes("%")) ||
-          (content.includes("(relaxed)") && !content.includes("%"))
-        ) {
-          data.status = 1;
-          data.done = true;
-        } else if (
-          content.includes("(Waiting to start)") &&
-          !content.includes("%")
-        ) {
-          data.status = 0;
-          data.done = false;
-        } else {
-          if (!data.startTime) {
-            data.startTime = Date.now();
-          }
-          data.status = status;
-        }
-
-        if (data.done) {
-          let timeInS = (Date.now() - data.startTime) / 1000;
-          //  each second is 0.001 credits
-          let pricePerSecond = 0.001;
-          if (mode == "relax") pricePerSecond = 0;
-          let credits = timeInS * pricePerSecond;
-          data.credits = credits;
-          data.queued = null;
-          redisClient.set(data.id, JSON.stringify(data));
-          botClient.off("messageUpdate", () => {});
-        }
+        data = await checkContent(newMessage, data, mode);
         event.emit("data", data);
       });
       botClient.off("messageCreate", () => {});
@@ -211,8 +189,164 @@ export async function imagine(prompt, mode, model, event) {
     }, 1000 * 60 * 5);
   });
 }
+export async function checkContent(newMessage, data, mode?) {
+  let content = newMessage.content;
+  let attachments = newMessage.attachments;
+  // get url
+  let image = attachments.first()?.url;
+  let status = 0;
+  if (content) {
+    status =
+      parseInt(content?.split("(")[1]?.split("%)")[0]?.replace("%", "")) / 100;
+  } else {
+    data.queued = 10;
+  }
+  data.image = image;
+  if (
+    (content.includes("(fast)") && !content.includes("%")) ||
+    (content.includes("(relaxed)") && !content.includes("%")) ||
+    (content.includes(`Image #${data.number + 1}`) && image) ||
+    (content.includes("Variations by") && !content.includes("%"))
+  ) {
+    data.status = 1;
+    data.done = true;
+  } else if (content.includes("(Waiting to start)") && !content.includes("%")) {
+    data.status = 0;
+    data.done = false;
+  } else {
+    if (!data.startTime) {
+      data.startTime = Date.now();
+    }
+    data.status = status;
+  }
 
-export async function actions() {}
+  if (data.done) {
+    let timeInS = (Date.now() - data.startTime) / 1000;
+    //  each second is 0.001 credits
+    let pricePerSecond = 0.001;
+    if (mode && mode == "relax") pricePerSecond = 0;
+    let credits = timeInS * pricePerSecond;
+    data.credits = credits;
+    data.queued = null;
+    redisClient.set(data.fullId ? data.fullId : data.id, JSON.stringify(data));
+    botClient.off("messageUpdate", () => {});
+  }
+  return data;
+}
+
+export async function actions(id, action, number) {
+  let event = new EventEmitter();
+  let messageId = id.split("-")[0];
+  let channelName = parseInt(id.split("-")[1]);
+  let fullId = `${id}-${action}-${number}`;
+  let job = await redisClient.get(fullId);
+  if (job) {
+    event.emit("data", {
+      ...JSON.parse(job),
+    });
+    return event;
+  }
+  let guild = botClient.guilds.cache.get("1111700862868406383");
+  if (!guild) return;
+  if (!channelName) {
+    event.emit("data", {
+      error: "No channels available",
+      done: true,
+      prompt: prompt,
+    });
+    return;
+  }
+  let channel = guild.channels.cache.find(
+    (x) => x.name == channelName.toString()
+  ) as TextChannel;
+  let message = await channel.messages.fetch(messageId);
+  let actionRow: any = message.components[action == "upscale" ? 0 : 1];
+  let button = actionRow.components[number];
+  // use application command
+  let r = await button.click(message);
+  let data = {
+    prompt: message.content
+      .split(" - ")[0]
+      .split(message.content.includes("niji") ? "--niji" : "--v")[0]
+      .replaceAll("**", "")
+      .trim(),
+    action: action,
+    model: `mj-${
+      message.content.includes("niji") ? "niji" : ""
+    }-${message.content
+      .split(" - ")[0]
+      .split(message.content.includes("niji") ? "--niji" : "--v")[1]
+      .replaceAll("**", "")
+      .replaceAll(" ", "")}`,
+    image: null,
+    status: null,
+    done: false,
+    number: number,
+    credits: 0,
+    startTime: null,
+    jobId: randomUUID(),
+    error: null,
+    fullId: fullId,
+    messageId: null,
+    id: null,
+  };
+  botClient.on("messageCreate", async (message) => {
+    let channel: any = message.channel;
+    let activated = false;
+    let footer = message.embeds[0]?.footer?.text;
+    // prompt can have image urls they can be from a lot of domains and paths
+    let promptWithOutURL = data.prompt.replace(/(https?:\/\/[^\s]+)/g, "");
+    if (footer && footer.includes(promptWithOutURL)) {
+      let title = message.embeds[0]?.title;
+      if (title && title.includes("Action needed to continue")) {
+        data.error = "Flagged";
+        data.done = true;
+        event.emit("data", data);
+        botClient.off("messageCreate", () => {});
+      }
+      if (title && title.includes("Job queued")) {
+        activated = true;
+      }
+    }
+    if (
+      message.content.includes(promptWithOutURL) &&
+      channel.name == channelName
+    ) {
+      activated = true;
+    }
+    if (activated) {
+      console.log("activated");
+      data.messageId = message.id;
+      data.id = `${message.id}-${channelName}`;
+      data.startTime = Date.now();
+      data.status = 0;
+      data = await checkContent(message, data);
+      event.emit("data", data);
+      if (data.done) return;
+      botClient.on("messageUpdate", async (oldMessage, newMessage) => {
+        if (oldMessage.id != message.id) return;
+        data = await checkContent(newMessage, data);
+        event.emit("data", data);
+      });
+      botClient.off("messageCreate", () => {});
+    }
+    let interval = setInterval(() => {
+      if (!data.done) {
+        let timeInS = (Date.now() - data.startTime) / 1000;
+        let timeToOut = 60 * 3;
+        if (timeInS > timeToOut) {
+          data.error = "Took too long to generate image";
+          data.done = true;
+          clearInterval(interval);
+          event.emit("data", data);
+        }
+      } else {
+        clearInterval(interval);
+      }
+    }, 1000 * 60 * 5);
+  });
+  return event;
+}
 
 function getChannel() {
   let usedChannels = generationQueue.map((x) => x.channel);

@@ -23,7 +23,7 @@ import supabase from "../modules/supabase.js";
 import redisClient from "../modules/cache/redis.js";
 import axios from "axios";
 import sharp from "sharp";
-import { queue } from "../modules/image/mj.js";
+import { queue, actions } from "../modules/image/mj.js";
 
 const router = express.Router();
 let configuration = new Configuration({
@@ -332,7 +332,11 @@ router.post(
       let { prompt, model, mode, premium = true } = req.body;
       res.set("content-type", "text/event-stream");
 
-      let event = await imagineWithQueue(prompt, mode, model, premium);
+      let event = await queue(prompt, mode, model, premium);
+      req.on("close", () => {
+        console.log("close");
+        event.emit("close", {});
+      });
       event.on("data", (data) => {
         res.write("data: " + JSON.stringify(data) + "\n\n");
         if (data.done) {
@@ -350,10 +354,14 @@ router.post(
           res.end();
         }
       });
-    } else if (action == "variation" || action == "upscale") {
+    } else if (
+      action == "variation" ||
+      action == "upscale" ||
+      action == "cancel"
+    ) {
       let { id, number, mode } = req.body;
       res.set("content-type", "text/event-stream");
-      let event = await buttons(id, action, number, mode);
+      let event = await actions(id, action, number);
       event.on("data", async (data) => {
         res.write("data: " + JSON.stringify(data) + "\n\n");
         if (data.done) {
