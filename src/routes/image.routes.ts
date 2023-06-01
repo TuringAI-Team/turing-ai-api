@@ -23,6 +23,7 @@ import supabase from "../modules/supabase.js";
 import redisClient from "../modules/cache/redis.js";
 import axios from "axios";
 import sharp from "sharp";
+import { queue } from "../modules/image/mj.js";
 
 const router = express.Router();
 let configuration = new Configuration({

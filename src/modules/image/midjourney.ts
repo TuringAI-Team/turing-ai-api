@@ -36,6 +36,13 @@ export async function imagineWithQueue(
   premium = false
 ) {
   let event = new EventEmitter();
+
+  event.emit("data", {
+    error:
+      "This command is disabled due to the fact that it is not working properly",
+    done: true,
+  });
+  return event;
   let job = {
     id: randomUUID(),
     prompt: prompt,
@@ -133,6 +140,12 @@ function reduceQueue() {
 export async function imagine(prompt: string, mode = "relax", model = "5.1") {
   let event = new EventEmitter();
 
+  event.emit("data", {
+    error:
+      "This command is disabled due to the fact that it is not working properly",
+    done: true,
+  });
+  return event;
   let guild = botClient.guilds.cache.get("1111700862868406383");
   if (!guild) return;
   if (jobQueue >= 11) {
@@ -346,6 +359,13 @@ export async function imagine(prompt: string, mode = "relax", model = "5.1") {
 
 export async function describe(image: string) {
   let event = new EventEmitter();
+
+  event.emit("data", {
+    error:
+      "This command is disabled due to the fact that it is not working properly",
+    done: true,
+  });
+  return event;
   let guild = botClient.guilds.cache.get("1111700862868406383");
   if (!guild) return;
   let desAt = describing.pop();
@@ -532,6 +552,13 @@ export async function buttons(id, action, number = 1, mode = "relax") {
   let channelid = parseInt(id.split("-")[1]);
   let jobId = `${id}-${action}-${number}`;
   let event = new EventEmitter();
+
+  event.emit("data", {
+    error:
+      "This command is disabled due to the fact that it is not working properly",
+    done: true,
+  });
+  return event;
   let job = await redisClient.get(jobId);
   if (job) {
     event.emit("data", {
