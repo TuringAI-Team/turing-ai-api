@@ -208,10 +208,10 @@ export async function checkContent(newMessage, data, mode?) {
   }
   data.image = image;
   if (
-    (content.includes("(fast)") && !content.includes("%")) ||
-    (content.includes("(relaxed)") && !content.includes("%")) ||
+    (content.includes("(fast)") && !content.includes("%") && image) ||
+    (content.includes("(relaxed)") && !content.includes("%") && image) ||
     (content.includes(`Image #${data.number + 1}`) && image) ||
-    (content.includes("Variations by") && !content.includes("%"))
+    (content.includes("Variations by") && !content.includes("%") && image)
   ) {
     data.status = 1;
     data.done = true;
