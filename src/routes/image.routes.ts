@@ -341,6 +341,7 @@ router.post(
       event.on("data", async (data) => {
         res.write("data: " + JSON.stringify(data) + "\n\n");
         if (data.done) {
+          console.log("done", data);
           try {
             // uploads image to storage, data.image is a url image
             let image = await axios.get(data.image, {

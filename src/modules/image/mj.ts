@@ -266,6 +266,13 @@ export async function actions(id, action, number) {
   ) as TextChannel;
   let message = await channel.messages.fetch(messageId);
   let actionRow: any = message.components[action == "upscale" ? 0 : 1];
+  if (!actionRow) {
+    event.emit("data", {
+      error: "No action row available",
+      done: true,
+    });
+    return;
+  }
   let button = actionRow.components[number];
   // use application command
   let r = await button.click(message);
