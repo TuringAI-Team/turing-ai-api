@@ -199,7 +199,9 @@ export async function checkContent(newMessage, data, mode?) {
     status =
       parseInt(content?.split("(")[1]?.split("%)")[0]?.replace("%", "")) / 100;
   } else {
-    data.queued = 10;
+    let generating = generationQueue.filter((x) => x.generating == true).length;
+    data.queued = generating - 1;
+    data.done = false;
   }
   data.image = image;
   if (
