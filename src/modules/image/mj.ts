@@ -259,7 +259,7 @@ export async function actions(id, action, number) {
       done: true,
       prompt: prompt,
     });
-    return;
+    return event;
   }
   let channel = guild.channels.cache.find(
     (x) => x.name == channelName.toString()
@@ -271,7 +271,7 @@ export async function actions(id, action, number) {
       error: "No action row available",
       done: true,
     });
-    return;
+    return event;
   }
   let button = actionRow.components[number];
   // use application command
