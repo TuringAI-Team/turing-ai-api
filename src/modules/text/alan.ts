@@ -39,7 +39,7 @@ import {
   AIChatMessage,
 } from "langchain/schema";
 import { imagine, imagineAsync } from "../image/midjourney.js";
-
+import { asyncQueue } from "../image/mj.js";
 export default class Alan {
   userName: string;
   conversation: any;
@@ -433,7 +433,7 @@ export default class Alan {
           if (imageGenerator == "midjourney") {
             // nsfwfilter to boolean
 
-            let result: any = await imagineAsync(imagePrompt); // this returns de generation id that need to be checked to get images
+            let result: any = await asyncQueue(imagePrompt); // this returns de generation id that need to be checked to get images
             console.log(result);
             credits += result.credits;
             images = [result.image];

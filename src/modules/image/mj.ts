@@ -14,7 +14,28 @@ botClient.setMaxListeners(0);
 let generationQueue = [];
 let maxGenerations = 8;
 
-export async function queue(prompt, mode, model = "5.1", premium = false) {
+export async function asyncQueue(
+  prompt,
+  mode = "relax",
+  model = "5.1",
+  premium = false
+) {
+  let event = await queue(prompt, mode, model, premium);
+  return new Promise((resolve, reject) => {
+    event.on("data", (data) => {
+      if (data.done) {
+        resolve(data);
+      }
+    });
+  });
+}
+
+export async function queue(
+  prompt,
+  mode = "relax",
+  model = "5.1",
+  premium = false
+) {
   let event = new EventEmitter();
   let id = randomUUID();
   let job = {
