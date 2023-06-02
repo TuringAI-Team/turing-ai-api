@@ -84,8 +84,9 @@ async function checkQueue(job, event, premium) {
   let queued = generationQueue.findIndex((x) => x.id == job.id);
   if (queued == -1) {
     event.emit("data", {
-      queued: queued,
+      queued: 0,
       done: true,
+      error: "Job not found",
       prompt: job.prompt,
     });
     return;
