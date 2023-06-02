@@ -254,7 +254,12 @@ export async function checkContent(newMessage, data, mode?) {
     let credits = timeInS * pricePerSecond;
     data.credits = credits;
     data.queued = null;
-    redisClient.set(data.fullId ? data.fullId : data.id, JSON.stringify(data));
+    if (data.fullId) {
+      redisClient.set(
+        data.fullId ? data.fullId : data.id,
+        JSON.stringify(data)
+      );
+    }
     botClient.off("messageUpdate", () => {});
   }
   return data;
