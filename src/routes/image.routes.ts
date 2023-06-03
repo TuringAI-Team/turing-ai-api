@@ -330,10 +330,10 @@ router.post(
   async (req: Request, res: Response) => {
     let action = req.params.action;
     if (action == "imagine") {
-      let { prompt, model, mode, premium = true } = req.body;
+      let { prompt, model, premium = true } = req.body;
       res.set("content-type", "text/event-stream");
 
-      let event = await queue(prompt, mode, model, premium);
+      let event = await queue(prompt, model, premium);
       req.on("close", () => {
         console.log("close");
         event.emit("close", {});
