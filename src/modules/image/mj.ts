@@ -89,6 +89,7 @@ async function checkQueue(job, event, premium) {
       error: "Job not found",
       prompt: job.prompt,
     });
+    console.log(queued, generationQueue, job);
     return;
   }
   if (generationQueue[queued].generating) {
