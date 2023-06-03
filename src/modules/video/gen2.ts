@@ -1,5 +1,5 @@
 import EventEmitter from "events";
-import client from "../../selfbot.js";
+import client from "../../selfbot2.js";
 import supabase from "../supabase.js";
 var videosGenerating = 0;
 import filter from "../filter/index.js";

@@ -290,7 +290,6 @@ router.post(`/:m`, key, turnstile, async (req: Request, res: Response) => {
       res.set("content-type", "text/event-stream");
       const openai = new OpenAIApi(configuration);
       let previousContent;
-
       let response = await axios({
         url: "https://api.pawan.krd/v1/chat/completions",
         method: "POST",
@@ -305,6 +304,7 @@ router.post(`/:m`, key, turnstile, async (req: Request, res: Response) => {
           max_tokens: maxTokens,
           messages: messages,
           temperature: temperature,
+          stream: true,
         },
       });
       let stream = response.data;
