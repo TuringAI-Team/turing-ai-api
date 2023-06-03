@@ -182,7 +182,8 @@ export async function imagine(prompt, model, event) {
       botClient.off("messageCreate", () => {});
     }
     let interval = setInterval(() => {
-      if (!data.done && !data.image) {
+      if (!data.done && !data.image && !data.status) {
+        console.log('timeout')
         let timeInS = (Date.now() - data.startTime) / 1000;
         let timeToOut = 60 * 2;
         if (mode == "relax") timeToOut = 60 * 10;
