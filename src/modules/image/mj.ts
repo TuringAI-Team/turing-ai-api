@@ -89,7 +89,8 @@ async function checkQueue(job, event, premium) {
     await imagine(
       generationQueue[queued].prompt,
       generationQueue[queued].model,
-      event
+      event,
+      job
     );
   } else {
     event.emit("data", {
@@ -99,7 +100,7 @@ async function checkQueue(job, event, premium) {
   }
 }
 
-export async function imagine(prompt, model, event) {
+export async function imagine(prompt, model, event, job) {
   let guild = botClient.guilds.cache.get("1111700862868406383");
   if (!guild) return;
   let channelName = getChannel();
@@ -182,8 +183,10 @@ export async function imagine(prompt, model, event) {
       botClient.off("messageCreate", () => {});
     }
     let interval = setInterval(() => {
-      if (!data.done && !data.image && !data.status) {
-        console.log('timeout')
+      let queued = generationQueue.findIndex((x) => x.id == job.id);
+      job = generationQueue[queued];
+      if (!data.done && !data.image && !data.status && queued != -1) {
+        console.log("timeout");
         let timeInS = (Date.now() - data.startTime) / 1000;
         let timeToOut = 60 * 2;
         if (mode == "relax") timeToOut = 60 * 10;
