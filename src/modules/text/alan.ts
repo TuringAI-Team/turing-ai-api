@@ -245,7 +245,7 @@ export default class Alan {
             searchResults
               ? `\nHere you have results from ${
                   searchEngine == "wikipedia" ? "Wikipedia" : "Google"
-                } that you can use to answer the user, do not mention the results, extract information from them to answer the question.You MAY mention the source of the information.\n${searchResults}`
+                } that you can use to answer the user, do not mention the results, extract information from them to answer the question. You MUST mention the source of the information. \n${searchResults}`
               : ""
           }`;
         }
@@ -296,7 +296,7 @@ export default class Alan {
           model: model == "chatgpt" ? "gpt-3.5-turbo" : "gpt-4",
           max_tokens: maxTokens,
           messages: messages,
-          temperature: 0.3,
+          temperature: 0.1,
         });
         let totalTokens = completion.data.usage.total_tokens;
         credits += (totalTokens / 1000) * 0.002;
@@ -714,17 +714,18 @@ async function getSearchResults(conversation, searchEngine) {
   let messages = [];
   messages.push({
     role: "system",
-    content: `This is a chat between an user and a chat assistant. Just answer with the search queries based on the user prompt, needed for the following topic for ${
-      searchEngine == "wikipedia" ? "Wikipedia" : "Google"
-    }, maximum 3 entries. Make each of the queries descriptive and include all related topics. If the prompt is a question to/about the chat assistant directly, reply with 'N'. If the prompt is a request of an image, video, audio, song, math calculation, etc, reply with 'N'. If the prompt is a request to modify an image, reply with 'N'. Search for something if it may require current world knowledge past 2021 (Current Date is ${getToday()}), or knowledge of user's or people. Create a | seperated list without quotes.  If you no search queries are applicable, answer with 'N' . NO EXPLANATIONS, EXTRA TEXT OR PUNTUATION. You can ONLY REPLY WITH SEARCH QUERIES IN THE MENTION FORMAT.`,
+    content: `The user will send a chat between a user and a chat assistant. Answer with the search queries based on the last user prompt, needed for the following topic for Gogle, maximum 3 entries. Make each of the queries descriptive and include all related topics. If the prompt is a question to/about the chat assistant directly, reply with 'N'. If the prompt is a request of an image, video, audio, song, math calculation, etc, reply with 'N'. If the prompt is a request to modify an image, reply with 'N'. Search for something if it may require current world knowledge past 2021 (Current Date is ${getToday()}), or knowledge of user's or people. Create a | seperated list without quotes.  If you no search queries are applicable, answer with 'N' . NO EXPLANATIONS, EXTRA TEXT OR PUNTUATION. You can ONLY REPLY WITH SEARCH QUERIES IN THE MENTION FORMAT.`,
   });
   conversation = conversation.map((m) => `${m.role}:${m.content}`);
+  // get the last 3 messages
+  conversation = conversation.slice(-3);
   messages.push({
     role: "user",
-    content: `Conversation: ${conversation.join("\n")}`,
+    content: `${conversation.join("\n")}`,
   });
 
   let searchQueries: any = await chatgpt(messages, 150, { temperature: 0.1 });
+  console.log(searchQueries);
   if (searchQueries.error)
     return { results: null, searchQueries: [], credits: 0 };
   let credits = 0;
@@ -781,9 +782,18 @@ async function google(query) {
     additional_params: {},
   };
 
-  let response = await googleAPI.search(query, options);
+  let response: any = await googleAPI.search(query, options);
   //  return first 2 results
   response.results = response.results.slice(0, 2);
+
+  response.results = response.results.map((x) => {
+    return {
+      title: x.title,
+      description: x.description,
+      url: x.url,
+    };
+  });
+
   return response;
 }
 async function DuckDuckGo(query) {
