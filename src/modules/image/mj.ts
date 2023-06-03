@@ -12,15 +12,11 @@ import { randomUUID } from "crypto";
 const botClient: Client = client;
 botClient.setMaxListeners(0);
 let generationQueue = [];
-let maxGenerations = 5;
+const maxGenerations = 5;
+const mode = "relax";
 
-export async function asyncQueue(
-  prompt,
-  mode = "relax",
-  model = "5.1",
-  premium = false
-) {
-  let event = await queue(prompt, mode, model, premium);
+export async function asyncQueue(prompt, model = "5.1", premium = false) {
+  let event = await queue(prompt, model, premium);
   return new Promise((resolve, reject) => {
     event.on("data", (data) => {
       if (data.done) {
@@ -30,12 +26,7 @@ export async function asyncQueue(
   });
 }
 
-export async function queue(
-  prompt,
-  mode = "relax",
-  model = "5.1",
-  premium = false
-) {
+export async function queue(prompt, model = "5.1", premium = false) {
   let event = new EventEmitter();
   let id = randomUUID();
   let job = {
@@ -97,7 +88,6 @@ async function checkQueue(job, event, premium) {
     generationQueue[queued].generating = true;
     await imagine(
       generationQueue[queued].prompt,
-      generationQueue[queued].mode,
       generationQueue[queued].model,
       event
     );
@@ -109,7 +99,7 @@ async function checkQueue(job, event, premium) {
   }
 }
 
-export async function imagine(prompt, mode, model, event) {
+export async function imagine(prompt, model, event) {
   let guild = botClient.guilds.cache.get("1111700862868406383");
   if (!guild) return;
   let channelName = getChannel();
@@ -180,12 +170,12 @@ export async function imagine(prompt, mode, model, event) {
       data.messageId = message.id;
       data.id = `${message.id}-${channelName}`;
       data.status = 0;
-      data = await checkContent(message, data, mode);
+      data = await checkContent(message, data);
       event.emit("data", data);
       if (data.done) return;
       botClient.on("messageUpdate", async (oldMessage, newMessage) => {
         if (oldMessage.id != message.id) return;
-        data = await checkContent(newMessage, data, mode);
+        data = await checkContent(newMessage, data);
         event.emit("data", data);
       });
       botClient.off("messageCreate", () => {});
