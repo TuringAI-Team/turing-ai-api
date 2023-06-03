@@ -292,12 +292,17 @@ export default class Alan {
         });
         const openai = new OpenAIApi(configuration);
 
-        const completion = await openai.createChatCompletion({
-          model: model == "chatgpt" ? "gpt-3.5-turbo" : "gpt-4",
-          max_tokens: maxTokens,
-          messages: messages,
-          temperature: 0.1,
-        });
+        const completion = await openai.createChatCompletion(
+          {
+            model: model == "chatgpt" ? "gpt-3.5-turbo" : "gpt-4",
+            max_tokens: maxTokens,
+            messages: messages,
+            temperature: 0.1,
+          },
+          {
+            url: "https://api.pawan.krd/v1",
+          }
+        );
         let totalTokens = completion.data.usage.total_tokens;
         credits += (totalTokens / 1000) * 0.002;
         response = completion.data.choices[0].message.content;
@@ -814,25 +819,19 @@ async function chatgpt(messages, maxtokens, options?) {
     messages,
     ...options,
   };
-  let acc = await getKey();
-  if (!acc) {
-    return {
-      error: "We are at maximum capacity, please try again later.",
-    };
-  }
-  let key = acc.key;
   try {
     const configuration = new Configuration({
-      apiKey: key,
+      apiKey: process.env.PAWAN_API_KEY,
     });
 
     const openai = new OpenAIApi(configuration);
 
-    const completion = await openai.createChatCompletion(data);
+    const completion = await openai.createChatCompletion(data, {
+      url: "https://api.pawan.krd/v1",
+    });
 
     let response = completion.data.choices[0].message.content;
     let totalTokens = completion.data.usage.total_tokens;
-    await removeMessage(acc.id);
     return { response, totalTokens };
   } catch (err: any) {
     return {

@@ -27,6 +27,7 @@ import Poe, { initPoeClient } from "../modules/text/poe.js";
 import redisClient from "../modules/cache/redis.js";
 import { getPlugins } from "../modules/text/plugins.js";
 import EventEmitter from "events";
+import axios from "axios";
 import Falcon from "../modules/text/falcon.js";
 
 const router = express.Router();
@@ -282,42 +283,38 @@ router.post(`/:m`, key, turnstile, async (req: Request, res: Response) => {
 
     if (m === "open-ai" && model != "text-davinci-003") {
       let { maxTokens = 100 } = req.body;
-      let key = process.env.OPENAI_API_KEY;
+      let key = process.env.PAWAN_API_KEY;
       const configuration = new Configuration({
         apiKey: key,
       });
-      res.setHeader("Content-Type", "text/html; charset=utf-8");
-      res.setHeader("Transfer-Encoding", "chunked");
+      res.set("content-type", "text/event-stream");
       const openai = new OpenAIApi(configuration);
       let previousContent;
-      OpenAIExt.streamServerChatCompletion(
-        {
+
+      let response = await axios({
+        url: "https://api.pawan.krd/v1/chat/completions",
+        method: "POST",
+        responseType: "stream",
+        headers: {
+          Authorization: `Bearer ${key}`,
+          "Content-Type": "application/json",
+        },
+
+        data: {
           model: model,
           max_tokens: maxTokens,
-          temperature: temperature,
           messages: messages,
+          temperature: temperature,
         },
-        {
-          openai: openai,
-          handler: {
-            // Content contains the string draft, which may be partial. When isFinal is true, the completion is done.
-            onContent(content, isFinal, stream) {
-              if (!previousContent) {
-                res.write(content);
-              } else {
-                res.write(content.replace(previousContent, ""));
-              }
-              previousContent = content;
-            },
-            onDone(stream) {
-              res.end();
-            },
-            onError(error, stream) {
-              console.error(error);
-            },
-          },
-        }
-      );
+      });
+      let stream = response.data;
+      stream.on("data", (chunk) => {
+        let content = chunk.toString();
+        res.write(content);
+      });
+      stream.on("end", () => {
+        res.end();
+      });
     } else if (m === "stablelm") {
       let { maxTokens = 500 } = req.body;
       let result: any = await StableLM(prompt, maxTokens);
@@ -379,8 +376,7 @@ router.post(`/:m`, key, turnstile, async (req: Request, res: Response) => {
         }
       });
     } else if (m == "claude") {
-      res.setHeader("Content-Type", "text/html; charset=utf-8");
-      res.setHeader("Transfer-Encoding", "chunked");
+      res.set("content-type", "text/event-stream");
       let c = await initPoeClient();
       console.log(c);
       let result = Poe(prompt, c);
