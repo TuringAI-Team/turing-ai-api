@@ -82,7 +82,7 @@ export async function queue(
 
 async function checkQueue(job, event, premium) {
   let queued = generationQueue.findIndex((x) => x.id == job.id);
-
+  if (!generationQueue[queued]) return;
   if (generationQueue[queued].generating) {
     return;
   }
