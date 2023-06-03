@@ -245,6 +245,7 @@ export async function checkContent(newMessage, data, mode?) {
     let timeInS = (Date.now() - data.startTime) / 1000;
     //  each second is 0.001 credits
     let pricePerSecond = 0.001;
+    if (mode == "relax") pricePerSecond = 0;
     let credits = timeInS * pricePerSecond;
     data.credits = credits;
     data.queued = null;
