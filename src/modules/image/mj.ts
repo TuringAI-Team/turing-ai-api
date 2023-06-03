@@ -184,6 +184,10 @@ export async function imagine(prompt, model, event, job) {
     }
     let interval = setInterval(() => {
       let queued = generationQueue.findIndex((x) => x.id == job.id);
+      if (!generationQueue[queued]) {
+        clearInterval(interval);
+        return;
+      }
       job = generationQueue[queued];
       if (!data.done && !data.image && !data.status && queued != -1) {
         console.log("timeout");
