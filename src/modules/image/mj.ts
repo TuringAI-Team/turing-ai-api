@@ -74,7 +74,9 @@ export async function queue(
     if (data.done) {
       clearInterval(interval);
       queued = generationQueue.findIndex((x) => x.id == job.id);
+      // remove job from queue
       generationQueue.splice(queued, 1);
+      console.log(generationQueue.length);
     }
   });
   return event;
