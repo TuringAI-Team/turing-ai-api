@@ -157,6 +157,13 @@ export async function imagine(prompt, model, event, job) {
         event.emit("data", data);
         botClient.off("messageCreate", () => {});
       }
+      if (title && title.includes("Queue full")) {
+        data.error = "Queue is full";
+        data.done = true;
+        data.queued = null;
+        event.emit("data", data);
+        botClient.off("messageCreate", () => {});
+      }
       if (title && title.includes("Job queued")) {
         activated = true;
       }
