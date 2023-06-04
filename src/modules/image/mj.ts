@@ -214,7 +214,7 @@ export async function imagine(prompt, model, event, job) {
     }, 1000 * 60 * 5);
   });
 }
-export async function checkContent(newMessage, data, mode?) {
+export async function checkContent(newMessage, data) {
   let content = newMessage.content;
   let attachments = newMessage.attachments;
   // get url
@@ -254,6 +254,8 @@ export async function checkContent(newMessage, data, mode?) {
     let pricePerSecond = 0.001;
     if (mode == "relax") pricePerSecond = 0;
     let credits = timeInS * pricePerSecond;
+
+    if (mode == "relax") credits = 0;
     data.credits = credits;
     data.queued = null;
     if (data.fullId) {
