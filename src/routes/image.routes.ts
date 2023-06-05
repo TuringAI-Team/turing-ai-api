@@ -360,7 +360,7 @@ router.post(
                 });
 
               if (error) {
-                console.log(error);
+                console.log(`upload: ${error}`);
               }
               let { data: dimg } = await supabase.storage
                 .from("mj")
