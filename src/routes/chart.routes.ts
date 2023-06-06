@@ -133,16 +133,18 @@ router.post("/:chart", key, turnstile, async (req: Request, res: Response) => {
         if (key.split(".").length == 3) {
           let subSubKey = key.split(".")[2];
           data.forEach((d: any) => {
-            dataset.data.push(d.data[parentKey][subKey][subSubKey]);
+            if (d.data[parentKey][subKey][subSubKey])
+              dataset.data.push(d.data[parentKey][subKey][subSubKey]);
           });
         } else {
           data.forEach((d: any) => {
-            dataset.data.push(d.data[parentKey][subKey]);
+            if (d.data[parentKey][subKey])
+              dataset.data.push(d.data[parentKey][subKey]);
           });
         }
       } else {
         data.forEach((d: any) => {
-          dataset.data.push(d.data[key]);
+          if (d.data[key]) dataset.data.push(d.data[key]);
         });
       }
 
@@ -167,16 +169,18 @@ router.post("/:chart", key, turnstile, async (req: Request, res: Response) => {
         if (key.split(".").length == 3) {
           let subSubKey = key.split(".")[2];
           data.forEach((d: any) => {
-            dataset.data.push(d.data[parentKey][subKey][subSubKey]);
+            if (d.data[parentKey][subKey][subSubKey])
+              dataset.data.push(d.data[parentKey][subKey][subSubKey]);
           });
         } else {
           data.forEach((d: any) => {
-            dataset.data.push(d.data[parentKey][subKey]);
+            if (d.data[parentKey][subKey])
+              dataset.data.push(d.data[parentKey][subKey]);
           });
         }
       } else {
         data.forEach((d: any) => {
-          dataset.data.push(d.data[key]);
+          if (d.data[key]) dataset.data.push(d.data[key]);
         });
       }
       dataset.backgroundColor.push(
@@ -199,10 +203,9 @@ router.post("/:chart", key, turnstile, async (req: Request, res: Response) => {
     },
   });
   chartImage.setWidth(width);
-  let image = await chartImage.toDataUrl();
+  let base64 = await chartImage.getBase64();
   res.json({
-    image: image,
-    url: image,
+    image: base64,
   });
 });
 
