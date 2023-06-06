@@ -203,7 +203,7 @@ router.post("/:chart", key, turnstile, async (req: Request, res: Response) => {
     },
   });
   chartImage.setWidth(width);
-  let base64 = await chartImage.getBase64();
+  let base64 = await chartImage.toDataUrl();
   res.json({
     image: base64,
   });
