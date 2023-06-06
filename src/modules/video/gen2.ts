@@ -19,16 +19,19 @@ export default async function Gen2(
       });
       return emitter;
     }
-    let channel: any = client.channels.cache.get("1098719904556929064");
+
+    let channel: any = await client.channels.fetch("1115394706424221819");
+    console.log(channel.name);
     if (!channel) {
       emitter.emit("data", { error: "channel not found", end: true });
       return emitter;
     }
-    await channel.send(
+    let r = await channel.send(
       `<@1093334543265693786> ${prompt} ${interpolate ? "--interpolate" : ""} ${
         upscale ? "--upscale" : ""
       }`
     );
+    console.log(r);
     videosGenerating++;
     let collector = channel.createMessageCollector({
       filter: (m: any) => m.author.id == "1093334543265693786",
@@ -64,7 +67,8 @@ export default async function Gen2(
     });
     return emitter;
   } catch (error) {
-    emitter.emit("data", { error: error });
+    console.log(error);
+    emitter.emit("data", { error: error, end: true });
     return emitter;
   }
 }

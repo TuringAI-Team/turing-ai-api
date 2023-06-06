@@ -35,6 +35,13 @@ router.post("/:chart", key, turnstile, async (req: Request, res: Response) => {
     let periodMs = ms(period);
     return diff <= periodMs;
   });
+  //sort by data, old first , recent last
+  data = data.sort((a: any, b: any) => {
+    let dateA = new Date(a.time);
+    let dateB = new Date(b.time);
+    return dateA.getTime() - dateB.getTime();
+  });
+
   let metricData = data.map((d: any) => d.data);
 
   let data1 = metricData[0];
@@ -195,7 +202,7 @@ router.post("/:chart", key, turnstile, async (req: Request, res: Response) => {
   let image = await chartImage.toDataUrl();
   res.json({
     image: image,
-    url: await chartImage.getShortUrl(),
+    url: image,
   });
 });
 

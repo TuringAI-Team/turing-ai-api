@@ -38,10 +38,13 @@ router.post("/:m", key, turnstile, async (req: Request, res: Response) => {
       console.log(prompt);
       if (!prompt) return res.json({ error: "No prompt provided" }).status(400);
       let result = await Gen2(prompt, interpolate, upscale);
+      res.set("content-type", "text/event-stream");
+
       result.on("data", (chunk) => {
-        console.log(chunk);
+        res.write(`data: ${JSON.stringify(chunk)}\n\n`);
         if (chunk.end) {
-          res.json(chunk).status(200);
+          res.write(`data: ${JSON.stringify(chunk)}\n\n`);
+          res.end();
         }
       });
     }
