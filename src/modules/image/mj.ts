@@ -145,6 +145,8 @@ export async function imagine(prompt, model, event, job) {
     let channel: any = message.channel;
     let activated = false;
     let footer = message.embeds[0]?.footer?.text;
+    console.log(message.content, message.embeds[0]?.title);
+
     // prompt can have image urls they can be from a lot of domains and paths
     let promptWithOutURL = prompt.replace(/(https?:\/\/[^\s]+)/g, "");
     if (footer && footer.includes(promptWithOutURL)) {
@@ -338,7 +340,6 @@ export async function actions(id, action, number) {
       let footer = message.embeds[0]?.footer?.text;
       // prompt can have image urls they can be from a lot of domains and paths
       let promptWithOutURL = data.prompt.replace(/(https?:\/\/[^\s]+)/g, "");
-      console.log(message.content, message.embeds[0]?.title);
       if (footer && footer.includes(promptWithOutURL)) {
         let title = message.embeds[0]?.title;
         if (title && title.includes("Action needed to continue")) {
