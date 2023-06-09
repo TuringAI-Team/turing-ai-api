@@ -12,7 +12,7 @@ import { randomUUID } from "crypto";
 const botClient: Client = client;
 botClient.setMaxListeners(0);
 let generationQueue = [];
-const maxGenerations = 5;
+const maxGenerations = 2;
 const mode = "relax";
 
 export async function asyncQueue(prompt, model = "5.1", premium = false) {
@@ -45,11 +45,6 @@ export async function queue(prompt, model = "5.1", premium = false) {
     done: false,
     prompt: prompt,
   });
-  event.emit("data", {
-    done: true,
-    error: "This feature is currently disabled",
-  });
-  return;
   await checkQueue(job, event, premium);
   let interval = setInterval(async () => {
     await checkQueue(job, event, premium);
