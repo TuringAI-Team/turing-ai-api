@@ -145,11 +145,6 @@ export async function imagine(prompt, model, event, job) {
     let channel: any = message.channel;
     let activated = false;
     let footer = message.embeds[0]?.footer?.text;
-    console.log(
-      message.content,
-      message.embeds[0]?.title,
-      message.embeds[0]?.description
-    );
 
     // prompt can have image urls they can be from a lot of domains and paths
     let promptWithOutURL = prompt.replace(/(https?:\/\/[^\s]+)/g, "");
