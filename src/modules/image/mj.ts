@@ -375,7 +375,7 @@ export async function actions(id, action, number) {
       let interval = setInterval(() => {
         if (!data.done) {
           let timeInS = (Date.now() - data.startTime) / 1000;
-          let timeToOut = 60 * 3;
+          let timeToOut = 60 * 10;
           if (timeInS > timeToOut) {
             data.error = "Took too long to generate image";
             data.done = true;
