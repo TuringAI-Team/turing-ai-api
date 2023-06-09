@@ -45,6 +45,11 @@ export async function queue(prompt, model = "5.1", premium = false) {
     done: false,
     prompt: prompt,
   });
+  event.emit("data", {
+    done: true,
+    error: "This feature is currently disabled",
+  });
+  return;
   await checkQueue(job, event, premium);
   let interval = setInterval(async () => {
     await checkQueue(job, event, premium);
