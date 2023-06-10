@@ -26,9 +26,10 @@ export async function asyncQueue(prompt, model = "5.1", premium = false) {
   });
 }
 setInterval(async () => {
-  console.log(generationQueue.length);
   let generatingQueue = generationQueue.filter((x) => x.generating == true);
-  console.log(generatingQueue.length);
+  console.log(
+    `${generatingQueue.length} jobs generating in queue, ${generationQueue.length} jobs in queue`
+  );
 }, 10000);
 
 export async function queue(
