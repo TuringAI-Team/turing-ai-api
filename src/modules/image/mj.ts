@@ -119,7 +119,7 @@ async function checkQueue(job, event, premium, action) {
     }
   } else {
     event.emit("data", {
-      queued: queued,
+      queued: queued - generating,
       done: false,
     });
   }
@@ -212,11 +212,13 @@ export async function imagine(prompt, model, event, job) {
       data.id = `${message.id}-${channelName}`;
       data.status = 0;
       data = await checkContent(message, data);
+      console.log(data);
       event.emit("data", data);
       if (data.done) return;
       botClient.on("messageUpdate", async (oldMessage, newMessage) => {
         if (oldMessage.id != message.id) return;
         data = await checkContent(newMessage, data);
+        console.log(data);
         event.emit("data", data);
       });
       botClient.off("messageCreate", () => {});
