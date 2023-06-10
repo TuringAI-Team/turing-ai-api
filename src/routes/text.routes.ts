@@ -310,11 +310,14 @@ router.post(`/:m`, key, turnstile, async (req: Request, res: Response) => {
       let stream = response.data;
       stream.on("data", (chunk) => {
         let content = chunk.toString();
+        res.status(response.status);
         res.write(content);
       });
       stream.on("end", () => {
+        res.status(response.status);
         res.end();
       });
+      res.status(response.status);
     } else if (m === "stablelm") {
       let { maxTokens = 500 } = req.body;
       let result: any = await StableLM(prompt, maxTokens);
