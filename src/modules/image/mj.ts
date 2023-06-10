@@ -12,7 +12,7 @@ import { randomUUID } from "crypto";
 const botClient: Client = client;
 botClient.setMaxListeners(0);
 let generationQueue = [];
-const maxGenerations = 4;
+const maxGenerations = -1;
 const mode = "relax";
 
 export async function asyncQueue(prompt, model = "5.1", premium = false) {
@@ -169,7 +169,6 @@ export async function imagine(prompt, model, event, job) {
     let promptWithOutURL = prompt.replace(/(https?:\/\/[^\s]+)/g, "");
     if (footer && footer.includes(promptWithOutURL)) {
       let title = message.embeds[0]?.title;
-      console.log(title);
       if (title && title.includes("Action needed to continue")) {
         data.error = "Flagged";
         data.done = true;
