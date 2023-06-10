@@ -12,11 +12,11 @@ import { randomUUID } from "crypto";
 const botClient: Client = client;
 botClient.setMaxListeners(0);
 let generationQueue = [];
-const maxGenerations = 2;
+const maxGenerations = 4;
 const mode = "relax";
 
 export async function asyncQueue(prompt, model = "5.1", premium = false) {
-  let event = await queue(prompt, model, premium);
+  let event = await queue(prompt, model, premium, "imagine");
   return new Promise((resolve, reject) => {
     event.on("data", (data) => {
       if (data.done) {
@@ -26,11 +26,20 @@ export async function asyncQueue(prompt, model = "5.1", premium = false) {
   });
 }
 
-export async function queue(prompt, model = "5.1", premium = false) {
+export async function queue(
+  prompt,
+  model = "5.1",
+  premium = false,
+  action = "imagine",
+  number = 1,
+  realId?: string
+) {
   let event = new EventEmitter();
   let id = randomUUID();
   let job = {
     id: id,
+    realId: realId,
+    number: number,
     prompt: prompt,
     mode: mode,
     model: model,
@@ -45,9 +54,9 @@ export async function queue(prompt, model = "5.1", premium = false) {
     done: false,
     prompt: prompt,
   });
-  await checkQueue(job, event, premium);
+  await checkQueue(job, event, premium, action);
   let interval = setInterval(async () => {
-    await checkQueue(job, event, premium);
+    await checkQueue(job, event, premium, action);
   }, 5000);
   event.on("close", () => {
     console.log("closed");
@@ -73,7 +82,7 @@ export async function queue(prompt, model = "5.1", premium = false) {
   return event;
 }
 
-async function checkQueue(job, event, premium) {
+async function checkQueue(job, event, premium, action) {
   let queued = generationQueue.findIndex((x) => x.id == job.id);
   if (!generationQueue[queued]) return;
   if (generationQueue[queued].generating) {
@@ -86,12 +95,22 @@ async function checkQueue(job, event, premium) {
   ) {
     console.log("generating");
     generationQueue[queued].generating = true;
-    await imagine(
-      generationQueue[queued].prompt,
-      generationQueue[queued].model,
-      event,
-      job
-    );
+    if (action == "imagine") {
+      await imagine(
+        generationQueue[queued].prompt,
+        generationQueue[queued].model,
+        event,
+        job
+      );
+    }
+    if (action == "variation") {
+      await actions(
+        generationQueue[queued].realId,
+        "variation",
+        generationQueue[queued].number,
+        event
+      );
+    }
   } else {
     event.emit("data", {
       queued: queued,
@@ -269,8 +288,8 @@ export async function checkContent(newMessage, data) {
   return data;
 }
 
-export async function actions(id, action, number) {
-  let event = new EventEmitter();
+export async function actions(id, action, number, event?) {
+  if (!event) event = new EventEmitter();
   let messageId = id.split("-")[0];
   let channelName = parseInt(id.split("-")[1]);
   let fullId = `${id}-${action}-${number}`;
@@ -330,6 +349,7 @@ export async function actions(id, action, number) {
       jobId: randomUUID(),
       error: null,
       fullId: fullId,
+      queued: null,
       messageId: null,
       id: null,
     };

@@ -403,9 +403,14 @@ router.post(
       action == "upscale" ||
       action == "cancel"
     ) {
-      let { id, number, mode } = req.body;
+      let { id, number, mode, premium } = req.body;
       res.set("content-type", "text/event-stream");
-      let event = await actions(id, action, number);
+      let event;
+      if (action == "upscale") {
+        event = await actions(id, action, number);
+      } else {
+        event = await queue(null, null, premium, "variation", number, id);
+      }
       event.on("data", async (data) => {
         res.write("data: " + JSON.stringify(data) + "\n\n");
         if (data.done) {
