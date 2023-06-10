@@ -25,6 +25,11 @@ export async function asyncQueue(prompt, model = "5.1", premium = false) {
     });
   });
 }
+setInterval(async () => {
+  console.log(generationQueue.length);
+  let generatingQueue = generationQueue.filter((x) => x.generating == true);
+  console.log(generatingQueue.length);
+}, 10000);
 
 export async function queue(
   prompt,
