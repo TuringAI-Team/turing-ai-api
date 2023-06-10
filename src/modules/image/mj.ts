@@ -186,6 +186,13 @@ export async function imagine(prompt, model, event, job) {
       if (title && title.includes("Job queued")) {
         activated = true;
       }
+      if (title && title.includes("Invalid parameter")) {
+        data.error = "Invalid parameter";
+        data.done = true;
+        data.queued = null;
+        event.emit("data", data);
+        botClient.off("messageCreate", () => {});
+      }
     }
     if (
       message.content.includes(promptWithOutURL) &&
