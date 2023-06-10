@@ -169,6 +169,7 @@ export async function imagine(prompt, model, event, job) {
     let promptWithOutURL = prompt.replace(/(https?:\/\/[^\s]+)/g, "");
     if (footer && footer.includes(promptWithOutURL)) {
       let title = message.embeds[0]?.title;
+      console.log(title);
       if (title && title.includes("Action needed to continue")) {
         data.error = "Flagged";
         data.done = true;
