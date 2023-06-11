@@ -22,6 +22,6 @@ export async function request(url, action, body) {
     },
   });
   console.log(res.data);
-  let result = res.data.output;
+  let result = res.data;
   return result;
 }
