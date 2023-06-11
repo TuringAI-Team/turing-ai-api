@@ -15,6 +15,7 @@ router.post("/runsync", key, turnstile, async (req: Request, res: Response) => {
   let body = req.body;
   delete body.model;
   let result = await request(url, "runsync", body);
+  res.json(result);
 });
 router.post("/run", key, turnstile, async (req: Request, res: Response) => {
   let { model } = req.body;
@@ -22,6 +23,7 @@ router.post("/run", key, turnstile, async (req: Request, res: Response) => {
   let body = req.body;
   delete body.model;
   let result = await request(url, "run", body);
+  res.json(result);
 });
 router.post("/status", key, turnstile, async (req: Request, res: Response) => {
   let { model } = req.body;
@@ -29,6 +31,7 @@ router.post("/status", key, turnstile, async (req: Request, res: Response) => {
   let body = req.body;
   delete body.model;
   let result = await request(url, "status", body);
+  res.json(result);
 });
 router.post("/cancel", key, turnstile, async (req: Request, res: Response) => {
   let { model } = req.body;
@@ -36,6 +39,7 @@ router.post("/cancel", key, turnstile, async (req: Request, res: Response) => {
   let body = req.body;
   delete body.model;
   let result = await request(url, "cancel", body);
+  res.json(result);
 });
 
 export default router;
