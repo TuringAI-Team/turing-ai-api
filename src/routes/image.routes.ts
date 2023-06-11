@@ -25,7 +25,6 @@ import axios from "axios";
 import sharp from "sharp";
 import { queue, actions } from "../modules/image/mj.js";
 import { randomUUID } from "crypto";
-
 const router = express.Router();
 let configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
