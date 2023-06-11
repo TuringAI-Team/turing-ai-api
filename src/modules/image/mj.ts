@@ -53,6 +53,11 @@ export async function queue(
     generating: false,
     channel: null,
   };
+  event.emit("data", {
+    done: true,
+    error: "This function has been disable for 3 days",
+  });
+  return event;
   generationQueue.push(job);
   let queued = generationQueue.length;
   event.emit("data", {
