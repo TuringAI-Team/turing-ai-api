@@ -99,6 +99,11 @@ export async function pluginsChat(config, plugins) {
         result.done = true;
         event.emit("data", result);
       }
+    })
+    .catch((err) => {
+      console.log(err.data);
+      result.done = true;
+      event.emit("data", result);
     });
   return event;
 }
