@@ -29,6 +29,7 @@ import { getPlugins } from "../modules/text/plugins.js";
 import EventEmitter from "events";
 import axios from "axios";
 import Falcon from "../modules/text/falcon.js";
+import { pluginsChat } from "../modules/text/gpt-functions.js";
 
 const router = express.Router();
 
@@ -217,34 +218,24 @@ router.delete(
     res.json({ message: "Conversation deleted" }).status(200);
   }
 );
-router.post(
-  `/plugins/:m`,
-  key,
-  turnstile,
-  async (req: Request, res: Response) => {
-    let { m } = req.params;
-    let model = `${m}-plugins`;
-    res.set("content-type", "text/event-stream");
+router.post(`/plugins`, key, turnstile, async (req: Request, res: Response) => {
+  let { m } = req.params;
+  res.set("content-type", "text/event-stream");
 
-    let { maxTokens = 500, pluginList, messages, temperature } = req.body;
-    let event: any = await LangChain(
-      model,
-      messages,
-      maxTokens,
-      temperature,
-      pluginList
-    );
+  let body = req.body;
+  let pluginList = body.plugins;
+  delete body.plugins;
+  let event: any = await pluginsChat(body, pluginList);
 
-    event.on("data", (data) => {
-      data.credits = data.credits;
-      console.log(data.credits);
-      res.write("data: " + JSON.stringify(data) + "\n\n");
-      if (data.done) {
-        res.end();
-      }
-    });
-  }
-);
+  event.on("data", (data) => {
+    console.log(data);
+    data.credits = data.credits;
+    res.write("data: " + JSON.stringify(data) + "\n\n");
+    if (data.done) {
+      res.end();
+    }
+  });
+});
 
 router.post(`/:m`, key, turnstile, async (req: Request, res: Response) => {
   try {

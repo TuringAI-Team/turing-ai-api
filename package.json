@@ -34,7 +34,7 @@
     "jsonwebtoken": "^9.0.0",
     "langchain": "^0.0.75",
     "mathjs": "^11.8.0",
-    "openai": "^3.2.1",
+    "openai": "^3.3.0",
     "openai-ext": "^1.2.4",
     "poe-node-api": "^0.0.5",
     "puppeteer": "^19.11.1",
@@ -43,7 +43,8 @@
     "sharp": "^0.31.3",
     "topgg-votes": "^2.1.0",
     "uuid": "^9.0.0",
-    "wikipedia": "^1.2.0"
+    "wikipedia": "^1.2.0",
+    "yt-search": "^2.10.4"
   },
   "description": "``` npm create astro@latest -- --template basics ```",
   "main": "dist/index.js",
