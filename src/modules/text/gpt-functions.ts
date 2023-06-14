@@ -52,6 +52,7 @@ export async function pluginsChat(config, plugins) {
         if (args[pluginInfo.parameters.required[0]]) {
           console.log(args);
           let pluginResponse = await pluginInfo.function(args);
+          console.log(pluginResponse);
           let body = {
             ...config,
             messages: [
@@ -215,13 +216,27 @@ let pluginList = [
           type: "string",
           description: "Query to get a gif from tenor.",
         },
+        limit: {
+          type: "number",
+          description: "Number of gifs to return. Default is 3",
+        },
       },
+      required: ["query"],
     },
     function: async (params) => {
+      let limit = params.limit || 3;
       const response = await axios.get(
-        `https://api.tenor.com/v1/search?q=${params.query}&key=${process.env.TENOR_KEY}`
+        `https://tenor.googleapis.com/v2/search?q=${params.query}&limit=${limit}&key=${process.env.TENOR_KEY}`
       );
-      return response.data;
+      let data = response.data;
+      let gifs = data.results.map((gif: any) => {
+        return {
+          url: gif.url,
+          title: gif.title,
+          content_description: gif.content_description,
+        };
+      });
+      return gifs;
     },
   },
   {
@@ -322,7 +337,34 @@ let pluginList = [
           params.platform ? `platform=${platform}` : ""
         }${params.category ? `&category=${category}` : ""}`
       );
-      console.log(response.data);
+      return response.data;
+    },
+  },
+  {
+    name: "tasty",
+    description: "Get recipes from tasty.",
+    parameters: {
+      type: "object",
+      properties: {
+        query: {
+          type: "string",
+          description: "Query to get recipes from tasty.",
+        },
+      },
+      required: ["query"],
+    },
+    function: async (params) => {
+      let query = params.query;
+      const response = await axios({
+        url: `https://api.tasty.co/openai/recipes/query`,
+        method: "post",
+        data: {
+          queries: [query],
+        },
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
       return response.data;
     },
   },
