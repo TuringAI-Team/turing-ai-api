@@ -64,8 +64,6 @@ export async function pluginsChat(config, plugins) {
             ],
             stream: true,
           };
-          let secondCompletation;
-          let status = 0;
           await fetchEventSource("	https://api.openai.com/v1/chat/completions", {
             method: "POST",
             headers: {
@@ -84,12 +82,10 @@ export async function pluginsChat(config, plugins) {
                 event.emit("data", result);
               } else {
                 data = JSON.parse(data);
-                result.result += data.choices[0].delta.content;
-                status++;
-                //each 20 messages, emit data
-                if (status % 20 == 0) {
-                  event.emit("data", result);
+                if (data.choices[0].delta.content) {
+                  result.result += data.choices[0].delta.content;
                 }
+                event.emit("data", result);
               }
             },
           });
@@ -210,31 +206,124 @@ let pluginList = [
     },
   },
   {
-    // more interesting plugins
-    name: "url-reader",
-    description: "Reads the content of a url and returns the text.",
+    name: "tenor",
+    description: "Get a gif from tenor based on a specific query.",
     parameters: {
       type: "object",
       properties: {
-        url: {
+        query: {
           type: "string",
-          description: "Url to read.",
+          description: "Query to get a gif from tenor.",
         },
       },
-      required: ["url"],
     },
     function: async (params) => {
-      let req = await axios({
-        url: "https://greenyroad.com/api/readUrls",
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await axios.get(
+        `https://api.tenor.com/v1/search?q=${params.query}&key=${process.env.TENOR_KEY}`
+      );
+      return response.data;
+    },
+  },
+  {
+    name: "alphavantage-stocks",
+    description:
+      "Get stock information for a specific stock using alphavantage.",
+    parameters: {
+      type: "object",
+      properties: {
+        stock: {
+          type: "string",
+          description: "Stock symbol to get information from.",
         },
-        data: {
-          urls: params.url,
+      },
+      required: ["stock"],
+    },
+    function: async (params) => {
+      const response = await axios.get(
+        `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${params.stock}&apikey=${process.env.ALPHA_VANTAGE}`
+      );
+      return response.data;
+    },
+  },
+  {
+    name: "alphavantage-crypto",
+    description:
+      "Get crypto information for a specific crypto using alphavantage.",
+    parameters: {
+      type: "object",
+      properties: {
+        from_currency: {
+          type: "string",
+          description: "Crypto symbol to get information from.",
         },
-      });
-      return req.data;
+        to_currency: {
+          type: "string",
+          description: "Currency to convert crypto to.",
+        },
+      },
+      required: ["from_currency"],
+    },
+    function: async (params) => {
+      let to_currency = params.to_currency || "USD";
+      const response = await axios.get(
+        `https://www.alphavantage.co/query?function=CURRENCY_EXCHANGE_RATE&from_currency=${params.from_currency}&to_currency=${to_currency}&apikey=${process.env.ALPHA_VANTAGE}`
+      );
+      return response.data;
+    },
+  },
+  {
+    name: "alphavantage-forex",
+    description:
+      "Get forex information for a specific forex using alphavantage.",
+    parameters: {
+      type: "object",
+      properties: {
+        from_currency: {
+          type: "string",
+          description: "Forex symbol to get information from.",
+        },
+        to_currency: {
+          type: "string",
+          description: "Currency to convert forex to.",
+        },
+      },
+      required: ["from_currency"],
+    },
+    function: async (params) => {
+      let to_currency = params.to_currency || "USD";
+      const response = await axios.get(
+        `https://www.alphavantage.co/query?function=CURRENCY_EXCHANGE_RATE&from_currency=${params.from_currency}&to_currency=${to_currency}&apikey=${process.env.ALPHA_VANTAGE}`
+      );
+      return response.data;
+    },
+  },
+  {
+    name: "free-games",
+    description: "Get free games from different platforms or categories.",
+    parameters: {
+      type: "object",
+      properties: {
+        platform: {
+          type: "string",
+          description: "Platform to get free games from.",
+        },
+        category: {
+          type: "string",
+          description:
+            "Category to get free games from. Complete list: mmorpg, shooter, strategy, moba, racing, sports, social, sandbox, open-world, survival, pvp, pve, pixel, voxel, zombie, turn-based, first-person, third-Person, top-down, tank, space, sailing, side-scroller, superhero, permadeath, card, battle-royale, mmo, mmofps, mmotps, 3d, 2d, anime, fantasy, sci-fi, fighting, action-rpg, action, military, martial-arts, flight, low-spec, tower-defense, horror, mmorts",
+        },
+      },
+    },
+    function: async (params) => {
+      let platform = params.platform || "pc";
+      let category = params.category || "mmorpg";
+      const response = await axios.get(
+        `https://www.freetogame.com/api/games?${
+          params.platform ? `platform=${platform}` : ""
+        }${params.category ? `&category=${category}` : ""}`
+      );
+      console.log(response.data);
+      return response.data;
     },
   },
 ];
