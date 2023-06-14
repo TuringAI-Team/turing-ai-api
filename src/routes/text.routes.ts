@@ -225,16 +225,22 @@ router.post(`/plugins`, key, turnstile, async (req: Request, res: Response) => {
   let body = req.body;
   let pluginList = body.plugins;
   delete body.plugins;
-  let event: any = await pluginsChat(body, pluginList);
+  try {
+    let event: any = await pluginsChat(body, pluginList);
 
-  event.on("data", (data) => {
-    console.log(data);
-    data.credits = data.credits;
-    res.write("data: " + JSON.stringify(data) + "\n\n");
-    if (data.done) {
-      res.end();
-    }
-  });
+    event.on("data", (data) => {
+      console.log(data);
+      data.credits = data.credits;
+      res.write("data: " + JSON.stringify(data) + "\n\n");
+      if (data.done) {
+        res.end();
+      }
+    });
+  } catch (error) {
+    console.log(JSON.stringify(error));
+    res.write("data: " + JSON.stringify({ error: error, done: true }) + "\n\n");
+    res.end();
+  }
 });
 
 router.post(`/:m`, key, turnstile, async (req: Request, res: Response) => {

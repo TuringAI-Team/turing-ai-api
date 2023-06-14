@@ -40,6 +40,7 @@ import {
 } from "langchain/schema";
 import { imagine, imagineAsync } from "../image/midjourney.js";
 import { asyncQueue } from "../image/mj.js";
+
 export default class Alan {
   userName: string;
   conversation: any;

@@ -4,6 +4,9 @@ import { EventEmitter } from "events";
 import axios from "axios";
 import { fetchEventSource } from "@waylaidwanderer/fetch-event-source";
 import yts from "yt-search";
+import { get_encoding } from "@dqbd/tiktoken";
+import { getChatMessageLength } from "./langchain.js";
+export const encoder = get_encoding("cl100k_base");
 
 export async function pluginsChat(config, plugins) {
   const configuration = new Configuration({
@@ -49,7 +52,7 @@ export async function pluginsChat(config, plugins) {
         if (args[pluginInfo.parameters.required[0]]) {
           console.log(args);
           let pluginResponse = await pluginInfo.function(args);
-          let secondCompletation = await openai.createChatCompletion({
+          let body = {
             ...config,
             messages: [
               ...messages,
@@ -59,12 +62,37 @@ export async function pluginsChat(config, plugins) {
                 content: JSON.stringify(pluginResponse),
               },
             ],
+            stream: true,
+          };
+          let secondCompletation;
+          let status = 0;
+          await fetchEventSource("	https://api.openai.com/v1/chat/completions", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+            },
+            body: JSON.stringify(body),
+            onmessage: async (ev) => {
+              let data: any = ev.data;
+              if (data == "[DONE]") {
+                result.done = true;
+                result.credits +=
+                  (getPromptLength(result.result) / 1000) * pricePerK;
+                result.credits +=
+                  (getChatMessageLength(messages) / 1000) * pricePerK;
+                event.emit("data", result);
+              } else {
+                data = JSON.parse(data);
+                result.result += data.choices[0].delta.content;
+                status++;
+                //each 20 messages, emit data
+                if (status % 20 == 0) {
+                  event.emit("data", result);
+                }
+              }
+            },
           });
-          result.credits +=
-            (secondCompletation.data.usage.total_tokens / 1000) * pricePerK;
-          result.result = secondCompletation.data.choices[0].message.content;
-          result.done = true;
-          event.emit("data", result);
         }
       } else {
         result.result = message.content;
@@ -74,7 +102,12 @@ export async function pluginsChat(config, plugins) {
     });
   return event;
 }
-
+export const getPromptLength = (content: string): number => {
+  content = content
+    .replaceAll("<|endoftext|>", "<|im_end|>")
+    .replaceAll("<|endofprompt|>", "<|im_end|>");
+  return encoder.encode(content).length;
+};
 let pluginList = [
   {
     name: "google",
@@ -131,13 +164,15 @@ let pluginList = [
   },
   {
     name: "weather",
-    description: "Get weather information for a specific location.",
+    description:
+      "Get weather information for a specific location using open weather map.",
     parameters: {
       type: "object",
       properties: {
         location: {
           type: "string",
-          description: "Location to get weather information.",
+          description:
+            "Location for openweathermap to get weather information. It needs to be the name of a real location that openweathermap can find.",
         },
       },
       required: ["location"],

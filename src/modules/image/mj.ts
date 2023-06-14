@@ -12,7 +12,7 @@ import { randomUUID } from "crypto";
 const botClient: Client = client;
 botClient.setMaxListeners(0);
 let generationQueue = [];
-const maxGenerations = 3;
+const maxGenerations = 2;
 const mode = "relax";
 
 export async function asyncQueue(prompt, model = "5.1", premium = false) {
@@ -54,11 +54,6 @@ export async function queue(
     generating: false,
     channel: null,
   };
-  event.emit("data", {
-    done: true,
-    error: "This function has been disable for 3 days",
-  });
-  return event;
   generationQueue.push(job);
   let queued = generationQueue.length;
   event.emit("data", {
