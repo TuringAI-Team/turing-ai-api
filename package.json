@@ -33,7 +33,7 @@
     "helmet": "^6.0.1",
     "jsonwebtoken": "^9.0.0",
     "langchain": "^0.0.75",
-    "mathjs": "^11.8.0",
+    "mathjs": "^11.8.1",
     "openai": "^3.3.0",
     "openai-ext": "^1.2.4",
     "poe-node-api": "^0.0.5",

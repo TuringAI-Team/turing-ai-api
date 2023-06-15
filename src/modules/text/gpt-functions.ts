@@ -7,7 +7,7 @@ import yts from "yt-search";
 import { get_encoding } from "@dqbd/tiktoken";
 import { getChatMessageLength } from "./langchain.js";
 export const encoder = get_encoding("cl100k_base");
-
+import { evaluate, round } from "mathjs";
 export async function pluginsChat(config, plugins) {
   const configuration = new Configuration({
     apiKey: process.env.OPENAI_API_KEY,
@@ -447,6 +447,30 @@ let pluginList = [
         console.log(`error: ${error}`);
         return {};
       }
+    },
+  },
+  {
+    name: "calculator",
+    description: "Calculate a math expression using mathjs evaluate function.",
+    parameters: {
+      type: "object",
+      properties: {
+        expression: {
+          type: "string",
+          description: "The math expression to evaluate.",
+        },
+        precision: {
+          type: "number",
+          description: "The number of digits to round to.",
+        },
+      },
+      required: ["expression"],
+    },
+    function: async (params) => {
+      let expression = params.expression;
+      let precision = params.precision || 14;
+      let result = evaluate(expression);
+      return round(result, precision);
     },
   },
 ];
