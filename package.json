@@ -11,6 +11,7 @@
   "dependencies": {
     "@dqbd/tiktoken": "^1.0.7",
     "@huggingface/inference": "^2.0.0",
+    "@octokit/rest": "^19.0.11",
     "@sellix/node-sdk": "^1.0.9",
     "@supabase/supabase-js": "^2.10.0",
     "@waylaidwanderer/chatgpt-api": "^1.36.2",

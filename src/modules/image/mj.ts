@@ -54,6 +54,12 @@ export async function queue(
     generating: false,
     channel: null,
   };
+  event.emit("data", {
+    done: true,
+    queued: null,
+    error: "This feature is currently disabled for maintenance.",
+  });
+  return event;
   generationQueue.push(job);
   let queued = generationQueue.length;
   event.emit("data", {

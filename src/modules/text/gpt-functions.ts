@@ -8,6 +8,12 @@ import { get_encoding } from "@dqbd/tiktoken";
 import { getChatMessageLength } from "./langchain.js";
 export const encoder = get_encoding("cl100k_base");
 import { evaluate, round } from "mathjs";
+import { Octokit } from "@octokit/rest";
+
+const octokit = new Octokit({
+  auth: process.env.GITHUB_TOKEN, // token from github, you get it from your profile settings -> developer settings -> personal access tokens
+});
+
 export async function pluginsChat(config, plugins) {
   const configuration = new Configuration({
     apiKey: process.env.OPENAI_API_KEY,
@@ -471,6 +477,110 @@ let pluginList = [
       let precision = params.precision || 14;
       let result = evaluate(expression);
       return round(result, precision);
+    },
+  },
+  {
+    name: "github",
+    description:
+      "Execute actions in github using octokit such as searching for topics,users or repos, or getting information from users or repos.",
+    parameters: {
+      type: "object",
+      properties: {
+        action: {
+          type: "string",
+          description: "The action to execute in github. (search, get)",
+        },
+        type: {
+          type: "string",
+          description:
+            "The type of action to execute in github. (topic, user, repo, org)",
+        },
+        query: {
+          type: "string",
+          description:
+            "The query to search in github. Or the username or repo name to get information from.",
+        },
+      },
+      required: ["action", "type", "query"],
+    },
+    function: async (params) => {
+      let action = params.action;
+      let type = params.type;
+      let query = params.query;
+      let result: any = {};
+      if (action === "search") {
+        if (type === "topic") {
+          result = await octokit.rest.search.topics({ q: query });
+        } else if (type === "user") {
+          result = await octokit.rest.search.users({ q: query });
+        } else if (type === "repo") {
+          result = await octokit.rest.search.repos({ q: query });
+        } else {
+          result = { error: "Invalid type." };
+        }
+      } else if (action === "get") {
+        if (type === "user") {
+          result = await octokit.rest.users.getByUsername({ username: query });
+        } else if (type === "repo") {
+          result = await octokit.rest.repos.get({
+            owner: query.split("/")[0],
+            repo: query.split("/")[1],
+          });
+        } else if (type === "org") {
+          result = await octokit.rest.orgs.get({ org: query });
+        } else {
+          result = { error: "Invalid type." };
+        }
+      } else {
+        result = { error: "Invalid action." };
+      }
+      if (!result.error) {
+        // format data
+        console.log(result);
+        if (action == "search") {
+          result = result.data.items;
+          result = result.map((r) => {
+            return {
+              name: r.name,
+              full_name: r.full_name,
+              url: r.html_url,
+              created_at: r.created_at,
+              updated_at: r.updated_at,
+              size: r.size,
+              forks_count: r.forks_count,
+              open_issues_count: r.open_issues_count,
+              license: r.license,
+              private: r.private,
+              owner: {
+                name: r.owner.login,
+                url: r.owner.html_url,
+                type: r.owner.type,
+              },
+            };
+          });
+          // just return the first 5 results
+          result = result.slice(0, 5);
+        }
+        if (action == "get") {
+          result = result.data;
+          result = {
+            name: result.login,
+            url: result.html_url,
+            type: result.type,
+            company: result.company,
+            blog: result.blog,
+            location: result.location,
+            bio: result.bio,
+            twitter_username: result.twitter_username,
+            created_at: result.created_at,
+            updated_at: result.updated_at,
+            public_repos: result.public_repos,
+            followers: result.followers,
+            following: result.following,
+          };
+        }
+      }
+      return result;
     },
   },
 ];

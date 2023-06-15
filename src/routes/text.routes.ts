@@ -229,7 +229,6 @@ router.post(`/plugins`, key, turnstile, async (req: Request, res: Response) => {
     let event: any = await pluginsChat(body, pluginList);
 
     event.on("data", (data) => {
-      console.log(data);
       data.credits = data.credits;
       res.write("data: " + JSON.stringify(data) + "\n\n");
       if (data.done) {
