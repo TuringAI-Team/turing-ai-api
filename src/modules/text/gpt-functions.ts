@@ -62,7 +62,13 @@ export async function pluginsChat(config, plugins) {
           pluginInfo.parameters.required.length == 0
         ) {
           console.log(`args ${JSON.stringify(args)}`);
-          let pluginResponse = await pluginInfo.function(args);
+          let pluginResponse;
+          try {
+            pluginResponse = await pluginInfo.function(args);
+          } catch (e) {
+            console.error(e);
+            pluginResponse = `Error: ${e}`;
+          }
           console.log(`pluginResponse ${JSON.stringify(pluginResponse)}`);
           let body = {
             ...config,
