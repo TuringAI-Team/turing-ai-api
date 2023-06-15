@@ -49,10 +49,15 @@ export async function pluginsChat(config, plugins) {
         event.emit("data", result);
         let pluginInfo = pluginList.find((p) => p.name === functionName);
         let args = JSON.parse(message["function_call"]["arguments"]);
-        if (args[pluginInfo.parameters.required[0]]) {
-          console.log(args);
+        if (
+          !pluginInfo.parameters.required ||
+          (args[pluginInfo.parameters.required[0]] &&
+            pluginInfo.parameters.required.length > 0) ||
+          pluginInfo.parameters.required.length == 0
+        ) {
+          console.log(`args ${JSON.stringify(args)}`);
           let pluginResponse = await pluginInfo.function(args);
-          console.log(pluginResponse);
+          console.log(`pluginResponse ${JSON.stringify(pluginResponse)}`);
           let body = {
             ...config,
             messages: [
@@ -98,7 +103,7 @@ export async function pluginsChat(config, plugins) {
       }
     })
     .catch((err) => {
-      console.log(JSON.stringify(err));
+      console.log(`err ${err}`);
       result.done = true;
       event.emit("data", result);
     });
@@ -366,6 +371,82 @@ let pluginList = [
         },
       });
       return response.data;
+    },
+  },
+  {
+    name: "world-news",
+    description:
+      "Get world news with specific country, language or text using worldnewsapi.com",
+    parameters: {
+      type: "object",
+      properties: {
+        text: {
+          type: "string",
+          description: "The text to match in the news content.",
+        },
+        "source-countries": {
+          type: "string",
+          description:
+            "A comma-separated list of ISO 3166 country codes from which the news should originate.",
+        },
+        language: {
+          type: "string",
+          description: "The ISO 6391 language code of the news.",
+        },
+        number: {
+          type: "number",
+          description:
+            "The number of news to return. The default is 5. The max is 12.",
+        },
+      },
+    },
+    function: async (params) => {
+      let text = params.text;
+      let sourceCountries = params["source-countries"];
+      let language = params.language;
+      let number = params.number || 5;
+
+      let p = {};
+      if (text) {
+        p["text"] = text;
+      }
+      if (sourceCountries) {
+        p["source-countries"] = sourceCountries.toLowerCase();
+      }
+      if (language) {
+        p["language"] = language.toLowerCase();
+      }
+      if (number) {
+        p["number"] = number;
+      }
+      try {
+        const response = await axios({
+          url: `https://api.worldnewsapi.com/search-news?api-key=${process.env.WORLD_NEWS_API}`,
+          method: "get",
+          params: p,
+          headers: {
+            "x-api-key": process.env.WORLD_NEWS_API,
+            "Content-Type": "application/json",
+          },
+        });
+
+        let data = JSON.parse(JSON.stringify(response.data));
+        let news = data.news.map((n) => {
+          return {
+            title: n.title,
+            url: n.url,
+            summary: n.summary,
+            image: n.image,
+            language: n.language,
+            source_country: n.source_country,
+            author: n.author,
+          };
+        });
+        return news;
+      } catch (error) {
+        console.log(`error: ${error}`);
+        return {};
+      }
     },
   },
 ];
