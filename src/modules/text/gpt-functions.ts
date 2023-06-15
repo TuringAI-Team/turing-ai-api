@@ -566,6 +566,10 @@ let pluginList = [
           });
           // just return the first 5 results
           result = result.slice(0, 5);
+          // if length is 0 return error message
+          if (result.length === 0) {
+            result = { error: "No results found." };
+          }
         }
         if (action == "get") {
           result = result.data;
