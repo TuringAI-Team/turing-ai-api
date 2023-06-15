@@ -382,7 +382,7 @@ let pluginList = [
   {
     name: "world-news",
     description:
-      "Get world news with specific country, language or text using worldnewsapi.com",
+      "Get world news with specific country, language or text using worldnewsapi.com. With this function you can provide real-time news updates.",
     parameters: {
       type: "object",
       properties: {
