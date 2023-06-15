@@ -542,9 +542,9 @@ let pluginList = [
       }
       if (!result.error) {
         // format data
-        console.log(result);
         if (action == "search") {
           result = result.data.items;
+          console.log(result);
           result = result.map((r) => {
             return {
               name: r.name,
@@ -558,9 +558,9 @@ let pluginList = [
               license: r.license,
               private: r.private,
               owner: {
-                name: r.owner.login,
-                url: r.owner.html_url,
-                type: r.owner.type,
+                name: r.owner?.login,
+                url: r.owner?.html_url,
+                type: r.owner?.type,
               },
             };
           });
