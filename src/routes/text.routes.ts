@@ -30,6 +30,7 @@ import EventEmitter from "events";
 import axios from "axios";
 import Falcon from "../modules/text/falcon.js";
 import { pluginsChat } from "../modules/text/gpt-functions.js";
+import { openaiReq } from "../modules/text/openai.js";
 
 const router = express.Router();
 
@@ -286,23 +287,29 @@ router.post(`/:m`, key, turnstile, async (req: Request, res: Response) => {
       res.set("content-type", "text/event-stream");
       const openai = new OpenAIApi(configuration);
       let previousContent;
-      let response = await axios({
-        url: "https://api.pawan.krd/v1/chat/completions",
-        method: "POST",
-        responseType: "stream",
-        headers: {
-          Authorization: `Bearer ${key}`,
-          "Content-Type": "application/json",
-        },
 
-        data: {
-          model: model,
-          max_tokens: maxTokens,
-          messages: messages,
-          temperature: temperature,
-          stream: true,
-        },
-      });
+      let response;
+      try {
+        response = await openaiReq(
+          key,
+          model,
+          maxTokens,
+          messages,
+          temperature,
+          "https://api.pawan.krd/v1/chat/completions"
+        );
+      } catch (error) {
+        console.log(error);
+        key = process.env.OPENAI_API_KEY;
+        response = await openaiReq(
+          key,
+          model,
+          maxTokens,
+          messages,
+          temperature,
+          "https://api.openai.com/v1/chat/completions"
+        );
+      }
       let stream = response.data;
       stream.on("data", (chunk) => {
         let content = chunk.toString();

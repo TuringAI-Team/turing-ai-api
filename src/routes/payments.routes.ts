@@ -52,6 +52,7 @@ router.post("/pay", key, async (req: Request, res: Response) => {
         surname: "Unknown",
       });
     } catch (err) {
+      console.log(`customer error ${err}`);
       let customers = await Sellix.customers.list();
       customer = customers.filter((c: any) => c.email === email)[0];
       if (!customer) {
@@ -148,7 +149,7 @@ router.post("/pay", key, async (req: Request, res: Response) => {
 
     res.status(200).json(payment);
   } catch (e: any) {
-    console.log(e);
+    console.log(`error ${e}`);
     res.status(500).json({
       error: e.error,
       url: `https://app.turing.sh/pay`,

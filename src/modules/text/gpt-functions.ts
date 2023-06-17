@@ -82,7 +82,7 @@ export async function pluginsChat(config, plugins) {
             ],
             stream: true,
           };
-          await fetchEventSource("	https://api.openai.com/v1/chat/completions", {
+          await fetchEventSource("https://api.openai.com/v1/chat/completions", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
