@@ -333,7 +333,6 @@ router.post(`/:m`, key, turnstile, async (req: Request, res: Response) => {
       }
       let stream = response.data;
       stream.on("data", (chunk) => {
-        console.log(chunk.toString());
         let content = chunk.toString();
         res.status(response.status);
         res.write(content);
