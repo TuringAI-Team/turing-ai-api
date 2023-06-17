@@ -318,6 +318,9 @@ router.post(`/:m`, key, turnstile, async (req: Request, res: Response) => {
           temperature,
           "https://api.openai.com/v1/chat/completions"
         );
+        if (response.status == 200) {
+          console.log("success with openai");
+        }
       }
       let stream = response.data;
       stream.on("data", (chunk) => {
