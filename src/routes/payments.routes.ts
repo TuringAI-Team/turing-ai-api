@@ -149,7 +149,7 @@ router.post("/pay", key, async (req: Request, res: Response) => {
 
     res.status(200).json(payment);
   } catch (e: any) {
-    console.log(`error ${e}`);
+    console.log(`error ${e}, for user ${userId}`);
     res.status(500).json({
       error: e.error,
       url: `https://app.turing.sh/pay`,
