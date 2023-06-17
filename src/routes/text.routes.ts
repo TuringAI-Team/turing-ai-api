@@ -307,8 +307,9 @@ router.post(`/:m`, key, turnstile, async (req: Request, res: Response) => {
             stream: true,
           },
         });
-      } catch (error) {
+      } catch (error: any) {
         console.log(`${error}, retrying with openai`);
+        console.log(JSON.stringify(error.response.data));
         key = process.env.OPENAI_API_KEY;
         response = await axios({
           url: "https://api.openai.com/v1/chat/completions",
