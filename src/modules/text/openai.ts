@@ -7,8 +7,8 @@ export async function openaiReq(
   temperature,
   url
 ) {
-  let response = await axios({
-    url: "https://api.pawan.krd/v1/chat/completions",
+  return await axios({
+    url: url,
     method: "POST",
     responseType: "stream",
     headers: {
@@ -24,5 +24,4 @@ export async function openaiReq(
       stream: true,
     },
   });
-  return response;
 }

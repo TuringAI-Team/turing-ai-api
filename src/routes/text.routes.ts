@@ -290,14 +290,23 @@ router.post(`/:m`, key, turnstile, async (req: Request, res: Response) => {
 
       let response;
       try {
-        response = await openaiReq(
-          key,
-          model,
-          maxTokens,
-          messages,
-          temperature,
-          "https://api.pawan.krd/v1/chat/completions"
-        );
+        response = await axios({
+          url: "https://api.pawan.krd/v1/chat/completions",
+          method: "POST",
+          responseType: "stream",
+          headers: {
+            Authorization: `Bearer ${key}`,
+            "Content-Type": "application/json",
+          },
+
+          data: {
+            model: model,
+            max_tokens: maxTokens,
+            messages: messages,
+            temperature: temperature,
+            stream: true,
+          },
+        });
       } catch (error) {
         console.log(error);
         key = process.env.OPENAI_API_KEY;
