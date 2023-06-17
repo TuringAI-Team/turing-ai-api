@@ -310,20 +310,30 @@ router.post(`/:m`, key, turnstile, async (req: Request, res: Response) => {
       } catch (error) {
         console.log(`${error}, retrying with openai`);
         key = process.env.OPENAI_API_KEY;
-        response = await openaiReq(
-          key,
-          model,
-          maxTokens,
-          messages,
-          temperature,
-          "https://api.openai.com/v1/chat/completions"
-        );
+        response = await axios({
+          url: "https://api.openai.com/v1/chat/completions",
+          method: "POST",
+          responseType: "stream",
+          headers: {
+            Authorization: `Bearer ${key}`,
+            "Content-Type": "application/json",
+          },
+
+          data: {
+            model: model,
+            max_tokens: maxTokens,
+            messages: messages,
+            temperature: temperature,
+            stream: true,
+          },
+        });
         if (response.status == 200) {
           console.log("success with openai");
         }
       }
       let stream = response.data;
       stream.on("data", (chunk) => {
+        console.log(chunk.toString());
         let content = chunk.toString();
         res.status(response.status);
         res.write(content);
