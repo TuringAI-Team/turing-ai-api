@@ -308,7 +308,7 @@ router.post(`/:m`, key, turnstile, async (req: Request, res: Response) => {
           },
         });
       } catch (error) {
-        console.log(error);
+        console.log(`${error}, retrying with openai`);
         key = process.env.OPENAI_API_KEY;
         response = await openaiReq(
           key,

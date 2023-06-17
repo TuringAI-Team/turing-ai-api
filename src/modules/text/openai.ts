@@ -10,7 +10,7 @@ export async function openaiReq(
   return await axios({
     url: url,
     method: "POST",
-    responseType: "stream",
+    responseType: "stream", // important for streaming response data
     headers: {
       Authorization: `Bearer ${key}`,
       "Content-Type": "application/json",
