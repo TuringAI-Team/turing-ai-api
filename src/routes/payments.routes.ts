@@ -44,6 +44,10 @@ router.post("/pay", key, async (req: Request, res: Response) => {
   let customer;
   let customers = await Sellix.customers.list();
   customer = customers.filter((c: any) => c.email === email)[0];
+  console.log(
+    customers.filter((c: any) => c.email === email).length,
+    customers.filter((c: any) => c.email === email)
+  );
   if (!customer) {
     try {
       customer = await Sellix.customers.create({

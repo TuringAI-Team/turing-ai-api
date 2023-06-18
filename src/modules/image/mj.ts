@@ -11,8 +11,10 @@ import redisClient from "../cache/redis.js";
 import { randomUUID } from "crypto";
 const botClient: Client = client;
 botClient.setMaxListeners(0);
+import supabase from "../supabase.js";
+import axios from "axios";
 let generationQueue = [];
-const maxGenerations = 2;
+const maxGenerations = 3;
 const mode = "relax";
 
 export async function asyncQueue(prompt, model = "5.1", premium = false) {
@@ -25,6 +27,7 @@ export async function asyncQueue(prompt, model = "5.1", premium = false) {
     });
   });
 }
+
 /*
 setInterval(async () => {
   let generatingQueue = generationQueue.filter((x) => x.generating == true);
@@ -54,12 +57,6 @@ export async function queue(
     generating: false,
     channel: null,
   };
-  event.emit("data", {
-    done: true,
-    queued: null,
-    error: "This feature is currently disabled for maintenance.",
-  });
-  return event;
   generationQueue.push(job);
   let queued = generationQueue.length;
   event.emit("data", {
@@ -180,6 +177,7 @@ export async function imagine(prompt, model, event, job) {
 
     // prompt can have image urls they can be from a lot of domains and paths
     let promptWithOutURL = prompt.replace(/(https?:\/\/[^\s]+)/g, "");
+    if (data.done) return;
     if (footer && footer.includes(promptWithOutURL)) {
       let title = message.embeds[0]?.title;
       if (title && title.includes("Action needed to continue")) {
@@ -219,16 +217,15 @@ export async function imagine(prompt, model, event, job) {
       data.id = `${message.id}-${channelName}`;
       data.status = 0;
       data = await checkContent(message, data);
-      console.log(data);
       event.emit("data", data);
       if (data.done) return;
       botClient.on("messageUpdate", async (oldMessage, newMessage) => {
         if (oldMessage.id != message.id) return;
+        if (data.done) return;
         data = await checkContent(newMessage, data);
-        console.log(data);
         event.emit("data", data);
+        botClient.off("messageCreate", () => {});
       });
-      botClient.off("messageCreate", () => {});
     }
     let interval = setInterval(() => {
       let queued = generationQueue.findIndex((x) => x.id == job.id);
@@ -255,10 +252,88 @@ export async function imagine(prompt, model, event, job) {
     }, 1000 * 60 * 5);
   });
 }
+
+export async function getImages(data) {
+  let id = data.id;
+  // generate 2 random numbers from 0 to 3
+  let random1 = Math.floor(Math.random() * 4);
+  let random2 = Math.floor(Math.random() * 4);
+  if (random1 == random2) random2 = Math.floor(Math.random() * 4);
+  console.log(`random1: ${random1} random2: ${random2}`);
+  let alreadyDone = [];
+  let event = await actions(id, "upscale", random1);
+  event.on("data", async (data) => {
+    if (data.done) {
+      if (data.image) {
+        if (alreadyDone.includes(random1)) return;
+        console.log(`upscale ${random1} done,  ${data.jobId}`);
+        alreadyDone.push(random1);
+        await saveImage(data, id);
+      }
+    }
+  });
+  let event2 = await actions(id, "upscale", random2);
+  event2.on("data", async (data) => {
+    if (data.done) {
+      if (data.image) {
+        if (alreadyDone.includes(random2)) return;
+        console.log(`upscale ${random2} done, ${data.jobId}`);
+        alreadyDone.push(random2);
+        await saveImage(data, id);
+      }
+    }
+  });
+}
+export async function saveImage(data, id) {
+  try {
+    // uploads image to storage, data.image is a url image
+    let image = await axios.get(data.image, {
+      responseType: "arraybuffer",
+    });
+    let buffer = Buffer.from(image.data, "base64");
+
+    // save it as png
+    let { error } = await supabase.storage
+      .from("mj")
+      .upload(`${data.jobId}.png`, buffer, {
+        cacheControl: "3600",
+        upsert: false,
+        contentType: "image/png",
+      });
+
+    if (error) {
+      console.log(`error uploading image ${data.jobId}, ${error}`);
+      return;
+    }
+    let { data: dimg } = await supabase.storage
+      .from("mj")
+      .getPublicUrl(`${data.jobId}.png`);
+    let publicUrl = dimg.publicUrl;
+    await supabase.from("dataset").insert([
+      {
+        id: data.jobId,
+        model: data.model,
+        dataset: "0-turingjourney",
+        data: {
+          id: id,
+          jobId: data.jobId,
+          prompt: data.prompt,
+          image: publicUrl,
+          model: data.model,
+          rating: null,
+        },
+      },
+    ]);
+  } catch (e) {
+    console.log(` error saving image ${data.jobId}, ${e}`);
+  }
+}
+
 export async function checkContent(newMessage, data) {
   let content = newMessage.content;
   let attachments = newMessage.attachments;
   // get url
+  if (data.done) return data;
   let image = attachments.first()?.url;
   let status = 0;
   if (content) {
@@ -295,12 +370,11 @@ export async function checkContent(newMessage, data) {
     let pricePerSecond = 0.001;
     if (mode == "relax") pricePerSecond = 0;
     let credits = timeInS * pricePerSecond;
-
     if (mode == "relax") credits = 0;
     data.credits = credits;
     data.queued = null;
     if (data.fullId) {
-      redisClient.set(
+      await redisClient.set(
         data.fullId ? data.fullId : data.id,
         JSON.stringify(data)
       );
@@ -317,9 +391,9 @@ export async function actions(id, action, number, event?) {
   let fullId = `${id}-${action}-${number}`;
   let job = await redisClient.get(fullId);
   if (job) {
-    event.emit("data", {
-      ...JSON.parse(job),
-    });
+    setTimeout(async () => {
+      event.emit("data", JSON.parse(job));
+    }, 3000);
     return event;
   }
   try {
@@ -400,7 +474,6 @@ export async function actions(id, action, number, event?) {
         activated = true;
       }
       if (activated) {
-        console.log("activated");
         data.messageId = message.id;
         data.id = `${message.id}-${channelName}`;
         data.startTime = Date.now();

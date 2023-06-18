@@ -23,7 +23,7 @@ import supabase from "../modules/supabase.js";
 import redisClient from "../modules/cache/redis.js";
 import axios from "axios";
 import sharp from "sharp";
-import { queue, actions } from "../modules/image/mj.js";
+import { queue, actions, saveImage, getImages } from "../modules/image/mj.js";
 import { randomUUID } from "crypto";
 const router = express.Router();
 let configuration = new Configuration({
@@ -340,7 +340,6 @@ router.post(
       event.on("data", async (data) => {
         res.write("data: " + JSON.stringify(data) + "\n\n");
         if (data.done) {
-          console.log("done", data);
           try {
             if (data.image) {
               // uploads image to storage, data.image is a url image
@@ -379,6 +378,7 @@ router.post(
                   },
                 },
               ]);
+              await getImages(data);
             }
           } catch (e) {
             console.log(e);
@@ -414,47 +414,7 @@ router.post(
         res.write("data: " + JSON.stringify(data) + "\n\n");
         if (data.done) {
           if (action == "upscale") {
-            try {
-              // uploads image to storage, data.image is a url image
-              let image = await axios.get(data.image, {
-                responseType: "arraybuffer",
-              });
-              let buffer = Buffer.from(image.data, "base64");
-
-              // save it as png
-              let { error } = await supabase.storage
-                .from("mj")
-                .upload(`${data.jobId}.png`, buffer, {
-                  cacheControl: "3600",
-                  upsert: false,
-                  contentType: "image/png",
-                });
-
-              if (error) {
-                console.log(error);
-              }
-              let { data: dimg } = await supabase.storage
-                .from("mj")
-                .getPublicUrl(`${data.jobId}.png`);
-              let publicUrl = dimg.publicUrl;
-              await supabase.from("dataset").insert([
-                {
-                  id: data.jobId,
-                  model: data.model,
-                  dataset: "0-turingjourney",
-                  data: {
-                    id: id,
-                    jobId: data.jobId,
-                    prompt: data.prompt,
-                    image: publicUrl,
-                    model: data.model,
-                    rating: null,
-                  },
-                },
-              ]);
-            } catch (e) {
-              console.log(e);
-            }
+            await saveImage(data, id);
           }
           res.end();
         }
