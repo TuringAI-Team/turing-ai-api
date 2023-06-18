@@ -45,7 +45,7 @@ router.post("/pay", key, async (req: Request, res: Response) => {
   let customers = await Sellix.customers.list();
   customer = customers.filter((c: any) => c.email === email)[0];
   console.log(
-    customers.filter((c: any) => c.email === email).length,
+    customers,
     customers.filter((c: any) => c.email === email)
   );
   if (!customer) {
@@ -57,6 +57,7 @@ router.post("/pay", key, async (req: Request, res: Response) => {
       });
     } catch (err) {
       console.log(`customer error ${err}`);
+      console.log(email, name);
       let customers = await Sellix.customers.list();
       customer = customers.filter((c: any) => c.email === email)[0];
       if (!customer) {
