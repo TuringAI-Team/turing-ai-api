@@ -43,7 +43,9 @@ router.post("/pay", key, async (req: Request, res: Response) => {
   const Sellix = sellix(process.env.SELLIX_KEY);
   let customer;
   let customers = await Sellix.customers.list();
-  customer = customers.filter((c: any) => c.email === email)[0];
+  customer = customers.filter(
+    (c: any) => c.email.toLowerCase() == email.toLowerCase()
+  )[0];
 
   if (!customer) {
     try {
@@ -55,9 +57,9 @@ router.post("/pay", key, async (req: Request, res: Response) => {
     } catch (err) {
       console.log(`customer error ${err}`);
       let customers = await Sellix.customers.list();
-      customer = customers.filter((c: any) => c.email === email)[0];
-      console.log(customers.map((c: any) => c.email));
-      console.log(customer);
+      customer = customers.filter(
+        (c: any) => c.email.toLowerCase() == email.toLowerCase()
+      )[0];
       if (!customer) {
         res.json({ error: "Failed to create customer" });
         return;
