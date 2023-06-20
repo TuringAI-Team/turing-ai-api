@@ -48,7 +48,6 @@ export async function vote(userId) {
   await pub.send(
     {
       exchange: "messages",
-      routingKey: "vote",
     },
     {
       id: "vote",
@@ -57,20 +56,4 @@ export async function vote(userId) {
       },
     }
   );
-  let user = await redisClient.get(`users:${userId}`);
-  if (user) {
-    let userData = JSON.parse(user);
-    userData.voted = new Date().toISOString();
-    redisClient.set(`users:${userId}`, userData);
-    let { data: userDB, error } = await supabase
-      .from("users_new")
-      .select("*")
-      .eq("id", userId)
-      .single();
-
-    if (userDB) {
-      userDB.voted = new Date().toISOString();
-      await supabase.from("users_new").update(userDB).eq("id", userId);
-    }
-  }
 }
