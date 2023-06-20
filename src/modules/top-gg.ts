@@ -48,6 +48,7 @@ export async function vote(userId) {
   await pub.send(
     {
       exchange: "messages",
+      routingKey: "message",
     },
     {
       id: "vote",
