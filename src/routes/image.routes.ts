@@ -25,6 +25,7 @@ import axios from "axios";
 import sharp from "sharp";
 import { queue, actions, saveImage, getImages } from "../modules/image/mj.js";
 import { randomUUID } from "crypto";
+import { kandinsky } from "../modules/image/kandinsky.js";
 const router = express.Router();
 let configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
@@ -420,6 +421,23 @@ router.post(
         }
       });
     }
+  }
+);
+
+// Kandinsky
+router.post(
+  "/kandinsky",
+  key,
+  turnstile,
+  async (req: Request, res: Response) => {
+    let { prompt, negative_prompt, steps, guidance_scale } = req.body;
+    let result = await kandinsky(
+      prompt,
+      steps,
+      guidance_scale,
+      negative_prompt
+    );
+    res.json(result).status(200);
   }
 );
 

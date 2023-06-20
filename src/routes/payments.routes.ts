@@ -8,6 +8,8 @@ import crypto, { createHmac } from "crypto";
 import ms from "ms";
 import axios from "axios";
 import redisClient from "../modules/cache/redis.js";
+import { pub } from "src/modules/mq/index.js";
+import geo from "../middlewares/geo.js";
 
 const router = express.Router();
 
@@ -26,7 +28,7 @@ const creditProducts = {
   },
 };
 
-router.post("/pay", key, async (req: Request, res: Response) => {
+router.post("/pay", key, geo, async (req: any, res: Response) => {
   let {
     productId,
     gateway,
@@ -83,39 +85,26 @@ router.post("/pay", key, async (req: Request, res: Response) => {
       },
     };
     if (userId) {
-      let { data: user }: any = await supabase
-        .from("users_new")
-        .select("*")
-        .eq("id", userId);
-      user = user[0];
-      if (!user) {
-        await supabase.from("users_new").insert([
-          {
+      pub.send(
+        {
+          exchange: "messages",
+          routingKey: "update",
+        },
+        {
+          id: "update",
+          data: {
+            collection: "users",
             id: userId,
-            metadata: {
-              email: email,
+            updates: {
+              metadata: {
+                email: email,
+                country: req.geo.country ? req.geo.country : "Unknown",
+                region: req.geo.region ? req.geo.region : "Unknown",
+              },
             },
           },
-        ]);
-        user = {
-          id: userId,
-          metadata: {
-            email: email,
-          },
-        };
-        redisClient.set(`users:${userId}`, JSON.stringify(user));
-      } else {
-        await supabase
-          .from("users_new")
-          .update({
-            metadata: {
-              ...(user.metadata || {}),
-              email: email,
-            },
-          })
-          .eq("id", userId);
-        redisClient.set(`users:${userId}`, JSON.stringify(user));
-      }
+        }
+      );
     }
     if (credits && plan == "credits") {
       data.custom_fields.credits = credits;

@@ -32,7 +32,7 @@ router.get(
 router.post("/top-vote", key, async (req: Request, res: Response) => {
   let body = req.body;
   let botId = "1053015370115588147";
-  if (body.bot == botId && body.type == "test") {
+  if (body.bot == botId && body.type == "upvote") {
     let r = await vote(body.user);
   }
 
