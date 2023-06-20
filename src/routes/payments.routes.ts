@@ -8,7 +8,7 @@ import crypto, { createHmac } from "crypto";
 import ms from "ms";
 import axios from "axios";
 import redisClient from "../modules/cache/redis.js";
-import { pub } from "src/modules/mq/index.js";
+import { pub } from "../modules/mq/index.js";
 import geo from "../middlewares/geo.js";
 
 const router = express.Router();
