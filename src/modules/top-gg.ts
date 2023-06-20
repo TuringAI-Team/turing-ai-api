@@ -50,11 +50,11 @@ export async function vote(userId) {
       exchange: "messages",
       routingKey: "message",
     },
-    {
+    JSON.stringify({
       id: "vote",
       data: {
         userId: userId,
       },
-    }
+    })
   );
 }
