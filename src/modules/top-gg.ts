@@ -2,7 +2,7 @@ import { VoteClient } from "topgg-votes";
 import fs from "fs";
 import redisClient from "./cache/redis.js";
 import supabase from "./supabase.js";
-import mq from "./mq/index.js";
+import { pub } from "./mq/index.js";
 
 const votesClient = new VoteClient()
   .setToken(process.env.TOPGG_TOKEN)
@@ -43,23 +43,18 @@ export async function hasVoted(userId) {
 votesClient.on("botVote", async ({ userId }) => {
   await vote(userId);
 });
-const pub = mq.createPublisher({
-  // Enable publish confirmations, similar to consumer acknowledgements
-  confirm: true,
-  // Enable retries
-  maxAttempts: 2,
-  // Optionally ensure the existence of an exchange before we use it
-  exchanges: [{ exchange: "votes", type: "topic" }],
-});
 export async function vote(userId) {
   console.log(`User ${userId} just voted!`);
   await pub.send(
     {
-      exchange: "votes",
+      exchange: "messages",
       routingKey: "vote",
     },
     {
-      userId,
+      id: "vote",
+      data: {
+        userId: userId,
+      },
     }
   );
   let user = await redisClient.get(`users:${userId}`);
