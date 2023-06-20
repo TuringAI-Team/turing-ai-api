@@ -52,9 +52,7 @@ export async function vote(userId) {
     },
     JSON.stringify({
       id: "vote",
-      data: {
-        userId: userId,
-      },
+      data: userId,
     })
   );
 }
