@@ -1,7 +1,7 @@
 import express from "express";
 import { Request, Response } from "express";
 import { verify } from "hcaptcha";
-import { hasVoted } from "../modules/top-gg.js";
+import { hasVoted, vote } from "../modules/top-gg.js";
 import { generateKey } from "../modules/keys.js";
 import turnstile from "../middlewares/captchas/turnstile.js";
 import key from "../middlewares/key.js";
@@ -28,6 +28,16 @@ router.get(
     res.json({ hasVoted: hasvoted });
   }
 );
+
+router.post("/top-vote", key, async (req: Request, res: Response) => {
+  let body = req.body;
+  let botId = "1053015370115588147";
+  if (body.bot == botId && body.type == "test") {
+    let r = await vote(body.user);
+  }
+
+  res.status(200).json({ success: true });
+});
 router.post("/key", key, turnstile, async (req: Request, res: Response) => {
   let { ips } = req.body;
   let key = await generateKey(ips);
