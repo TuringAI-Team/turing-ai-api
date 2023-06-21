@@ -450,7 +450,6 @@ export async function actions(id, action, number, event?) {
       let promptWithOutURL = data.prompt
         .replace(/(https?:\/\/[^\s]+)/g, "")
         .replace("<", "");
-      console.log(`${promptWithOutURL}`);
       if (footer && footer.includes(promptWithOutURL)) {
         let title = message.embeds[0]?.title;
         if (title && title.includes("Action needed to continue")) {
@@ -472,7 +471,6 @@ export async function actions(id, action, number, event?) {
       if (activated) {
         if (alreadyActivated) return;
         alreadyActivated = true;
-        console.log(`activated ${data.prompt}`);
         data.messageId = message.id;
         data.id = `${message.id}-${channelName}`;
         data.startTime = Date.now();
