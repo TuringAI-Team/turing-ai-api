@@ -217,10 +217,14 @@ let pluginList = [
       required: ["topic"],
     },
     function: async (params) => {
-      const response = await axios.get(
-        `https://en.wikipedia.org/api/rest_v1/page/summary/${params.topic}`
-      );
-      return response.data;
+      try {
+        const response = await axios.get(
+          `https://en.wikipedia.org/api/rest_v1/page/summary/${params.topic}`
+        );
+        return response.data;
+      } catch (e) {
+        return "No results found";
+      }
     },
   },
   {
