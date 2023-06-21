@@ -287,9 +287,10 @@ router.post(`/:m`, key, turnstile, async (req: Request, res: Response) => {
       res.set("content-type", "text/event-stream");
       const openai = new OpenAIApi(configuration);
       let previousContent;
-
       let response;
+      console.log("generating with", model, maxTokens);
       try {
+        console.log("trying with pawan");
         response = await axios({
           url: "https://api.pawan.krd/v1/chat/completions",
           method: "POST",
