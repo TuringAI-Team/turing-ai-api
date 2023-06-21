@@ -341,6 +341,7 @@ router.post(
       event.on("data", async (data) => {
         res.write("data: " + JSON.stringify(data) + "\n\n");
         if (data.done) {
+          res.end();
           try {
             if (data.image) {
               // uploads image to storage, data.image is a url image
@@ -384,7 +385,6 @@ router.post(
           } catch (e) {
             console.log(e);
           }
-          res.end();
         }
       });
     } else if (action == "describe") {

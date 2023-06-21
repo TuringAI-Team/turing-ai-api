@@ -255,34 +255,26 @@ export async function imagine(prompt, model, event, job) {
 
 export async function getImages(data) {
   let id = data.id;
-  // generate 2 random numbers from 0 to 3
-  let random1 = Math.floor(Math.random() * 4);
-  let random2 = Math.floor(Math.random() * 4);
-  if (random1 == random2) random2 = Math.floor(Math.random() * 4);
-  console.log(`random1: ${random1} random2: ${random2}`);
+  let numbers = [0, 1, 2, 3];
   let alreadyDone = [];
-  let event = await actions(id, "upscale", random1);
-  event.on("data", async (data) => {
-    if (data.done) {
-      if (data.image) {
-        if (alreadyDone.includes(random1)) return;
-        console.log(`upscale ${random1} done,  ${data.jobId}`);
-        alreadyDone.push(random1);
-        await saveImage(data, id);
-      }
-    }
-  });
-  let event2 = await actions(id, "upscale", random2);
-  event2.on("data", async (data) => {
-    if (data.done) {
-      if (data.image) {
-        if (alreadyDone.includes(random2)) return;
-        console.log(`upscale ${random2} done, ${data.jobId}`);
-        alreadyDone.push(random2);
-        await saveImage(data, id);
-      }
-    }
-  });
+  for (var i = 0; i < numbers.length; i++) {
+    let random1 = numbers[i];
+    let event = await actions(id, "upscale", random1);
+    new Promise((resolve) => {
+      event.on("data", async (data) => {
+        if (data.done) {
+          if (data.image) {
+            if (alreadyDone.includes(random1)) return;
+            console.log(`upscale ${random1} done,  ${data.jobId}`);
+            alreadyDone.push(random1);
+            await saveImage(data, id);
+          }
+          resolve(true);
+        }
+      });
+    });
+    await new Promise((resolve) => setTimeout(resolve, 1000 * 5));
+  }
 }
 export async function saveImage(data, id) {
   try {
