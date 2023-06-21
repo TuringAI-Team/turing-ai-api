@@ -240,6 +240,7 @@ export async function imagine(prompt, model, event, job) {
         let timeToOut = 60 * 2;
         if (mode == "relax") timeToOut = 60 * 10;
         if (timeInS > timeToOut) {
+          console.log("timed out", mode, data.prompt);
           data.error = "Took too long to generate image";
           data.done = true;
           data.queued = null;
