@@ -235,7 +235,6 @@ export async function imagine(prompt, model, event, job) {
       }
       job = generationQueue[queued];
       if (!data.done && !data.image && !data.status && queued != -1) {
-        console.log("timeout");
         let timeInS = (Date.now() - data.startTime) / 1000;
         let timeToOut = 60 * 2;
         if (mode == "relax") timeToOut = 60 * 10;
