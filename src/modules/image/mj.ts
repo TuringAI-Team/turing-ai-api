@@ -253,7 +253,7 @@ export async function imagine(prompt, model, event, job) {
       } else {
         clearInterval(interval);
       }
-    }, 1000 * 60 * 3);
+    }, 1000 * 30);
   });
 }
 
