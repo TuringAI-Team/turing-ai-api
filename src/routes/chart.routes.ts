@@ -19,6 +19,7 @@ router.post("/:chart", key, turnstile, async (req: Request, res: Response) => {
     "vote",
     "campaigns",
     "midjourney",
+    "datasets",
   ];
   if (!availableCharts.includes(chart)) {
     return res.status(400).json({

@@ -2,13 +2,16 @@ import ms from "ms";
 import { saveMetrics } from "./stats/ads.js";
 import SavePaymentMetrics from "./stats/payments.js";
 import supabase from "./supabase.js";
+import SaveDatasetMetrics from "./stats/datasets.js";
 
 export default async function Ciclic() {
+  await SaveDatasetMetrics();
   await saveMetrics();
   await SavePaymentMetrics();
   await putGAcc0();
   setInterval(async () => {
     await saveMetrics();
+    await SaveDatasetMetrics();
     await SavePaymentMetrics();
   }, ms("1h"));
 }
