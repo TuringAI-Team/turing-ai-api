@@ -307,6 +307,7 @@ router.post(`/:m`, key, turnstile, async (req: Request, res: Response) => {
             stream: true,
           },
         });
+        throw new Error("error");
       } catch (error: any) {
         console.log(`data: ${JSON.stringify(error.response.data)}`);
         console.log(`${error}, retrying with openai`);
