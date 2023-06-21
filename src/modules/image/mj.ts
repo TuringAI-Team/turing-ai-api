@@ -466,6 +466,7 @@ export async function actions(id, action, number, event?) {
         activated = true;
       }
       if (activated) {
+        console.log(`activated ${data.prompt}`);
         data.messageId = message.id;
         data.id = `${message.id}-${channelName}`;
         data.startTime = Date.now();
