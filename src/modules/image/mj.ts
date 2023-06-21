@@ -447,7 +447,9 @@ export async function actions(id, action, number, event?) {
       let activated = false;
       let footer = message.embeds[0]?.footer?.text;
       // prompt can have image urls they can be from a lot of domains and paths
-      let promptWithOutURL = data.prompt.replace(/(https?:\/\/[^\s]+)/g, "");
+      let promptWithOutURL = data.prompt
+        .replace(/(https?:\/\/[^\s]+)/g, "")
+        .replace("<", "");
       console.log(`${promptWithOutURL}`);
       if (footer && footer.includes(promptWithOutURL)) {
         let title = message.embeds[0]?.title;
