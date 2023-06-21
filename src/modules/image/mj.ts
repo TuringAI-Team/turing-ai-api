@@ -387,6 +387,7 @@ export async function actions(id, action, number, event?) {
   let fullId = `${id}-${action}-${number}`;
   let job = await redisClient.get(fullId);
   if (job) {
+    console.log(`job exists`);
     setTimeout(async () => {
       event.emit("data", JSON.parse(job));
     }, 3000);
@@ -486,8 +487,8 @@ export async function actions(id, action, number, event?) {
           if (oldMessage.id != message.id) return;
           data = await checkContent(newMessage, data);
           event.emit("data", data);
+          botClient.off("messageCreate", () => {});
         });
-        botClient.off("messageCreate", () => {});
       }
       let interval = setInterval(() => {
         if (!data.done) {
