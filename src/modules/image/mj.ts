@@ -234,6 +234,10 @@ export async function imagine(prompt, model, event, job) {
         return;
       }
       job = generationQueue[queued];
+      if (!data.done && data.status == 0) {
+        data.status = 0;
+        event.emit("data", data);
+      }
       if (!data.done && !data.image && !data.status && queued != -1) {
         let timeInS = (Date.now() - data.startTime) / 1000;
         let timeToOut = 60 * 2;
