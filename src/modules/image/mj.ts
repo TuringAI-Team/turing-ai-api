@@ -57,6 +57,11 @@ export async function queue(
     generating: false,
     channel: null,
   };
+  event.emit("data", {
+    done: true,
+    error: "This feature has been disabled",
+  });
+  return event;
   generationQueue.push(job);
   let queued = generationQueue.length;
   event.emit("data", {
