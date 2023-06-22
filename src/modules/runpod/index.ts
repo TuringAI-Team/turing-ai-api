@@ -2,6 +2,7 @@ import axios from "axios";
 export async function translateModels(model) {
   let models = {
     blip2: "v2/22whrikqknoc11",
+    musicgen: "v2/j2exf53cbmqqsa",
   };
   return models[model];
 }
