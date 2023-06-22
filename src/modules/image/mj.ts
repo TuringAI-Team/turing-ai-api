@@ -14,7 +14,7 @@ botClient.setMaxListeners(0);
 import supabase from "../supabase.js";
 import axios from "axios";
 let generationQueue = [];
-const maxGenerations = 3;
+const maxGenerations = 2;
 const mode = "relax";
 
 export async function asyncQueue(prompt, model = "5.1", premium = false) {
