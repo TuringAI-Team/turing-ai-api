@@ -279,7 +279,7 @@ router.post(`/:m`, key, turnstile, async (req: Request, res: Response) => {
     }
 
     if (m === "open-ai" && model != "text-davinci-003") {
-      let { maxTokens = 100 } = req.body;
+      let { maxTokens = 100, pw = true } = req.body;
       let key = process.env.PAWAN_API_KEY;
       const configuration = new Configuration({
         apiKey: key,
@@ -292,8 +292,13 @@ router.post(`/:m`, key, turnstile, async (req: Request, res: Response) => {
       }
       let response;
       try {
+        if (!pw) {
+          key = process.env.OPENAI_API_KEY;
+        }
         response = await axios({
-          url: "https://api.pawan.krd/v1/chat/completions",
+          url: pw
+            ? "https://api.pawan.krd/v1/chat/completions"
+            : "https://api.openai.com/v1/chat/completions",
           method: "POST",
           responseType: "stream",
           headers: {
