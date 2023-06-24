@@ -291,7 +291,7 @@ router.post(`/:m`, key, turnstile, async (req: Request, res: Response) => {
         model = "gpt-3.5-turbo-0613";
       }
       let response;
-      /*   try {
+         try {
         response = await axios({
           url: "https://api.pawan.krd/v1/chat/completions",
           method: "POST",
@@ -311,7 +311,7 @@ router.post(`/:m`, key, turnstile, async (req: Request, res: Response) => {
         });
       } catch (error: any) {
         console.log(`data: ${JSON.stringify(error.response.data)}`);
-        console.log(`${error}, retrying with openai`);*/
+        console.log(`${error}, retrying with openai`);
       key = process.env.OPENAI_API_KEY;
       response = await axios({
         url: "https://api.openai.com/v1/chat/completions",
@@ -333,7 +333,7 @@ router.post(`/:m`, key, turnstile, async (req: Request, res: Response) => {
       if (response.status == 200) {
         console.log("success with openai");
       }
-      //}
+      }
       let stream = response.data;
       stream.on("data", (chunk) => {
         let content = chunk.toString();
