@@ -25,15 +25,20 @@ router.post("/run", key, turnstile, async (req: Request, res: Response) => {
   let result = await request(url, "run", body);
   res.json(result);
 });
-router.post("/status/:id", key, turnstile, async (req: Request, res: Response) => {
-  let { model } = req.body;
-  let {id } = req.params
-  let url = await translateModels(model);
-  let body = req.body;
-  delete body.model;
-  let result = await request(url, `/status/${id}`, body);
-  res.json(result);
-});
+router.post(
+  "/status/:id",
+  key,
+  turnstile,
+  async (req: Request, res: Response) => {
+    let { model } = req.body;
+    let { id } = req.params;
+    let url = await translateModels(model);
+    let body = req.body;
+    delete body.model;
+    let result = await request(url, `status/${id}`, body);
+    res.json(result);
+  }
+);
 router.post("/cancel", key, turnstile, async (req: Request, res: Response) => {
   let { model } = req.body;
   let url = await translateModels(model);
