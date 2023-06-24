@@ -287,6 +287,9 @@ router.post(`/:m`, key, turnstile, async (req: Request, res: Response) => {
       res.set("content-type", "text/event-stream");
       const openai = new OpenAIApi(configuration);
       let previousContent;
+      if (model.includes("gpt-3.5-turbo")) {
+        model = "gpt-3.5-turbo-0613";
+      }
       let response;
       /*   try {
         response = await axios({
