@@ -290,6 +290,11 @@ router.post(`/:m`, key, turnstile, async (req: Request, res: Response) => {
       if (model.includes("gpt-3.5-turbo")) {
         model = "gpt-3.5-turbo-0613";
       }
+      if (model.includes("gpt-4")) {
+        pw = false;
+      }
+      console.log(`model ${model} pw ${pw}`);
+
       let response;
       try {
         if (!pw) {
