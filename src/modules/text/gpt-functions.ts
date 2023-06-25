@@ -49,6 +49,7 @@ export async function pluginsChat(config, plugins) {
       let pricePerK = 0.002;
       if (config.model.includes("gpt-4")) pricePerK = 0.05;
       result.credits += (completion.data.usage.total_tokens / 1000) * pricePerK;
+      console.log(`message ${JSON.stringify(message)}`);
       if (message["function_call"]) {
         let functionName = message["function_call"]["name"];
         result.tool = functionName;
