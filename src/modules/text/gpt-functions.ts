@@ -116,7 +116,8 @@ export async function pluginsChat(config, plugins) {
       }
     })
     .catch((err) => {
-      console.log(`err ${err}`);
+      console.log(config, messages);
+      console.log(`err plugins: ${err}`);
       result.done = true;
       result.result = `Error: ${err}`;
       event.emit("data", result);
