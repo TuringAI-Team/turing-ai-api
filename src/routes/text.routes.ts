@@ -231,7 +231,6 @@ router.post(`/plugins`, key, turnstile, async (req: Request, res: Response) => {
 
     event.on("data", (data) => {
       data.credits = data.credits;
-      console.log(data);
       res.write("data: " + JSON.stringify(data) + "\n\n");
       if (data.done) {
         res.end();

@@ -441,4 +441,7 @@ router.post(
   }
 );
 
+// Stability.ai
+router.post("/sdxl", key, turnstile, async (req: Request, res: Response) => {});
+
 export default router;
