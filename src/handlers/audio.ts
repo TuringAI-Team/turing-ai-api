@@ -6,7 +6,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 export default async function audioHandler(client) {
-  if (client.text.length > 0) return;
+  if (client.audio.length > 0) return;
   const audios = [];
   const audioPath = path.join(__dirname, "../models/audio");
 
@@ -16,10 +16,10 @@ export default async function audioHandler(client) {
 
   for (const file of audioFils) {
     const filePath = `../models/audio/${file}`;
-    const { default: text } = await import(filePath);
+    const { default: audio } = await import(filePath);
     // Set a new item in the Collection with the key as the command name and the value as the exported module
-    if ("data" in text && "execute" in text) {
-      audios.push(text);
+    if ("data" in audio && "execute" in audio) {
+      audios.push(audio);
     } else {
       log(
         "warning",
