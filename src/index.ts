@@ -2,34 +2,28 @@ import express, { Application, Request, Response } from "express";
 import helmet from "helmet";
 import cors from "cors";
 import "dotenv/config";
-import swaggerUi from "swagger-ui-express";
-import swaggerJSDoc from "swagger-jsdoc";
-import { generateKey } from "./modules/keys.js";
+import { generateKey } from "./utils/key.js";
 
 // routes
-import ImageRoutes from "./routes/image.routes.js";
-import TextRoutes from "./routes/text.routes.js";
-import AudioRoutes from "./routes/audio.routes.js";
 import OtherRoutes from "./routes/other.routes.js";
-import CacheRoutes from "./routes/cache.routes.js";
-import VideoRoutes from "./routes/video.routes.js";
 import ChartRoutes from "./routes/chart.routes.js";
-import PaymentRoutes from "./routes/payments.routes.js";
+import PaymentRoutes from "./routes/payment.routes.js";
 import DataRoutes from "./routes/data.routes.js";
 import RunpodRoutes from "./routes/runpod.routes.js";
+import ModelRoutes from "./routes/models.routes.js";
 
 const app: Application = express();
 
 import { verifyToken } from "./middlewares/key.js";
-import Ciclic from "./modules/ciclic.js";
-
-// generateKey([
-//   "152.160.174.34",
-//   "172.16.5.4",
-//   "172.17.0.1",
-//   "127.0.0.1",
-//   "0.0.0.0"
-// ]);
+import Ciclic from "./utils/ciclic.js";
+import textHandler from "./handlers/text.js";
+import imageHandler from "./handlers/image.js";
+import audioHandler from "./handlers/audio.js";
+const client = {
+  text: [],
+  image: [],
+  audio: [],
+};
 
 app.use(helmet());
 app.use(
@@ -51,38 +45,19 @@ app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
 app.set("port", process.env.PORT || 3000);
 
-app.use("/imgs", ImageRoutes);
-app.use("/text", TextRoutes);
-app.use("/audio", AudioRoutes);
 app.use("/other", OtherRoutes);
-app.use("/cache", CacheRoutes);
-app.use("/video", VideoRoutes);
 app.use("/chart", ChartRoutes);
 app.use("/payments", PaymentRoutes);
 app.use("/data", DataRoutes);
 app.use("/runpod", RunpodRoutes);
-
-const options = {
-  definition: {
-    openapi: "3.0.0",
-    info: {
-      title: "Turing AI",
-      version: "1.0.0",
-      description: "API Documentation for Turing AI",
-    },
-    servers: [
-      {
-        url: `https://api.turingai.tech/`,
-      },
-    ],
-  },
-  apis: ["./src/routes/*.ts"],
-};
-
-const specs = swaggerJSDoc(options);
-app.use("/docs", swaggerUi.serve, swaggerUi.setup(specs));
+app.use("/", ModelRoutes);
 
 app.listen(app.get("port"), async () => {
   console.log(`Server is running on port ${app.get("port")}`);
   await Ciclic();
+  await textHandler(client);
+  await imageHandler(client);
+  await audioHandler(client);
 });
+
+export default client;

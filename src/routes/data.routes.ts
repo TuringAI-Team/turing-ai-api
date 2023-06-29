@@ -1,11 +1,7 @@
 import express from "express";
-import { Request, Response } from "express";
-import { verify } from "hcaptcha";
-import { hasVoted } from "../modules/top-gg.js";
-import { generateKey } from "../modules/keys.js";
-import turnstile from "../middlewares/captchas/turnstile.js";
 import key from "../middlewares/key.js";
-import supabase from "../modules/supabase.js";
+import supabase from "../db/supabase.js";
+import { update } from "../utils/db.js";
 
 const router = express.Router();
 
@@ -16,20 +12,23 @@ router.get("/user/:id", key, async (req, res) => {
     .from("users_new")
     .select("*")
     .eq("id", id);
-  if (error) return res.json({ error: error.message }).status(400);
-  if (!user[0]) return res.json({ error: "user not found" }).status(400);
+  if (error)
+    return res.json({ error: error.message, success: false }).status(400);
+  if (!user[0])
+    return res.json({ error: "user not found", success: false }).status(400);
   res.json(user[0]).status(200);
 });
 router.put("/user/:id", key, async (req, res) => {
   let { id } = req.params;
-  let { data: user, error } = await supabase
+  let result = await update("update", {
+    collection: "users",
+    id,
+    ...req.body,
+  });
 
-    .from("users_new")
-    .update(req.body)
-    .eq("id", id)
-    .select("*");
-  if (error) return res.json({ error: error.message }).status(400);
-  res.json(user[0]).status(200);
+  if (result.error)
+    return res.json({ error: result.error, success: false }).status(400);
+  res.json({ success: true }).status(200);
 });
 
 router.post("/user/:id", key, async (req, res) => {
@@ -42,7 +41,8 @@ router.post("/user/:id", key, async (req, res) => {
       ...req.body,
     })
     .select("*");
-  if (error) return res.json({ error: error.message }).status(400);
+  if (error)
+    return res.json({ error: error.message, success: false }).status(400);
   res.json(user[0]).status(200);
 });
 export default router;

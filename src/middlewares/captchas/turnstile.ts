@@ -1,5 +1,5 @@
 import axios from "axios";
-import { checkCaptchaToken } from "../../modules/keys.js";
+import { checkCaptchaToken } from "../../utils/key.js";
 export default async function (req, res, next) {
   //  captcha token is on headers
   const token = req.headers["x-captcha-token"];
@@ -11,7 +11,7 @@ export default async function (req, res, next) {
     if (valid) {
       return next();
     }
-    const data = await validate(process.env.TURNSTILE_SECRET, token);
+    const data = await validate(process.env.TURNSTILE_SECRET as string, token);
     if (data.success) {
       return next();
     }
@@ -51,41 +51,37 @@ async function validate(secret: string, token: string, ip?: string) {
     switch (error) {
       case "missing-input-secret":
         return {
-          errorDescription: "The secret parameter was not passed.",
+          error: "The secret parameter was not passed.",
           ...data,
         };
       case "invalid-input-secret":
         return {
-          errorDescription:
-            "The secret parameter was invalid or did not exist.",
+          error: "The secret parameter was invalid or did not exist.",
           ...data,
         };
       case "missing-input-response":
         return {
-          errorDescription: "The response(token) parameter was not passed.",
+          error: "The response(token) parameter was not passed.",
           ...data,
         };
       case "invalid-input-response":
         return {
-          errorDescription:
-            "The response(token) parameter is invalid or has expired.",
+          error: "The response(token) parameter is invalid or has expired.",
           ...data,
         };
       case "bad-request":
         return {
-          errorDescription:
-            "The request was rejected because it was malformed.",
+          error: "The request was rejected because it was malformed.",
           ...data,
         };
       case "timeout-or-duplicate":
         return {
-          errorDescription:
-            "The response parameter has already been validated before.",
+          error: "The response parameter has already been validated before.",
           ...data,
         };
       case "internal-error":
         return {
-          errorDescription:
+          error:
             "An internal error happened while validating the response. The request can be retried.",
           ...data,
         };

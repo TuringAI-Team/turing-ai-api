@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import supabase from "../modules/supabase.js";
+import supabase from "../db/supabase.js";
 import { Request, Response } from "express";
 
 export async function verifyToken(token: string) {
