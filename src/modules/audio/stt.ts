@@ -44,6 +44,22 @@ export default async function STT(
   if (ai == "whisper-fast") {
     let models = ["tiny", "base", "small", "medium", "large-v1", "large-v2"];
     let modelName = models.includes(model) ? model : "base";
+    const input = {
+      audio: url,
+      model: modelName,
+      transcription: "plain text",
+      translate: false,
+      temperature: 0,
+      best_of: 5,
+      beam_size: 5,
+      suppress_tokens: "-1",
+      condition_on_previous_text: false,
+      temperature_increment_on_fallback: 0.2,
+      compression_ratio_threshold: 2.4,
+      logprob_threshold: -1,
+      no_speech_threshold: 0.6,
+    };
+    console.log(input);
     try {
       let response = await axios({
         url: "https://api.runpod.ai/v2/faster-whisper/runsync",
@@ -54,21 +70,7 @@ export default async function STT(
           accept: "application/json",
         },
         data: {
-          input: {
-            audio: url,
-            model: modelName,
-            transcription: "plain text",
-            translate: false,
-            temperature: 0,
-            best_of: 5,
-            beam_size: 5,
-            suppress_tokens: "-1",
-            condition_on_previous_text: false,
-            temperature_increment_on_fallback: 0.2,
-            compression_ratio_threshold: 2.4,
-            logprob_threshold: -1,
-            no_speech_threshold: 0.6,
-          },
+          input,
         },
       });
       return response.data;
