@@ -10,7 +10,7 @@ async function oggToMp3(oggBuffer) {}
 export default async function STT(
   ai: "gladia" | "whisper" | "whisper-fast" = "whisper-fast",
   model: string,
-  url
+  url: string
 ) {
   if (ai == "gladia") {
     try {
@@ -44,6 +44,7 @@ export default async function STT(
   if (ai == "whisper-fast") {
     let models = ["tiny", "base", "small", "medium", "large-v1", "large-v2"];
     let modelName = models.includes(model) ? model : "base";
+    console.log(url);
     const input = {
       audio: url,
       model: modelName,
@@ -59,7 +60,6 @@ export default async function STT(
       logprob_threshold: -1,
       no_speech_threshold: 0.6,
     };
-    console.log(input);
     try {
       let response = await axios({
         url: "https://api.runpod.ai/v2/faster-whisper/runsync",

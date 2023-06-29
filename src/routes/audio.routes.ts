@@ -13,6 +13,7 @@ router.post(
   turnstile,
   async (req: Request, res: Response) => {
     let { ai = "whisper-fast", model = "base", url } = req.body;
+    console.log(req.body);
     let result = await STT(ai, model, url);
     res.json(result).status(200);
   }
