@@ -50,7 +50,7 @@ export default async function STT(
         method: "post",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `${process.env.RUNPOD_API_KEY}`,
+          Authorization: `Bearer ${process.env.RUNPOD_KEY}`,
           accept: "application/json",
         },
         data: {
@@ -86,7 +86,7 @@ export default async function STT(
         method: "post",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `${process.env.RUNPOD_API_KEY}`,
+          Authorization: `Bearer ${process.env.RUNPOD_KEY}`,
           accept: "application/json",
         },
         data: {
