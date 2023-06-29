@@ -288,7 +288,7 @@ router.post(`/:m`, key, turnstile, async (req: Request, res: Response) => {
       const openai = new OpenAIApi(configuration);
       let previousContent;
       if (model.includes("gpt-3.5-turbo")) {
-        model = "gpt-3.5-turbo-0613";
+        model = "gpt-3.5-turbo";
       }
       if (model.includes("gpt-4")) {
         pw = false;

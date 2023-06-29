@@ -12,8 +12,8 @@ router.post(
   key,
   turnstile,
   async (req: Request, res: Response) => {
-    let { ai = "gladia", model, file } = req.body;
-    let result = await STT(ai, "", file);
+    let { ai = "whisper-fast", model = "base", url } = req.body;
+    let result = await STT(ai, model, url);
     res.json(result).status(200);
   }
 );
