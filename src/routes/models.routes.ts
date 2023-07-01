@@ -22,7 +22,7 @@ router.post(
     try {
       let aiObject = typeObj.find((a) => a.data.name === ai);
       if (!aiObject) {
-        log("error", `AI not found: ${ai}`, typeObj);
+        log("info", `AI not found: ${ai}`, typeObj);
         res.status(404).json({ success: false, error: "AI not found" });
         return;
       }
