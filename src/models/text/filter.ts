@@ -2,7 +2,10 @@ import axios from "axios";
 import { Configuration, OpenAIApi } from "openai";
 import { nsfwWords, underagedCebs, youngWords } from "../../utils/keywords.js";
 const availableFilters = ["nsfw", "cp", "toxicity"];
-
+const configuration = new Configuration({
+  apiKey: process.env.OPENAI_KEY,
+});
+const openai = new OpenAIApi(configuration);
 export default {
   data: {
     name: "filter",
@@ -24,15 +27,12 @@ export default {
       throw new Error("No valid filters provided");
     }
     let result = {
-      isNsfw: false,
-      isYouth: false,
-      isCP: false,
-      isToxic: false,
+      nsfw: false,
+      youth: false,
+      cp: false,
+      toxic: false,
     };
-    const configuration = new Configuration({
-      apiKey: process.env.OPENAI_KEY,
-    });
-    const openai = new OpenAIApi(configuration);
+
     var res = await openai.createModeration({
       input: text,
     });
@@ -49,7 +49,7 @@ export default {
         if (nsfwWords.some((v) => text.toLowerCase().includes(v.toLowerCase())))
           isNsfw = true;
       }
-      result.isNsfw = isNsfw;
+      result.nsfw = isNsfw;
     } else if (filters.find((f) => f === "cp")) {
       let isNsfw = false;
       let isYouth = false;
@@ -72,9 +72,9 @@ export default {
       if (!isCP) {
         if (isNsfw && isYouth) isCP = true;
       }
-      result.isNsfw = isNsfw;
-      result.isYouth = isYouth;
-      result.isCP = isCP;
+      result.nsfw = isNsfw;
+      result.youth = isYouth;
+      result.cp = isCP;
     } else if (filters.find((f) => f === "toxicity")) {
       let isToxic = false;
       if (
@@ -85,7 +85,7 @@ export default {
       ) {
         isToxic = true;
       }
-      result.isToxic = isToxic;
+      result.toxic = isToxic;
     }
   },
 };

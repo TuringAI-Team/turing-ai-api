@@ -10,6 +10,8 @@ export default function log(type: "info" | "warning" | "error", ...args) {
   const log = `[${type.toUpperCase()}] ${args.join(" ")}`;
   const color =
     type === "info" ? "green" : type === "warning" ? "yellow" : "red";
-  console.log(chalk[color](log));
+  if (process.env.NODE_ENV == "development") {
+    console.log(chalk[color](log));
+  }
   fs.appendFileSync(logFile, `${log}\n`);
 }

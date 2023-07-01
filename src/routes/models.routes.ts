@@ -19,17 +19,18 @@ router.post(
       return;
     }
     try {
-      let aiObject = typeObj.find((a) => a.name === ai);
+      let aiObject = typeObj.find((a) => a.data.name === ai);
       if (!aiObject) {
         res.status(404).json({ success: false, error: "AI not found" });
         return;
       }
       // check params and body
-      let parameters = aiObject.parameters;
-      let requiredParameters = parameters.filter((p) => p.required === true);
-      let requiredParams = Object.keys(requiredParameters);
+      let realParameters = aiObject.data.parameters; // is an object with keys as parameter names and values as parameter types
+      let parameters = Object.keys(realParameters);
+      let requiredParams = parameters.filter(
+        (p) => realParameters[p].required === true
+      );
       let bodyKeys = Object.keys(body);
-
       // check if all required params are in body
       let missingParams = requiredParams.filter((p) => !bodyKeys.includes(p));
       if (missingParams.length > 0) {
@@ -61,10 +62,18 @@ router.post(
       } else {
         res.status(200).json({ success: true, execution });
       }
-    } catch (error) {
-      res.status(500).json({ success: false, error });
+    } catch (error: any) {
+      let resultError = error;
+      if (error.response && error.response.data) {
+        resultError = error.response.data;
+      }
+      console.log(resultError);
+      res.status(500).json({ success: false, error: resultError });
     }
   }
 );
+router.get("/", (req, res) => {
+  res.json({ success: true, message: "Welcome to the API, docs at /docs" });
+});
 
 export default router;

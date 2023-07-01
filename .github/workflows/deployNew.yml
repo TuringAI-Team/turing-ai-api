@@ -3,7 +3,7 @@ name: Deploy to SSH VPS
 on:
   push:
     branches:
-      - main
+      - new
 
 jobs:
   deploy:
@@ -24,9 +24,9 @@ jobs:
           username: ${{ secrets.USERNAME }}
           password: ${{ secrets.PASSWORD }}
           script: |
-            cd /home/loick/github/turing-api
+            cd /home/loick/github/turing-api-new
             npm run git
-            npm i
+            npm i --force
             npm run build
             nvm use 18
-            pm2 reload TuringAPI
+            pm2 reload TuringAPINew

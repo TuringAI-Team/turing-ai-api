@@ -7,7 +7,7 @@ export default {
     parameters: {
       prompts: {
         type: "array",
-        required: false,
+        required: true,
       },
       image: {
         type: "string",
@@ -15,7 +15,7 @@ export default {
       },
       action: {
         type: "string",
-        required: false,
+        required: true,
         options: ["generate", "img2img", "upscale"],
       },
       width: {
@@ -83,11 +83,7 @@ export default {
       },
       model: {
         type: "string",
-        required: false,
-      },
-      strength: {
-        type: "number",
-        required: false,
+        required: true,
         options: [
           "sdxl",
           "sd-1.5",
@@ -103,6 +99,10 @@ export default {
           "stable-diffusion-768-v2-1",
           "stable-diffusion-xl-beta-v2-2-2",
         ],
+      },
+      strength: {
+        type: "number",
+        required: false,
       },
     },
   },

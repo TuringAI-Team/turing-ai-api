@@ -17,7 +17,13 @@ export default async function imageHandler(client) {
   for (const file of imageFiles) {
     const filePath = `../models/image/${file}`;
     const { default: image } = await import(filePath);
-
+    if (!image) {
+      log(
+        "warning",
+        `The command at ${filePath} is missing a required "data" or "execute" property.`
+      );
+      continue;
+    }
     // Set a new item in the Collection with the key as the command name and the value as the exported module
     if ("data" in image && "execute" in image) {
       images.push(image);
