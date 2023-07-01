@@ -1,6 +1,7 @@
 export default {
   data: {
     name: "other",
+    fullName: "Other models",
     parameters: {
       messages: {
         type: "array",

@@ -9,6 +9,7 @@ const openai = new OpenAIApi(configuration);
 export default {
   data: {
     name: "filter",
+    fullName: "Text Filter",
     parameters: {
       text: {
         type: "string",

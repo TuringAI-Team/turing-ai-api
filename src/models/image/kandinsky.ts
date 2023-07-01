@@ -3,6 +3,7 @@ import axios from "axios";
 export default {
   data: {
     name: "kandinsky",
+    fullName: "Kandinsky 2.1",
     parameters: {
       prompt: {
         type: "string",

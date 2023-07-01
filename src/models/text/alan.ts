@@ -18,6 +18,7 @@ const openai = new OpenAIApi(configuration);
 export default {
   data: {
     name: "alan",
+    fullName: "Alan",
     parameters: {
       userName: {
         type: "string",

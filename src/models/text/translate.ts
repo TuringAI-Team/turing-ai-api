@@ -3,6 +3,7 @@ import axios from "axios";
 export default {
   data: {
     name: "translate",
+    fullName: "Translate text",
     parameters: {
       text: {
         type: "string",

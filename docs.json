@@ -7,84 +7,84 @@
   "twitter": "Turing_AI_",
   "sidebar": [
     [
-      "text",
+      "Text Models",
       [
         [
-          "alan",
+          "Alan",
           "/text/alan"
         ],
         [
-          "anthropic",
+          "Anthropic Models",
           "/text/anthropic"
         ],
         [
-          "filter",
+          "Text Filter",
           "/text/filter"
         ],
         [
-          "google",
+          "Google Models",
           "/text/google"
         ],
         [
-          "gpt",
+          "OpenAI Models",
           "/text/gpt"
         ],
         [
-          "huggingface",
+          "Huggingface based models",
           "/text/huggingface"
         ],
         [
-          "other",
+          "Other models",
           "/text/other"
         ],
         [
-          "translate",
+          "Translate text",
           "/text/translate"
         ]
       ]
     ],
     [
-      "image",
+      "Image Models",
       [
         [
-          "controlnet",
+          "Controlnet",
           "/image/controlnet"
         ],
         [
-          "dall-e",
+          "Dall-e 2",
           "/image/dall-e"
         ],
         [
-          "kandinsky",
+          "Kandinsky 2.1",
           "/image/kandinsky"
         ],
         [
-          "mj",
+          "MJ",
           "/image/mj"
         ],
         [
-          "sdxl",
+          "Stable Diffusion XL",
           "/image/sdxl"
         ],
         [
-          "sh",
+          "Stablehorde",
           "/image/sh"
         ]
       ]
     ],
     [
-      "audio",
+      "Audio Models",
       [
         [
-          "music",
+          "Music generation",
           "/audio/music"
         ],
         [
-          "stt",
+          "Speech to text",
           "/audio/stt"
         ],
         [
-          "tts",
+          "Text to speech",
           "/audio/tts"
         ]
       ]

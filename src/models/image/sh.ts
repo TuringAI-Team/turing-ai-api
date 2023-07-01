@@ -4,6 +4,7 @@ import axios from "axios";
 export default {
   data: {
     name: "sh",
+    fullName: "Stablehorde",
     parameters: {
       prompt: {
         type: "string",

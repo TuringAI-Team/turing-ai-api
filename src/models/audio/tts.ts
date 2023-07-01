@@ -4,6 +4,7 @@ import * as googleTTS from "google-tts-api";
 export default {
   data: {
     name: "tts",
+    fullName: "Text to speech",
     parameters: {
       model: {
         type: "string",

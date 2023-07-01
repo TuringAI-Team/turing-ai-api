@@ -1,6 +1,7 @@
 export default {
   data: {
     name: "anthropic",
+    fullName: "Anthropic Models",
     parameters: {
       messages: {
         type: "array",

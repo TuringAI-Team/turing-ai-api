@@ -4,6 +4,7 @@ import FormData from "form-data";
 export default {
   data: {
     name: "stt",
+    fullName: "Speech to text",
     parameters: {
       model: {
         type: "string",

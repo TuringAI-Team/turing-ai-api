@@ -1,6 +1,7 @@
 export default {
   data: {
     name: "music",
+    fullName: "Music generation",
     parameters: {
       prompt: {
         type: "string",

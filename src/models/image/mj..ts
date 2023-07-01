@@ -1,6 +1,7 @@
 export default {
   data: {
     name: "mj",
+    fullName: "MJ",
     parameters: {
       prompt: {
         type: "string",

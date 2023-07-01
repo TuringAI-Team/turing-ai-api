@@ -2,6 +2,7 @@ import axios from "axios";
 export default {
   data: {
     name: "google",
+    fullName: "Google Models",
     parameters: {
       messages: {
         type: "array",

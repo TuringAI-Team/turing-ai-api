@@ -3,6 +3,7 @@ import { Configuration, OpenAIApi } from "openai";
 export default {
   data: {
     name: "dall-e",
+    fullName: "Dall-e 2",
     parameters: {
       prompt: {
         type: "string",

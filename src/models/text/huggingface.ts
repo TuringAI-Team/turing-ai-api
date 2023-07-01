@@ -3,6 +3,7 @@ import axios from "axios";
 export default {
   data: {
     name: "huggingface",
+    fullName: "Huggingface based models",
     parameters: {
       messages: {
         type: "array",

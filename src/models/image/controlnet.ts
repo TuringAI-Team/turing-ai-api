@@ -2,6 +2,7 @@ import { predict } from "replicate-api";
 export default {
   data: {
     name: "controlnet",
+    fullName: "Controlnet",
     parameters: {
       prompt: {
         type: "string",

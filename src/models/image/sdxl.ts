@@ -4,6 +4,7 @@ const apiHost = "https://api.stability.ai";
 export default {
   data: {
     name: "sdxl",
+    fullName: "Stable Diffusion XL",
     parameters: {
       prompts: {
         type: "array",
