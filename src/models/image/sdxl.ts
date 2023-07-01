@@ -140,7 +140,7 @@ export default {
         style
       );
       response = response[0];
-      log("info", "response", response);
+      log("info", response);
       response = {
         images: response,
       };
@@ -163,7 +163,7 @@ export default {
       response = await upscale(image, width, height);
     }
     let newBalance = await getBalance();
-    let cost = originalBalance - newBalance;
+    let cost = (originalBalance - newBalance) / 100;
     return { ...response, cost };
   },
 };
