@@ -124,7 +124,7 @@ export default {
       number,
       strength,
     } = data;
-    let response = {};
+    let response: any = {};
     let originalBalance = await getBalance();
     if (action === "generate") {
       response = await generate(
@@ -139,7 +139,7 @@ export default {
         seed,
         style
       );
-      response = response[0];
+      response = response.artifacts;
       log("info", response);
       response = {
         images: response,
