@@ -1,10 +1,11 @@
 import { Connection } from "rabbitmq-client";
+import log from "../utils/log.js";
 const rabbit = new Connection(process.env.MQ_URL);
 rabbit.on("error", (err) => {
-  console.log("RabbitMQ connection error", err);
+  log("error", "RabbitMQ connection error", err);
 });
 rabbit.on("connection", () => {
-  console.log("Connection successfully (re)established");
+  log("info", "RabbitMQ connected");
 });
 
 const pub = rabbit.createPublisher({
