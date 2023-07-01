@@ -140,7 +140,7 @@ export default {
         style
       );
       response = response.artifacts;
-      log("info", response);
+      log("info", JSON.stringify(response));
       response = {
         images: response,
       };
