@@ -3,6 +3,7 @@ import { Request, Response } from "express";
 import turnstile from "../middlewares/captchas/turnstile.js";
 import key from "../middlewares/key.js";
 import client from "../index.js";
+import log from "../utils/log.js";
 
 const router = express.Router();
 
@@ -21,6 +22,7 @@ router.post(
     try {
       let aiObject = typeObj.find((a) => a.data.name === ai);
       if (!aiObject) {
+        log("error", `AI not found: ${ai}`, typeObj);
         res.status(404).json({ success: false, error: "AI not found" });
         return;
       }
