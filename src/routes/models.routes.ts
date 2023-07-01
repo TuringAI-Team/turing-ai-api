@@ -62,7 +62,7 @@ router.post(
           }
         });
       } else {
-        res.status(200).json({ success: true, execution });
+        res.status(200).json({ success: true, ...execution });
       }
     } catch (error: any) {
       let resultError = error;
