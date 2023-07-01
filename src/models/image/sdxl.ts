@@ -1,3 +1,4 @@
+import log from "../../utils/log.js";
 import axios from "axios";
 const apiHost = "https://api.stability.ai";
 
@@ -124,6 +125,7 @@ export default {
       strength,
     } = data;
     let response = {};
+    let originalBalance = await getBalance();
     if (action === "generate") {
       response = await generate(
         prompts,
@@ -137,6 +139,11 @@ export default {
         seed,
         style
       );
+      response = response[0][0];
+      log("info", "response", response);
+      response = {
+        images: response,
+      };
     }
     if (action === "img2img") {
       response = await img2img(
@@ -155,7 +162,9 @@ export default {
     if (action === "upscale") {
       response = await upscale(image, width, height);
     }
-    return response;
+    let newBalance = await getBalance();
+    let cost = originalBalance - newBalance;
+    return { ...response, cost };
   },
 };
 
@@ -248,6 +257,19 @@ export async function upscale(image: any, width: number, height: number) {
     },
   });
   return response.data;
+}
+
+export async function getBalance() {
+  let response = await axios({
+    method: "get",
+    url: `${apiHost}/v1/user/balance`,
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${process.env.DREAMSTUDIO_KEY}`,
+    },
+  });
+  return response.data.credits;
 }
 
 function parseModels(model: string) {
