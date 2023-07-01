@@ -85,7 +85,7 @@ export default {
       },
       model: {
         type: "string",
-        required: true,
+        required: false,
         options: [
           "sdxl",
           "sd-1.5",
@@ -101,6 +101,7 @@ export default {
           "stable-diffusion-768-v2-1",
           "stable-diffusion-xl-beta-v2-2-2",
         ],
+        default: "sdxl",
       },
       strength: {
         type: "number",
@@ -124,6 +125,7 @@ export default {
       number,
       strength,
     } = data;
+    if (!model) model = "sdxl";
     let response: any = {};
     let originalBalance = await getBalance();
     if (action === "generate") {
@@ -140,7 +142,6 @@ export default {
         style
       );
       response = response.artifacts;
-      log("info", JSON.stringify(response));
       response = {
         images: response,
       };
