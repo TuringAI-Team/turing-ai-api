@@ -139,7 +139,7 @@ export default {
         seed,
         style
       );
-      response = response[0][0];
+      response = response[0];
       log("info", "response", response);
       response = {
         images: response,
