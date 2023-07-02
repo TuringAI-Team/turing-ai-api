@@ -179,7 +179,7 @@ async function streams(data) {
   } else {
     let response;
     let key = process.env.PAWAN_API_KEY;
-
+    pw = false;
     if (!pw) {
       key = process.env.OPENAI_API_KEY;
     }
