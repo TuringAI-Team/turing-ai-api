@@ -41,7 +41,11 @@ title: Other models
         "Content-Type": "application/json",
         Authorization: "Bearer YOUR_API_KEY",
       },
-      data: [object Object],
+      data: {
+  "prompt": "string",
+  "model": "vicuna",
+  "max_tokens": 1
+},
     })
   })();
   ```

@@ -40,7 +40,11 @@ title: Speech to text
         "Content-Type": "application/json",
         Authorization: "Bearer YOUR_API_KEY",
       },
-      data: [object Object],
+      data: {
+  "model": "fast-whisper",
+  "audio": "string",
+  "type": "base"
+},
     })
   })();
   ```

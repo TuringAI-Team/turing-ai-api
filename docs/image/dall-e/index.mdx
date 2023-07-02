@@ -39,7 +39,12 @@ title: Dall-e 2
         "Content-Type": "application/json",
         Authorization: "Bearer YOUR_API_KEY",
       },
-      data: [object Object],
+      data: {
+  "prompt": "string",
+  "samples": 1,
+  "size": "512x512",
+  "image": "string"
+},
     })
   })();
   ```

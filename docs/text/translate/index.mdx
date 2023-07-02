@@ -39,7 +39,12 @@ title: Translate text
         "Content-Type": "application/json",
         Authorization: "Bearer YOUR_API_KEY",
       },
-      data: [object Object],
+      data: {
+  "text": "string",
+  "from": "auto",
+  "to": "string",
+  "ai": "google"
+},
     })
   })();
   ```

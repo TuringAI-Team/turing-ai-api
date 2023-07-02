@@ -40,7 +40,11 @@ title: Google Models
         "Content-Type": "application/json",
         Authorization: "Bearer YOUR_API_KEY",
       },
-      data: [object Object],
+      data: {
+  "model": "chat-bison",
+  "max_tokens": 512,
+  "temperature": 0.9
+},
     })
   })();
   ```

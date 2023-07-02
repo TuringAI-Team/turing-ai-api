@@ -43,7 +43,13 @@ title: Kandinsky 2.1
         "Content-Type": "application/json",
         Authorization: "Bearer YOUR_API_KEY",
       },
-      data: [object Object],
+      data: {
+  "prompt": "string",
+  "steps": 100,
+  "number": 1,
+  "negative_prompt": "string",
+  "guidance_scale": 4
+},
     })
   })();
   ```

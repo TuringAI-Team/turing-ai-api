@@ -34,7 +34,11 @@ title: Controlnet
         "Content-Type": "application/json",
         Authorization: "Bearer YOUR_API_KEY",
       },
-      data: [object Object],
+      data: {
+  "prompt": "string",
+  "model": "normal",
+  "image": "string"
+},
     })
   })();
   ```

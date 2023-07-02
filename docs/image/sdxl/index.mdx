@@ -87,7 +87,22 @@ title: Stable Diffusion XL
         "Content-Type": "application/json",
         Authorization: "Bearer YOUR_API_KEY",
       },
-      data: [object Object],
+      data: {
+  "prompt": "string",
+  "negative_prompt": "string",
+  "image": "string",
+  "action": "generate",
+  "width": 512,
+  "height": 512,
+  "steps": 100,
+  "number": 1,
+  "sampler": "DDIM",
+  "cfg_scale": 7,
+  "seed": 1,
+  "style": "3d-model",
+  "model": "sdxl",
+  "strength": 1
+},
     })
   })();
   ```

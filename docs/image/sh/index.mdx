@@ -84,7 +84,21 @@ title: Stablehorde
         "Content-Type": "application/json",
         Authorization: "Bearer YOUR_API_KEY",
       },
-      data: [object Object],
+      data: {
+  "prompt": "string",
+  "negative_prompt": "string",
+  "image": "string",
+  "width": 512,
+  "height": 512,
+  "steps": 50,
+  "number": 1,
+  "strength": 1,
+  "sampler": "k_lms",
+  "cfg_scale": 1,
+  "seed": 1,
+  "model": "stable_diffusion",
+  "stream": true
+},
     })
   })();
   ```

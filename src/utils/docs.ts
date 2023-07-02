@@ -92,7 +92,7 @@ function generateExamples(model, section) {
         "Content-Type": "application/json",
         Authorization: "Bearer YOUR_API_KEY",
       },
-      data: ${data},
+      data: ${JSON.stringify(data, null, 2)},
     })
   })();
   \`\`\`

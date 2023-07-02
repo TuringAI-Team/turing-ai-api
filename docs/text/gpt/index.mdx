@@ -50,7 +50,13 @@ title: OpenAI Models
         "Content-Type": "application/json",
         Authorization: "Bearer YOUR_API_KEY",
       },
-      data: [object Object],
+      data: {
+  "model": "gpt-3.5-turbo",
+  "max_tokens": 512,
+  "temperature": 0.9,
+  "plugins": [],
+  "stream": true
+},
     })
   })();
   ```

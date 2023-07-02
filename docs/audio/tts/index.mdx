@@ -43,7 +43,12 @@ title: Text to speech
         "Content-Type": "application/json",
         Authorization: "Bearer YOUR_API_KEY",
       },
-      data: [object Object],
+      data: {
+  "model": "google",
+  "voice": "string",
+  "text": "string",
+  "language": "en"
+},
     })
   })();
   ```
