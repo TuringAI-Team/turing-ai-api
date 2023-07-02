@@ -59,16 +59,18 @@ export default {
       images: [],
     };
     if (data.number && data.number > 1) {
-      result.images = response.data.output.images.map(async (x) => {
-        let res = await axios.get(x, {
-          responseType: "arraybuffer",
-        });
-        let base64 = Buffer.from(res.data, "binary").toString("base64");
-        return {
-          base64: base64,
-          seed: Math.floor(Math.random() * 100000000),
-        };
-      });
+      result.images = await Promise.all(
+        response.data.output.images.map(async (x) => {
+          let res = await axios.get(x, {
+            responseType: "arraybuffer",
+          });
+          let base64 = Buffer.from(res.data, "binary").toString("base64");
+          return {
+            base64: base64,
+            seed: Math.floor(Math.random() * 100000000),
+          };
+        })
+      );
     } else {
       let res = await axios.get(response.data.output.image_url, {
         responseType: "arraybuffer",
