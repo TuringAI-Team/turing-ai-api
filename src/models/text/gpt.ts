@@ -227,6 +227,7 @@ async function streams(data) {
       let tokensSent = 0;
       stream.on("data", (chunk) => {
         let content = chunk.toString();
+        content = content.replace("data: ", "");
 
         if (content == "[DONE]") {
           let tokens = getPromptLength(result.result);
