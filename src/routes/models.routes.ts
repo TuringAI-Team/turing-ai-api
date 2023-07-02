@@ -15,6 +15,9 @@ router.post(
     const { type, ai } = req.params;
     const body = req.body;
     let typeObj = client[type];
+    if (body.stream) {
+      res.set("content-type", "text/event-stream");
+    }
     if (!typeObj) {
       res.status(404).json({ success: false, error: "Type not found" });
       return;
@@ -26,6 +29,7 @@ router.post(
         res.status(404).json({ success: false, error: "AI not found" });
         return;
       }
+
       // check params and body
       let realParameters = aiObject.data.parameters; // is an object with keys as parameter names and values as parameter types
       let parameters = Object.keys(realParameters);
@@ -54,7 +58,6 @@ router.post(
       }
       let execution = await aiObject.execute(body);
       if (body.stream) {
-        res.set("content-type", "text/event-stream");
         if (aiObject.name == "gpt") {
           execution.on("data", (data) => res.write(data));
           execution.on("end", () => res.end());
