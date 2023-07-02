@@ -81,6 +81,7 @@ async function streams(data) {
         functions.push(plugin);
       }
     }
+    console.log(`${functions}`);
     if (data.model == "gpt-3.5-turbo") {
       data.model = "gpt-3.5-turbo-0613";
     }
