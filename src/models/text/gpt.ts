@@ -136,38 +136,48 @@ async function streams(data) {
               ],
               stream: true,
             };
-            await fetchEventSource(
-              "https://api.openai.com/v1/chat/completions",
-              {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
-                },
-                body: JSON.stringify(body),
-                onmessage: async (ev) => {
-                  let data: any = ev.data;
-                  if (data == "[DONE]") {
-                    result.done = true;
-                    result.cost +=
-                      (getPromptLength(result.result) / 1000) * pricePerK;
-                    result.cost +=
-                      (getChatMessageLength(messages) / 1000) * pricePerK;
-                    event.emit("data", result);
-                  } else {
-                    data = JSON.parse(data);
-                    if (data.choices[0].delta.content) {
-                      result.result += data.choices[0].delta.content;
+            try {
+              await fetchEventSource(
+                "https://api.openai.com/v1/chat/completions",
+                {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+                  },
+                  body: JSON.stringify(body),
+                  onmessage: async (ev) => {
+                    let data: any = ev.data;
+                    if (data == "[DONE]") {
+                      result.done = true;
+                      result.cost +=
+                        (getPromptLength(result.result) / 1000) * pricePerK;
+                      result.cost +=
+                        (getChatMessageLength(messages) / 1000) * pricePerK;
+                      event.emit("data", result);
+                    } else {
+                      data = JSON.parse(data);
+                      if (data.choices[0].delta.content) {
+                        result.result += data.choices[0].delta.content;
+                      }
+                      let finishReason = data.choices[0].finish_reason;
+                      if (finishReason) {
+                        result.finishReason = finishReason;
+                      }
+                      event.emit("data", result);
                     }
-                    let finishReason = data.choices[0].finish_reason;
-                    if (finishReason) {
-                      result.finishReason = finishReason;
-                    }
-                    event.emit("data", result);
-                  }
-                },
+                  },
+                }
+              );
+            } catch (e: any) {
+              let err = e;
+              if (e.response && e.response.data) {
+                err = e.response.data;
               }
-            );
+              result.done = true;
+              result.error = `${err}`;
+              event.emit("data", result);
+            }
           }
         } else {
           result.result = message.content;
@@ -176,66 +186,79 @@ async function streams(data) {
           event.emit("data", result);
         }
       })
-      .catch((err) => {
+      .catch((e) => {
+        let err = e;
+        if (e.response && e.response.data) {
+          err = e.response.data;
+        }
         result.done = true;
-        result.error = `Error: ${err}`;
+        result.error = `${err}`;
         event.emit("data", result);
       });
     return event;
   } else {
     let key = process.env.OPENAI_API_KEY;
-    let response = await axios({
-      url: "https://api.openai.com/v1/chat/completions",
-      method: "POST",
-      responseType: "stream",
-      headers: {
-        Authorization: `Bearer ${key}`,
-        "Content-Type": "application/json",
-      },
-
-      data: {
-        model: model,
-        max_tokens: max_tokens,
-        messages: messages,
-        temperature: temperature,
-        stream: true,
-      },
-    });
-
-    let result = {
+    let result: any = {
       result: "",
       done: false,
       cost: 0,
       finishReason: null,
     };
+    try {
+      let response = await axios({
+        url: "https://api.openai.com/v1/chat/completions",
+        method: "POST",
+        responseType: "stream",
+        headers: {
+          Authorization: `Bearer ${key}`,
+          "Content-Type": "application/json",
+        },
 
-    let stream = response.data;
-    let tokensSent = 0;
-    stream.on("data", (chunk) => {
-      let content = chunk.toString();
+        data: {
+          model: model,
+          max_tokens: max_tokens,
+          messages: messages,
+          temperature: temperature,
+          stream: true,
+        },
+      });
 
-      if (content == "[DONE]") {
-        let tokens = getPromptLength(result.result);
-        let pricePerK = 0.002;
-        if (model.includes("gpt-4")) pricePerK = 0.05;
-        result.cost += (tokens / 1000) * pricePerK;
-        result.done = true;
-        event.emit("data", result);
-      } else {
-        tokensSent++;
-        content = JSON.parse(content);
-        let text = content.choices[0].delta.content;
-        let finishReason = content.choices[0].finish_reason;
-        if (finishReason) {
-          result.finishReason = finishReason;
-        }
-        result.result += text;
-        if (tokensSent >= 30) {
+      let stream = response.data;
+      let tokensSent = 0;
+      stream.on("data", (chunk) => {
+        let content = chunk.toString();
+
+        if (content == "[DONE]") {
+          let tokens = getPromptLength(result.result);
+          let pricePerK = 0.002;
+          if (model.includes("gpt-4")) pricePerK = 0.05;
+          result.cost += (tokens / 1000) * pricePerK;
+          result.done = true;
           event.emit("data", result);
-          tokensSent = 0;
+        } else {
+          tokensSent++;
+          content = JSON.parse(content);
+          let text = content.choices[0].delta.content;
+          let finishReason = content.choices[0].finish_reason;
+          if (finishReason) {
+            result.finishReason = finishReason;
+          }
+          result.result += text;
+          if (tokensSent >= 30) {
+            event.emit("data", result);
+            tokensSent = 0;
+          }
         }
+      });
+    } catch (e: any) {
+      let err = e;
+      if (e.response && e.response.data) {
+        err = e.response.data;
       }
-    });
+      result.done = true;
+      result.error = `${err}`;
+      event.emit("data", result);
+    }
     return event;
   }
 }
