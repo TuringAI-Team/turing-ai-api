@@ -50,7 +50,7 @@ export default {
           {
             context: message
               ? message.content
-              : "Your are PaLM 2 a AI chatbot created by Google.",
+              : "You are PaLM 2 a AI chatbot created by Google.",
             messages: messages,
             examples: [],
           },
