@@ -61,6 +61,7 @@ async function request(req, res) {
     }
 
     // not existing params
+    /*
     let notExistingParams = bodyKeys.filter((p) => !parameters.includes(p));
     if (notExistingParams.length > 0) {
       res.status(400).json({
@@ -68,7 +69,7 @@ async function request(req, res) {
         error: `Not existing parameters: ${notExistingParams.join(", ")}`,
       });
       return;
-    }
+    }*/
     let execution = await aiObject.execute(body);
     if (body.stream) {
       execution.on("data", (data) => {
