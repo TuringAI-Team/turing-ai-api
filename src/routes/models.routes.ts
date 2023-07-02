@@ -59,7 +59,6 @@ router.post(
       let execution = await aiObject.execute(body);
       if (body.stream) {
         execution.on("data", (data) => {
-          console.log(data);
           res.write("data: " + JSON.stringify(data) + "\n\n");
           if (data.done) {
             res.end();
