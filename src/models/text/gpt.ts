@@ -196,7 +196,6 @@ async function streams(data) {
       });
     return event;
   } else {
-    let key = process.env.OPENAI_API_KEY;
     let result: any = {
       result: "",
       done: false,
