@@ -32,7 +32,7 @@ export default {
       if (message.role != "system") {
         return {
           content: message.content,
-          author: message.author == "user" ? "user" : "bot",
+          author: message.role == "user" ? "user" : "bot",
         };
       }
     });
@@ -48,7 +48,9 @@ export default {
       data: {
         instances: [
           {
-            context: message.content,
+            context: message
+              ? message.content
+              : "Your are PaLM 2 a AI chatbot created by Google.",
             messages: messages,
             examples: [],
           },
