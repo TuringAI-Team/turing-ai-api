@@ -29,3 +29,19 @@ title: Google Models
 
 ## Examples
 
+<CodeGroup title="Google Models example">
+  ```typescript
+  import axios from "axios";
+  (async () => {
+    let response = await axios({
+      method: "post",
+      url: 'https://api.turing.sh/text/google',
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer YOUR_API_KEY",
+      },
+      data: [object Object],
+    })
+  })();
+  ```
+</CodeGroup>

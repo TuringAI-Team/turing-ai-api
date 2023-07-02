@@ -23,3 +23,19 @@ title: Controlnet
 
 ## Examples
 
+<CodeGroup title="Controlnet example">
+  ```typescript
+  import axios from "axios";
+  (async () => {
+    let response = await axios({
+      method: "post",
+      url: 'https://api.turing.sh/image/controlnet',
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer YOUR_API_KEY",
+      },
+      data: [object Object],
+    })
+  })();
+  ```
+</CodeGroup>

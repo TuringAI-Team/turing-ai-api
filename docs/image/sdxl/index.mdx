@@ -7,9 +7,13 @@ title: Stable Diffusion XL
 ## Parameters
 
 
-- **prompts**
-  - Type: array
+- **prompt**
+  - Type: string
   - Required: true
+
+- **negative_prompt**
+  - Type: string
+  - Required: false
 
 - **image**
   - Type: string
@@ -72,3 +76,19 @@ title: Stable Diffusion XL
 
 ## Examples
 
+<CodeGroup title="Stable Diffusion XL example">
+  ```typescript
+  import axios from "axios";
+  (async () => {
+    let response = await axios({
+      method: "post",
+      url: 'https://api.turing.sh/image/sdxl',
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer YOUR_API_KEY",
+      },
+      data: [object Object],
+    })
+  })();
+  ```
+</CodeGroup>

@@ -16,6 +16,11 @@ title: Kandinsky 2.1
   - Required: false
   - Default: 100
 
+- **number**
+  - Type: number
+  - Required: false
+  - Default: 1
+
 - **negative_prompt**
   - Type: string
   - Required: false
@@ -27,3 +32,19 @@ title: Kandinsky 2.1
 
 ## Examples
 
+<CodeGroup title="Kandinsky 2.1 example">
+  ```typescript
+  import axios from "axios";
+  (async () => {
+    let response = await axios({
+      method: "post",
+      url: 'https://api.turing.sh/image/kandinsky',
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer YOUR_API_KEY",
+      },
+      data: [object Object],
+    })
+  })();
+  ```
+</CodeGroup>

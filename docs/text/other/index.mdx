@@ -30,3 +30,19 @@ title: Other models
 
 ## Examples
 
+<CodeGroup title="Other models example">
+  ```typescript
+  import axios from "axios";
+  (async () => {
+    let response = await axios({
+      method: "post",
+      url: 'https://api.turing.sh/text/other',
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer YOUR_API_KEY",
+      },
+      data: [object Object],
+    })
+  })();
+  ```
+</CodeGroup>
