@@ -98,7 +98,6 @@ async function streams(data) {
       .then(async (completion) => {
         let message = completion.data.choices[0].message;
         let pricePerK = 0.002;
-        console.log(`model ${data.model} ${message}`);
         if (data.model.includes("gpt-4")) pricePerK = 0.05;
         result.cost += (completion.data.usage.total_tokens / 1000) * pricePerK;
         if (message["function_call"]) {
@@ -238,7 +237,6 @@ async function streams(data) {
           event.emit("data", result);
         } else {
           tokensSent++;
-          console.log(`content ${content}`);
           content = JSON.parse(content);
           let text = content.choices[0].delta.content;
           let finishReason = content.choices[0].finish_reason;
