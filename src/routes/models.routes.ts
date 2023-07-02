@@ -58,7 +58,10 @@ router.post(
       }
       let execution = await aiObject.execute(body);
       if (body.stream) {
-        if (aiObject.data.name == "gpt") {
+        if (
+          aiObject.data.name == "gpt" &&
+          (!body.plugins || body.plugins.length == 0)
+        ) {
           execution.on("data", (data) => {
             console.log(data);
             res.write(`${data}\n\n`);
