@@ -60,14 +60,16 @@ export default {
         Authorization: `Bearer ${process.env.RUNPOD_KEY}`,
       },
       data: {
-        prompt: prompt,
-        steps: steps,
-        guidance_scale: guidance_scale,
-        negative_prompt: negative_prompt,
-        num_images: data.number || 1,
-        w: data.width || 512,
-        h: data.height || 512,
-        prior_cf_scale: data.cfg_scale || 4,
+        input: {
+          prompt: prompt,
+          steps: steps,
+          guidance_scale: guidance_scale,
+          negative_prompt: negative_prompt,
+          num_images: data.number || 1,
+          w: data.width || 512,
+          h: data.height || 512,
+          prior_cf_scale: data.cfg_scale || 4,
+        },
       },
     });
     let spentInSec = (Date.now() - start) / 1000;
