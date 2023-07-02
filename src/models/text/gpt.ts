@@ -230,7 +230,11 @@ async function streams(data) {
             event.emit("data", result);
           } else {
             data = JSON.parse(data);
-            if (data.choices[0].delta.content) {
+            if (!data.choices) {
+              result.done = true;
+              result.error = JSON.stringify(data);
+              return event;
+            } else if (data.choices[0].delta.content) {
               result.result += data.choices[0].delta.content;
             }
             let finishReason = data.choices[0].finish_reason;
