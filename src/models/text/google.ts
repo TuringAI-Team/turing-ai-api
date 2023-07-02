@@ -1,5 +1,4 @@
 import axios from "axios";
-import { GoogleAuth } from "google-auth-library";
 
 export default {
   data: {
@@ -42,17 +41,13 @@ export default {
       }
     });
 
-    let client = new GoogleAuth().fromAPIKey(process.env.GCLOUD_KEY);
-    // get the access token
-    let token = await client.getAccessToken();
-    console.log(token);
     let response = await axios({
       method: "post",
       url: `https://us-central1-aiplatform.googleapis.com/v1/projects/turingai-4354f/locations/us-central1/publishers/google/models/${
         model == "chat-bison" ? "chat-bison@001" : "chat-bison@001"
       }:predict`,
       headers: {
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${process.env.GCLOUD_KEY}`,
         "Content-Type": "application/json",
       },
       data: {

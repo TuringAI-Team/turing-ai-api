@@ -318,7 +318,7 @@ export async function getBalance() {
 function parseModels(model: string) {
   switch (model) {
     case "sdxl":
-      return "stable-diffusion-xl-beta-v2-2-2";
+      return "stable-diffusion-512-v2-1";
     case "sd-1.5":
       return "stable-diffusion-v1-5";
     case "sd":
