@@ -97,6 +97,7 @@ async function streams(data) {
       .then(async (completion) => {
         let message = completion.data.choices[0].message;
         let pricePerK = 0.002;
+        console.log(`model ${data.model} ${message}`);
         if (data.model.includes("gpt-4")) pricePerK = 0.05;
         result.credits +=
           (completion.data.usage.total_tokens / 1000) * pricePerK;

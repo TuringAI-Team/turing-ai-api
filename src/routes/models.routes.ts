@@ -63,7 +63,6 @@ router.post(
           (!body.plugins || body.plugins.length == 0)
         ) {
           execution.on("data", (data) => {
-            console.log(data);
             res.write(`${data}\n\n`);
           });
           execution.on("end", () => res.end());
