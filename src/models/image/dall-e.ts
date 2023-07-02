@@ -18,6 +18,7 @@ export default {
         type: "string",
         required: false,
         options: ["512x512", "256x256", "1024x1024"],
+        default: "512x512",
       },
       image: {
         type: "string",

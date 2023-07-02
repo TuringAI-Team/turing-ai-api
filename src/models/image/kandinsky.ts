@@ -12,6 +12,7 @@ export default {
       steps: {
         type: "number",
         required: false,
+        default: 100,
       },
       negative_prompt: {
         type: "string",
@@ -20,6 +21,7 @@ export default {
       guidance_scale: {
         type: "number",
         required: false,
+        default: 4,
       },
     },
   },

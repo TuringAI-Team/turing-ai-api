@@ -21,18 +21,22 @@ export default {
       width: {
         type: "number",
         required: false,
+        default: 512,
       },
       height: {
         type: "number",
         required: false,
+        default: 512,
       },
       steps: {
         type: "number",
         required: false,
+        default: 50,
       },
       number: {
         type: "number",
         required: false,
+        default: 1,
       },
       strength: {
         type: "number",
@@ -102,14 +106,17 @@ export default {
           "Arcane Diffusion",
           "OpenJourney Diffusion",
         ],
+        default: "stable_diffusion",
       },
       nsfw: {
         type: "boolean",
         required: false,
+        default: false,
       },
       stream: {
         type: "boolean",
         required: false,
+        default: true,
       },
     },
   },
@@ -124,6 +131,7 @@ export default {
       results: [],
     };
     if (res.id) {
+      if (!data.stream) data.stream = true;
       if (data.stream) {
         let stream = new EventEmitter();
         stream.emit("data", result);

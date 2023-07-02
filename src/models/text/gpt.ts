@@ -26,32 +26,34 @@ export default {
         type: "string",
         required: true,
         options: ["gpt-3.5-turbo", "gpt-4"],
+        default: "gpt-3.5-turbo",
       },
       max_tokens: {
         type: "number",
         required: false,
+        default: 512,
       },
       temperature: {
         type: "number",
         required: false,
+        default: 0.9,
       },
       plugins: {
         type: "array",
         required: false,
-      },
-      pw: {
-        type: "boolean",
-        required: false,
+        default: [],
       },
       stream: {
         type: "boolean",
         required: false,
+        default: true,
       },
     },
   },
   execute: async (data) => {
     let { messages, model, max_tokens, temperature, plugins, pw, stream } =
       data;
+
     if (stream == true) {
       return await streams(data);
     } else {

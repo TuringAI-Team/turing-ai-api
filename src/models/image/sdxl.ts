@@ -20,22 +20,27 @@ export default {
         type: "string",
         required: true,
         options: ["generate", "img2img", "upscale"],
+        default: "generate",
       },
       width: {
         type: "number",
         required: false,
+        default: 512,
       },
       height: {
         type: "number",
         required: false,
+        default: 512,
       },
       steps: {
         type: "number",
         required: false,
+        default: 100,
       },
       number: {
         type: "number",
         required: false,
+        default: 1,
       },
       sampler: {
         type: "string",
@@ -56,6 +61,7 @@ export default {
       cfg_scale: {
         type: "number",
         required: false,
+        default: 7,
       },
       seed: {
         type: "number",

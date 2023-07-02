@@ -12,6 +12,7 @@ export default {
       from: {
         type: "string",
         required: false,
+        default: "auto",
       },
       to: {
         type: "string",
@@ -21,6 +22,7 @@ export default {
         type: "string",
         required: true,
         options: ["google", "microsoft"],
+        default: "google",
       },
     },
   },

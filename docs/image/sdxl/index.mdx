@@ -1,0 +1,74 @@
+---
+title: Stable Diffusion XL
+---
+
+# Stable Diffusion XL
+
+## Parameters
+
+
+- **prompts**
+  - Type: array
+  - Required: true
+
+- **image**
+  - Type: string
+  - Required: false
+
+- **action**
+  - Type: string
+  - Required: true
+  - Options: generate, img2img, upscale
+  - Default: generate
+
+- **width**
+  - Type: number
+  - Required: false
+  - Default: 512
+
+- **height**
+  - Type: number
+  - Required: false
+  - Default: 512
+
+- **steps**
+  - Type: number
+  - Required: false
+  - Default: 100
+
+- **number**
+  - Type: number
+  - Required: false
+  - Default: 1
+
+- **sampler**
+  - Type: string
+  - Required: false
+  - Options: DDIM, DDPM, K_DPMPP_2M, K_DPMPP_2S_ANCESTRAL, K_DPM_2, K_DPM_2_ANCESTRAL, K_EULER, K_EULER_ANCESTRAL, K_HEUN, K_LMS
+
+- **cfg_scale**
+  - Type: number
+  - Required: false
+  - Default: 7
+
+- **seed**
+  - Type: number
+  - Required: false
+
+- **style**
+  - Type: string
+  - Required: false
+  - Options: 3d-model, analog-film, anime, cinematic, comic-book, digital-art, enhance, fantasy-art, isometric, line-art, low-poly, modeling-compound, neon-punk, origami, photographic, pixel-art, title-texture
+
+- **model**
+  - Type: string
+  - Required: false
+  - Options: sdxl, sd-1.5, sd, sd-768, stable-diffusion-xl-1024-v0-9, stable-diffusion-v1, stable-diffusion-v1-5, stable-diffusion-512-v2-0, stable-diffusion-768-v2-0, stable-diffusion-depth-v2-0, stable-diffusion-512-v2-1, stable-diffusion-768-v2-1, stable-diffusion-xl-beta-v2-2-2
+  - Default: sdxl
+
+- **strength**
+  - Type: number
+  - Required: false
+
+## Examples
+

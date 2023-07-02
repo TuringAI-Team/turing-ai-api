@@ -20,6 +20,7 @@ export default {
           "pose",
           "seg",
         ],
+        default: "normal",
       },
       image: {
         type: "string",

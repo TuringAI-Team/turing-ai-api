@@ -18,6 +18,7 @@ export default {
       filters: {
         type: "array",
         required: true,
+        options: availableFilters,
       },
     },
   },

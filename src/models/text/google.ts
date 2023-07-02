@@ -13,14 +13,17 @@ export default {
         type: "string",
         required: true,
         options: ["chat-bison"],
+        default: "chat-bison",
       },
       max_tokens: {
         type: "number",
         required: false,
+        default: 512,
       },
       temperature: {
         type: "number",
         required: false,
+        default: 0.9,
       },
     },
   },

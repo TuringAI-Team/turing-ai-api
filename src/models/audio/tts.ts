@@ -10,6 +10,7 @@ export default {
         type: "string",
         required: true,
         options: ["google", "elevenlabs"],
+        default: "google",
       },
       voice: {
         type: "string",
@@ -22,10 +23,12 @@ export default {
       language: {
         type: "string",
         required: true,
+        default: "en",
       },
       slow: {
         type: "boolean",
         required: false,
+        default: false,
       },
     },
   },

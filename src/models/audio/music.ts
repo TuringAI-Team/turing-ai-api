@@ -5,16 +5,18 @@ export default {
     parameters: {
       prompt: {
         type: "string",
-        required: false,
+        required: true,
       },
       model: {
         type: "string",
-        required: true,
+        required: false,
         options: ["small", "medium", "melody", "large"],
+        default: "small",
       },
       duration: {
         type: "number",
         required: false,
+        default: 8,
       },
     },
   },

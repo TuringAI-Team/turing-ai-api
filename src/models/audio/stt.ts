@@ -8,8 +8,9 @@ export default {
     parameters: {
       model: {
         type: "string",
-        required: true,
+        required: false,
         options: ["whisper", "fast-whisper", "gladia"],
+        default: "fast-whisper",
       },
       audio: {
         type: "string",
@@ -18,11 +19,13 @@ export default {
       diarization: {
         type: "boolean",
         required: false,
+        default: false,
       },
       type: {
         type: "string",
         required: false,
         options: ["tiny", "base", "small", "medium", "large-v1", "large-v2"],
+        default: "base",
       },
     },
   },
