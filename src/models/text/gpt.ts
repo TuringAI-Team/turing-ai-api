@@ -63,7 +63,6 @@ export default {
 async function streams(data) {
   let { messages, model, max_tokens, temperature, plugins, pw, stream } = data;
   const event = new EventEmitter();
-  console.log(data.plugins);
   if (data.plugins && data.plugins.length > 0) {
     let functions = [];
     let messages = data.messages;
@@ -72,7 +71,7 @@ async function streams(data) {
       result: "",
       done: false,
       tool: null,
-      credits: 0,
+      cost: 0,
       error: null,
     };
 
@@ -82,7 +81,6 @@ async function streams(data) {
         functions.push(plugin);
       }
     }
-    console.log(`${functions}`);
     if (data.model == "gpt-3.5-turbo") {
       data.model = "gpt-3.5-turbo-0613";
     }
@@ -101,8 +99,7 @@ async function streams(data) {
         let pricePerK = 0.002;
         console.log(`model ${data.model} ${message}`);
         if (data.model.includes("gpt-4")) pricePerK = 0.05;
-        result.credits +=
-          (completion.data.usage.total_tokens / 1000) * pricePerK;
+        result.cost += (completion.data.usage.total_tokens / 1000) * pricePerK;
         if (message["function_call"]) {
           let functionName = message["function_call"]["name"];
           result.tool = functionName;
@@ -151,9 +148,9 @@ async function streams(data) {
                   let data: any = ev.data;
                   if (data == "[DONE]") {
                     result.done = true;
-                    result.credits +=
+                    result.cost +=
                       (getPromptLength(result.result) / 1000) * pricePerK;
-                    result.credits +=
+                    result.cost +=
                       (getChatMessageLength(messages) / 1000) * pricePerK;
                     event.emit("data", result);
                   } else {
@@ -202,7 +199,7 @@ async function streams(data) {
     let result = {
       result: "",
       done: false,
-      credits: 0,
+      cost: 0,
     };
 
     let stream = response.data;
@@ -214,7 +211,7 @@ async function streams(data) {
         let tokens = getPromptLength(result.result);
         let pricePerK = 0.002;
         if (model.includes("gpt-4")) pricePerK = 0.05;
-        result.credits += (tokens / 1000) * pricePerK;
+        result.cost += (tokens / 1000) * pricePerK;
         result.done = true;
         event.emit("data", result);
       } else {
