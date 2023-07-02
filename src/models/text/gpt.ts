@@ -204,7 +204,6 @@ async function streams(data) {
         },
       });
     } catch (error: any) {
-      console.log(`data: ${JSON.stringify(error)}`);
       console.log(`${error}, retrying with openai`);
       key = process.env.OPENAI_API_KEY;
       response = await axios({
