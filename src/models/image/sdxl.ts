@@ -8,9 +8,13 @@ export default {
     name: "sdxl",
     fullName: "Stable Diffusion XL",
     parameters: {
-      prompts: {
-        type: "array",
+      prompt: {
+        type: "string",
         required: true,
+      },
+      negative_prompt: {
+        type: "string",
+        required: false,
       },
       image: {
         type: "string",
@@ -119,7 +123,6 @@ export default {
   execute: async (data) => {
     let {
       action,
-      prompts,
       image,
       model,
       style,
@@ -134,6 +137,17 @@ export default {
     } = data;
     if (!model) model = "sdxl";
     let response: any = {};
+    let prompts = [];
+    if (data.prompt)
+      prompts.push({
+        text: data.prompt,
+        weight: 0.5,
+      });
+    if (data.negative_prompt)
+      prompts.push({
+        text: data.negative_prompt,
+        weight: -1,
+      });
     let originalBalance = await getBalance();
     if (action === "generate") {
       response = await generate(
