@@ -238,6 +238,7 @@ async function streams(data) {
           event.emit("data", result);
         } else {
           tokensSent++;
+          console.log(`content ${content}`);
           content = JSON.parse(content);
           let text = content.choices[0].delta.content;
           let finishReason = content.choices[0].finish_reason;
