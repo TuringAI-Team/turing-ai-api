@@ -212,7 +212,7 @@ async function streams(data) {
       };
       let pricePerK = 0.002;
       if (data.model.includes("gpt-4")) pricePerK = 0.05;
-      await fetchEventSource("https://api.openai.com/v1/chat/completions", {
+      fetchEventSource("https://api.openai.com/v1/chat/completions", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
