@@ -6,7 +6,7 @@ export default {
     parameters: {
       messages: {
         type: "array",
-        required: false,
+        required: true,
       },
 
       model: {
