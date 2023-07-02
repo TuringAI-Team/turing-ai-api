@@ -199,7 +199,6 @@ async function streams(data) {
     let stream = response.data;
     stream.on("data", (chunk) => {
       let content = chunk.toString();
-      console.log(content);
       event.emit("data", content);
     });
     stream.on("end", () => {
