@@ -211,6 +211,10 @@ async function streams(data) {
       let content = chunk.toString();
 
       if (content == "[DONE]") {
+        let tokens = getPromptLength(result.result);
+        let pricePerK = 0.002;
+        if (model.includes("gpt-4")) pricePerK = 0.05;
+        result.credits += (tokens / 1000) * pricePerK;
         result.done = true;
         event.emit("data", result);
       } else {
