@@ -76,6 +76,7 @@ export default {
       cost: cost,
       images: [],
     };
+    console.log(response.data);
     if (data.number && data.number > 1) {
       result.images = await Promise.all(
         response.data.output.images.map(async (x) => {
