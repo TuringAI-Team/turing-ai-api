@@ -142,10 +142,6 @@ export default {
         seed,
         style
       );
-      response = response.artifacts;
-      response = {
-        images: response,
-      };
     }
     if (image) {
       // image i s base64, transforming to binary
@@ -168,6 +164,10 @@ export default {
     if (action === "upscale") {
       response = await upscale(image, width, height);
     }
+    response = response.artifacts;
+    response = {
+      images: response,
+    };
     let newBalance = await getBalance();
     let cost = (originalBalance - newBalance) / 100;
     return { ...response, cost };
