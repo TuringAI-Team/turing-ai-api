@@ -183,50 +183,26 @@ async function streams(data) {
     if (!pw) {
       key = process.env.OPENAI_API_KEY;
     }
-    try {
-      response = await axios({
-        url: pw
-          ? "https://api.pawan.krd/v1/chat/completions"
-          : "https://api.openai.com/v1/chat/completions",
-        method: "POST",
-        responseType: "stream",
-        headers: {
-          Authorization: `Bearer ${key}`,
-          "Content-Type": "application/json",
-        },
 
-        data: {
-          model: model,
-          max_tokens: max_tokens,
-          messages: messages,
-          temperature: temperature,
-          stream: true,
-        },
-      });
-    } catch (error: any) {
-      console.log(`${error}, retrying with openai`);
-      key = process.env.OPENAI_API_KEY;
-      response = await axios({
-        url: "https://api.openai.com/v1/chat/completions",
-        method: "POST",
-        responseType: "stream",
-        headers: {
-          Authorization: `Bearer ${key}`,
-          "Content-Type": "application/json",
-        },
+    key = process.env.OPENAI_API_KEY;
+    response = await axios({
+      url: "https://api.openai.com/v1/chat/completions",
+      method: "POST",
+      responseType: "stream",
+      headers: {
+        Authorization: `Bearer ${key}`,
+        "Content-Type": "application/json",
+      },
 
-        data: {
-          model: model,
-          max_tokens: max_tokens,
-          messages: messages,
-          temperature: temperature,
-          stream: true,
-        },
-      });
-      if (response.status == 200) {
-        console.log("success with openai");
-      }
-    }
+      data: {
+        model: model,
+        max_tokens: max_tokens,
+        messages: messages,
+        temperature: temperature,
+        stream: true,
+      },
+    });
+
     let stream = response.data;
     stream.on("data", (chunk) => {
       let content = chunk.toString();
