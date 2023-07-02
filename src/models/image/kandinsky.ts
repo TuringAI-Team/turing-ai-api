@@ -28,6 +28,21 @@ export default {
         required: false,
         default: 4,
       },
+      width: {
+        type: "number",
+        required: false,
+        default: 512,
+      },
+      height: {
+        type: "number",
+        required: false,
+        default: 512,
+      },
+      cfg_scale: {
+        type: "number",
+        required: false,
+        default: 4,
+      },
     },
   },
   execute: async (data) => {
@@ -50,6 +65,9 @@ export default {
         guidance_scale: guidance_scale,
         negative_prompt: negative_prompt,
         num_images: data.number || 1,
+        w: data.width || 512,
+        h: data.height || 512,
+        prior_cf_scale: data.cfg_scale || 4,
       },
     });
     let spentInSec = (Date.now() - start) / 1000;
