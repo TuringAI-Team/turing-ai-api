@@ -73,6 +73,7 @@ async function streams(data) {
       tool: null,
       cost: 0,
       error: null,
+      finishReason: null,
     };
 
     for (let i = 0; i < data.plugins.length; i++) {
@@ -158,6 +159,10 @@ async function streams(data) {
                     if (data.choices[0].delta.content) {
                       result.result += data.choices[0].delta.content;
                     }
+                    let finishReason = data.choices[0].finish_reason;
+                    if (finishReason) {
+                      result.finishReason = finishReason;
+                    }
                     event.emit("data", result);
                   }
                 },
@@ -166,6 +171,7 @@ async function streams(data) {
           }
         } else {
           result.result = message.content;
+          result.finishReason = completion.data.choices[0].finish_reason;
           result.done = true;
           event.emit("data", result);
         }
@@ -200,6 +206,7 @@ async function streams(data) {
       result: "",
       done: false,
       cost: 0,
+      finishReason: null,
     };
 
     let stream = response.data;
@@ -218,6 +225,10 @@ async function streams(data) {
         tokensSent++;
         content = JSON.parse(content);
         let text = content.choices[0].delta.content;
+        let finishReason = content.choices[0].finish_reason;
+        if (finishReason) {
+          result.finishReason = finishReason;
+        }
         result.result += text;
         if (tokensSent >= 30) {
           event.emit("data", result);
