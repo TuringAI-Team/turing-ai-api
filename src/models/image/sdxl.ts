@@ -266,6 +266,9 @@ export async function img2img(
 export async function upscale(image: any, width: number, height: number) {
   const formData = new FormData();
   formData.append("image", image);
+  if (width) {
+    formData.append("width", width);
+  }
   let response = await axios({
     method: "post",
     url: `${apiHost}/v1/generation/esrgan-v1-x2plus/image-to-image/upscale`,
