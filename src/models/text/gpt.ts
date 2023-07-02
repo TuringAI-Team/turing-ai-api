@@ -55,6 +55,7 @@ export default {
     if (stream == true) {
       return await streams(data);
     } else {
+      return await rest(data);
     }
   },
 };
@@ -62,7 +63,7 @@ export default {
 async function streams(data) {
   let { messages, model, max_tokens, temperature, plugins, pw, stream } = data;
   const event = new EventEmitter();
-  if (data.plugins.length > 0) {
+  if (data.plugins && data.plugins.length > 0) {
     let functions = [];
     let messages = data.messages;
     delete data.messages;
@@ -239,7 +240,7 @@ async function streams(data) {
 }
 async function rest(data) {
   let { messages, model, max_tokens, temperature, plugins, pw, stream } = data;
-  if (data.plugins.length > 0) {
+  if (data.plugins && data.plugins.length > 0) {
     let functions = [];
     let messages = data.messages;
     delete data.messages;
@@ -330,7 +331,7 @@ async function rest(data) {
   } else {
     let response;
     let key = process.env.PAWAN_API_KEY;
-
+    pw = false;
     if (!pw) {
       key = process.env.OPENAI_API_KEY;
     }
