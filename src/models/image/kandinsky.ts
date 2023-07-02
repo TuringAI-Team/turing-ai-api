@@ -62,7 +62,7 @@ export default {
       data: {
         input: {
           prompt: prompt,
-          steps: steps,
+          prior_steps: steps,
           guidance_scale: guidance_scale,
           negative_prompt: negative_prompt,
           num_images: data.number || 1,
