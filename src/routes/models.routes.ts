@@ -55,12 +55,17 @@ router.post(
       let execution = await aiObject.execute(body);
       if (body.stream) {
         res.set("content-type", "text/event-stream");
-        execution.on("data", (data) => {
-          res.write("data: " + JSON.stringify(data) + "\n\n");
-          if (data.done) {
-            res.end();
-          }
-        });
+        if (aiObject.name == "gpt") {
+          execution.on("data", (data) => res.write(data));
+          execution.on("end", () => res.end());
+        } else {
+          execution.on("data", (data) => {
+            res.write("data: " + JSON.stringify(data) + "\n\n");
+            if (data.done) {
+              res.end();
+            }
+          });
+        }
       } else {
         res.status(200).json({ success: true, ...execution });
       }
