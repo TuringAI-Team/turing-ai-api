@@ -196,7 +196,7 @@ async function streams(data) {
       },
     });
 
-    console.log(response.status);
+    console.log(response.data);
     let stream = response.data;
     stream.on("data", (chunk) => {
       let content = chunk.toString();
