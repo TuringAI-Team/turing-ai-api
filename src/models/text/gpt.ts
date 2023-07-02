@@ -204,53 +204,41 @@ async function streams(data) {
       finishReason: null,
     };
     try {
-      let response = await axios({
-        url: "https://api.openai.com/v1/chat/completions",
+      let body = {
+        temperature: data.temperature || 0.9,
+        max_tokens: data.max_tokens || 150,
+        model: data.model,
+        messages: [...messages],
+        stream: true,
+      };
+      let pricePerK = 0.002;
+      if (data.model.includes("gpt-4")) pricePerK = 0.05;
+      await fetchEventSource("https://api.openai.com/v1/chat/completions", {
         method: "POST",
-        responseType: "stream",
         headers: {
-          Authorization: `Bearer ${key}`,
           "Content-Type": "application/json",
+          Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
         },
-
-        data: {
-          model: model,
-          max_tokens: max_tokens,
-          messages: messages,
-          temperature: temperature,
-          stream: true,
-        },
-      });
-
-      let stream = response.data;
-      let tokensSent = 0;
-      stream.on("data", (chunk) => {
-        let content = chunk.toString();
-        content = content.replace("data: ", "");
-
-        if (content == "[DONE]") {
-          let tokens = getPromptLength(result.result);
-          let pricePerK = 0.002;
-          if (model.includes("gpt-4")) pricePerK = 0.05;
-          result.cost += (tokens / 1000) * pricePerK;
-          result.done = true;
-          event.emit("data", result);
-        } else {
-          tokensSent++;
-          content = content.replace("data: ", "");
-          console.log(content);
-          content = JSON.parse(`"${content}"`);
-          let text = content.choices[0].delta.content;
-          let finishReason = content.choices[0].finish_reason;
-          if (finishReason) {
-            result.finishReason = finishReason;
-          }
-          result.result += text;
-          if (tokensSent >= 30) {
+        body: JSON.stringify(body),
+        onmessage: async (ev) => {
+          let data: any = ev.data;
+          if (data == "[DONE]") {
+            result.done = true;
+            result.cost += (getPromptLength(result.result) / 1000) * pricePerK;
+            result.cost += (getChatMessageLength(messages) / 1000) * pricePerK;
             event.emit("data", result);
-            tokensSent = 0;
+          } else {
+            data = JSON.parse(data);
+            if (data.choices[0].delta.content) {
+              result.result += data.choices[0].delta.content;
+            }
+            let finishReason = data.choices[0].finish_reason;
+            if (finishReason) {
+              result.finishReason = finishReason;
+            }
+            event.emit("data", result);
           }
-        }
+        },
       });
     } catch (e: any) {
       let err = e;
