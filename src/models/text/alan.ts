@@ -10,6 +10,13 @@ import googleAPI from "googlethis";
 import supabase from "../../db/supabase.js";
 import { getToday } from "../../utils/ms.js";
 
+//MODELS
+import kandinsky from "../image/kandinsky.js";
+import dall_e from "../image/dall-e.js";
+import sdxl from "../image/sdxl.js";
+import music from "../audio/music.js";
+import controlnet from "../image/controlnet.js";
+
 const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
 });
@@ -48,7 +55,7 @@ export default {
       imageGenerator: {
         type: "string",
         required: false,
-        options: ["sdxl", "kandisnky", "dall-e", "none"],
+        options: ["sdxl", "kandinsky", "dall-e", "none"],
       },
       nsfwFilter: {
         type: "boolean",
@@ -283,7 +290,7 @@ const pluginList = [
         message: "",
         generations: [],
       };
-      if (params.generator) {
+      if (params.generator == "kandinsky") {
       }
     },
   },
