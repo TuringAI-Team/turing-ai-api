@@ -177,15 +177,8 @@ async function streams(data) {
       });
     return event;
   } else {
-    let response;
-    let key = process.env.PAWAN_API_KEY;
-    pw = false;
-    if (!pw) {
-      key = process.env.OPENAI_API_KEY;
-    }
-
-    key = process.env.OPENAI_API_KEY;
-    response = await axios({
+    let key = process.env.OPENAI_API_KEY;
+    let response = await axios({
       url: "https://api.openai.com/v1/chat/completions",
       method: "POST",
       responseType: "stream",
@@ -203,6 +196,7 @@ async function streams(data) {
       },
     });
 
+    console.log(response.status);
     let stream = response.data;
     stream.on("data", (chunk) => {
       let content = chunk.toString();
