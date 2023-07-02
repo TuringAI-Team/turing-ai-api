@@ -184,6 +184,7 @@ async function streams(data) {
       responseType: "stream",
       headers: {
         Authorization: `Bearer ${key}`,
+        "Content-Type": "application/json",
       },
 
       data: {
