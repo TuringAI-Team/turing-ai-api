@@ -63,6 +63,7 @@ export default {
 async function streams(data) {
   let { messages, model, max_tokens, temperature, plugins, pw, stream } = data;
   const event = new EventEmitter();
+  console.log(data.plugins);
   if (data.plugins && data.plugins.length > 0) {
     let functions = [];
     let messages = data.messages;
@@ -198,13 +199,30 @@ async function streams(data) {
       },
     });
 
+    let result = {
+      result: "",
+      done: false,
+      credits: 0,
+    };
+
     let stream = response.data;
+    let tokensSent = 0;
     stream.on("data", (chunk) => {
       let content = chunk.toString();
-      event.emit("data", content.trim());
-    });
-    stream.on("end", () => {
-      event.emit("end");
+
+      if (content == "[DONE]") {
+        result.done = true;
+        event.emit("data", result);
+      } else {
+        tokensSent++;
+        content = JSON.parse(content);
+        let text = content.choices[0].delta.content;
+        result.result += text;
+        if (tokensSent >= 30) {
+          event.emit("data", result);
+          tokensSent = 0;
+        }
+      }
     });
     return event;
   }
