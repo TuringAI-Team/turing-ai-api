@@ -228,6 +228,7 @@ async function streams(data) {
             event.emit("data", result);
           } else {
             data = JSON.parse(data);
+            console.log(`data ${JSON.stringify(data)}`);
             if (data.choices[0].delta.content) {
               result.result += data.choices[0].delta.content;
             }
