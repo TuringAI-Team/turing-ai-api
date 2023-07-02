@@ -237,6 +237,7 @@ async function streams(data) {
           event.emit("data", result);
         } else {
           tokensSent++;
+          content = content.replace("data: ", "");
           console.log(content);
           content = JSON.parse(content);
           let text = content.choices[0].delta.content;
