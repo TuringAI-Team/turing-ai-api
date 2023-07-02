@@ -61,7 +61,7 @@ router.post(
         if (aiObject.data.name == "gpt") {
           execution.on("data", (data) => {
             console.log(data);
-            res.write(`${data}\n`);
+            res.write(`${data}\n\n`);
           });
           execution.on("end", () => res.end());
         } else {
