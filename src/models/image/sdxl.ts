@@ -1,6 +1,7 @@
 import log from "../../utils/log.js";
 import axios from "axios";
 const apiHost = "https://api.stability.ai";
+import FormData from "form-data";
 
 export default {
   data: {
@@ -146,6 +147,10 @@ export default {
         images: response,
       };
     }
+    if (image) {
+      // image i s base64, transforming to binary
+      image = Buffer.from(image, "base64");
+    }
     if (action === "img2img") {
       response = await img2img(
         prompts,
@@ -217,42 +222,57 @@ export async function img2img(
   cfg_scale?: number,
   sampler?: string
 ) {
-  let data = {
-    text_prompts: prompts,
-    init_image: init_image,
-  };
-  if (steps) data["steps"] = steps;
-  if (number) data["samples"] = number;
-  if (cfg_scale) data["cfg_scale"] = cfg_scale;
-  if (sampler) data["sampler"] = sampler;
-  if (strength) data["image_strength"] = strength;
-  if (imageMode) data["init_image_mode"] = imageMode;
-  if (style_preset) data["style_preset"] = style_preset;
+  const formData = new FormData();
+  formData.append("init_image", init_image);
+  formData.append("text_prompts[0][text]", prompts[0]["text"]);
+  if (prompts[1]) {
+    formData.append("text_prompts[1][text]", prompts[1]["text"]);
+  }
+  if (steps) {
+    formData.append("steps", steps);
+  }
+  if (number) {
+    formData.append("samples", number);
+  }
+  if (cfg_scale) {
+    formData.append("cfg_scale", cfg_scale);
+  }
+  if (sampler) {
+    formData.append("sampler", sampler);
+  }
+  if (strength) {
+    formData.append("image_strength", strength);
+  }
+  if (imageMode) {
+    formData.append("init_image_mode", imageMode);
+  }
+  if (style_preset) {
+    formData.append("style_preset", style_preset);
+  }
+
   let response = await axios({
     method: "post",
     url: `${apiHost}/v1/generation/${parseModels(model)}/image-to-image`,
-    data: data,
     headers: {
-      "Content-Type": "application/json",
+      ...formData.getHeaders(),
       Accept: "application/json",
       Authorization: `Bearer ${process.env.DREAMSTUDIO_KEY}`,
     },
+    data: formData,
   });
   return response.data;
 }
 
 export async function upscale(image: any, width: number, height: number) {
-  let data = {
-    image: image,
-    width: width,
-    height: height,
-  };
+  const formData = new FormData();
+  formData.append("image", image);
+  formData.append("width", width);
   let response = await axios({
     method: "post",
     url: `${apiHost}/v1/generation/esrgan-v1-x2plus/image-to-image`,
-    data: data,
+    data: formData,
     headers: {
-      "Content-Type": "application/json",
+      ...formData.getHeaders(),
       Accept: "application/json",
       Authorization: `Bearer ${process.env.DREAMSTUDIO_KEY}`,
     },
