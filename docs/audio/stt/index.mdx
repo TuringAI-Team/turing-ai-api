@@ -48,4 +48,20 @@ title: Speech to text
     })
   })();
   ```
+  ```python
+  import requests
+  import json
+  response = requests.post(
+    "https://api.turing.sh/audio/stt",
+    headers={
+      "Content-Type": "application/json",
+      "Authorization": "Bearer YOUR_API_KEY",
+    },
+    data=json.dumps({
+  "model": "fast-whisper",
+  "audio": "string",
+  "type": "base"
+}),
+  )
+  ```
 </CodeGroup>

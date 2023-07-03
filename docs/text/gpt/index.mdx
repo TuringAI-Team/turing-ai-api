@@ -51,6 +51,7 @@ title: OpenAI Models
         Authorization: "Bearer YOUR_API_KEY",
       },
       data: {
+  "messages": "array",
   "model": "gpt-3.5-turbo",
   "max_tokens": 512,
   "temperature": 0.9,
@@ -59,5 +60,24 @@ title: OpenAI Models
 },
     })
   })();
+  ```
+  ```python
+  import requests
+  import json
+  response = requests.post(
+    "https://api.turing.sh/text/gpt",
+    headers={
+      "Content-Type": "application/json",
+      "Authorization": "Bearer YOUR_API_KEY",
+    },
+    data=json.dumps({
+  "messages": "array",
+  "model": "gpt-3.5-turbo",
+  "max_tokens": 512,
+  "temperature": 0.9,
+  "plugins": [],
+  "stream": true
+}),
+  )
   ```
 </CodeGroup>

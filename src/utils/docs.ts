@@ -74,10 +74,8 @@ function generateExamples(model, section) {
       data[parameter] = model.data.parameters[parameter].default;
     } else if (model.data.parameters[parameter].options) {
       data[parameter] = model.data.parameters[parameter].options[0];
-    } else if (model.data.parameters[parameter].type === "number") {
-      data[parameter] = 1;
-    } else if (model.data.parameters[parameter].type === "string") {
-      data[parameter] = "string";
+    } else if (model.data.parameters[parameter].required == true) {
+      data[parameter] = model.data.parameters[parameter].type;
     }
   }
 
@@ -95,6 +93,18 @@ function generateExamples(model, section) {
       data: ${JSON.stringify(data, null, 2)},
     })
   })();
+  \`\`\`
+  \`\`\`python
+  import requests
+  import json
+  response = requests.post(
+    "https://api.turing.sh/${section}/${model.data.name}",
+    headers={
+      "Content-Type": "application/json",
+      "Authorization": "Bearer YOUR_API_KEY",
+    },
+    data=json.dumps(${JSON.stringify(data, null, 2)}),
+  )
   \`\`\`
 </CodeGroup>`;
   return example;

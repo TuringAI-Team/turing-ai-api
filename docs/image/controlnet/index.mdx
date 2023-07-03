@@ -35,11 +35,23 @@ title: Controlnet
         Authorization: "Bearer YOUR_API_KEY",
       },
       data: {
-  "prompt": "string",
-  "model": "normal",
-  "image": "string"
+  "model": "normal"
 },
     })
   })();
+  ```
+  ```python
+  import requests
+  import json
+  response = requests.post(
+    "https://api.turing.sh/image/controlnet",
+    headers={
+      "Content-Type": "application/json",
+      "Authorization": "Bearer YOUR_API_KEY",
+    },
+    data=json.dumps({
+  "model": "normal"
+}),
+  )
   ```
 </CodeGroup>

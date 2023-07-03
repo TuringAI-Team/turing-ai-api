@@ -41,11 +41,29 @@ title: Google Models
         Authorization: "Bearer YOUR_API_KEY",
       },
       data: {
+  "messages": "array",
   "model": "chat-bison",
   "max_tokens": 512,
   "temperature": 0.9
 },
     })
   })();
+  ```
+  ```python
+  import requests
+  import json
+  response = requests.post(
+    "https://api.turing.sh/text/google",
+    headers={
+      "Content-Type": "application/json",
+      "Authorization": "Bearer YOUR_API_KEY",
+    },
+    data=json.dumps({
+  "messages": "array",
+  "model": "chat-bison",
+  "max_tokens": 512,
+  "temperature": 0.9
+}),
+  )
   ```
 </CodeGroup>

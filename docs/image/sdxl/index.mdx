@@ -89,8 +89,6 @@ title: Stable Diffusion XL
       },
       data: {
   "prompt": "string",
-  "negative_prompt": "string",
-  "image": "string",
   "action": "generate",
   "width": 512,
   "height": 512,
@@ -98,12 +96,33 @@ title: Stable Diffusion XL
   "number": 1,
   "sampler": "DDIM",
   "cfg_scale": 7,
-  "seed": 1,
   "style": "3d-model",
-  "model": "sdxl",
-  "strength": 1
+  "model": "sdxl"
 },
     })
   })();
+  ```
+  ```python
+  import requests
+  import json
+  response = requests.post(
+    "https://api.turing.sh/image/sdxl",
+    headers={
+      "Content-Type": "application/json",
+      "Authorization": "Bearer YOUR_API_KEY",
+    },
+    data=json.dumps({
+  "prompt": "string",
+  "action": "generate",
+  "width": 512,
+  "height": 512,
+  "steps": 100,
+  "number": 1,
+  "sampler": "DDIM",
+  "cfg_scale": 7,
+  "style": "3d-model",
+  "model": "sdxl"
+}),
+  )
   ```
 </CodeGroup>

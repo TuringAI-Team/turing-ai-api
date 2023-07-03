@@ -42,11 +42,23 @@ title: Other models
         Authorization: "Bearer YOUR_API_KEY",
       },
       data: {
-  "prompt": "string",
-  "model": "vicuna",
-  "max_tokens": 1
+  "model": "vicuna"
 },
     })
   })();
+  ```
+  ```python
+  import requests
+  import json
+  response = requests.post(
+    "https://api.turing.sh/text/other",
+    headers={
+      "Content-Type": "application/json",
+      "Authorization": "Bearer YOUR_API_KEY",
+    },
+    data=json.dumps({
+  "model": "vicuna"
+}),
+  )
   ```
 </CodeGroup>

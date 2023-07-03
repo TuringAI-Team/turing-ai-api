@@ -43,4 +43,20 @@ title: Music generation
     })
   })();
   ```
+  ```python
+  import requests
+  import json
+  response = requests.post(
+    "https://api.turing.sh/audio/music",
+    headers={
+      "Content-Type": "application/json",
+      "Authorization": "Bearer YOUR_API_KEY",
+    },
+    data=json.dumps({
+  "prompt": "string",
+  "model": "small",
+  "duration": 8
+}),
+  )
+  ```
 </CodeGroup>

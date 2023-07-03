@@ -40,12 +40,25 @@ title: Dall-e 2
         Authorization: "Bearer YOUR_API_KEY",
       },
       data: {
-  "prompt": "string",
   "samples": 1,
-  "size": "512x512",
-  "image": "string"
+  "size": "512x512"
 },
     })
   })();
+  ```
+  ```python
+  import requests
+  import json
+  response = requests.post(
+    "https://api.turing.sh/image/dall-e",
+    headers={
+      "Content-Type": "application/json",
+      "Authorization": "Bearer YOUR_API_KEY",
+    },
+    data=json.dumps({
+  "samples": 1,
+  "size": "512x512"
+}),
+  )
   ```
 </CodeGroup>

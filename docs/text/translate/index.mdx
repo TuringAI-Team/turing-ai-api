@@ -48,4 +48,21 @@ title: Translate text
     })
   })();
   ```
+  ```python
+  import requests
+  import json
+  response = requests.post(
+    "https://api.turing.sh/text/translate",
+    headers={
+      "Content-Type": "application/json",
+      "Authorization": "Bearer YOUR_API_KEY",
+    },
+    data=json.dumps({
+  "text": "string",
+  "from": "auto",
+  "to": "string",
+  "ai": "google"
+}),
+  )
+  ```
 </CodeGroup>

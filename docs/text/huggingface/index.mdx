@@ -42,11 +42,23 @@ title: Huggingface based models
         Authorization: "Bearer YOUR_API_KEY",
       },
       data: {
-  "prompt": "string",
-  "model": "OpenAssistant/oasst-sft-4-pythia-12b-epoch-3.5",
-  "stop": "string"
+  "model": "OpenAssistant/oasst-sft-4-pythia-12b-epoch-3.5"
 },
     })
   })();
+  ```
+  ```python
+  import requests
+  import json
+  response = requests.post(
+    "https://api.turing.sh/text/huggingface",
+    headers={
+      "Content-Type": "application/json",
+      "Authorization": "Bearer YOUR_API_KEY",
+    },
+    data=json.dumps({
+  "model": "OpenAssistant/oasst-sft-4-pythia-12b-epoch-3.5"
+}),
+  )
   ```
 </CodeGroup>

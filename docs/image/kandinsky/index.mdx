@@ -59,10 +59,8 @@ title: Kandinsky 2.1
         Authorization: "Bearer YOUR_API_KEY",
       },
       data: {
-  "prompt": "string",
   "steps": 100,
   "number": 1,
-  "negative_prompt": "string",
   "guidance_scale": 4,
   "width": 512,
   "height": 512,
@@ -70,5 +68,24 @@ title: Kandinsky 2.1
 },
     })
   })();
+  ```
+  ```python
+  import requests
+  import json
+  response = requests.post(
+    "https://api.turing.sh/image/kandinsky",
+    headers={
+      "Content-Type": "application/json",
+      "Authorization": "Bearer YOUR_API_KEY",
+    },
+    data=json.dumps({
+  "steps": 100,
+  "number": 1,
+  "guidance_scale": 4,
+  "width": 512,
+  "height": 512,
+  "cfg_scale": 4
+}),
+  )
   ```
 </CodeGroup>
