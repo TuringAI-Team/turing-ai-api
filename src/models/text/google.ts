@@ -1,4 +1,6 @@
 import axios from "axios";
+import { GoogleAuth } from "google-auth-library";
+import { DiscussServiceClient } from "@google-ai/generativelanguage";
 
 export default {
   data: {
@@ -12,7 +14,7 @@ export default {
 
       model: {
         type: "string",
-        required: true,
+        required: false,
         options: ["chat-bison"],
         default: "chat-bison",
       },
@@ -30,6 +32,9 @@ export default {
   },
   execute: async (data) => {
     let { messages, model, max_tokens, temperature } = data;
+    if (!model) {
+      model = "chat-bison";
+    }
     // get message that is message.role == "system"
     let message = messages.find((message) => message.role == "system");
     messages = messages.map((message) => {
@@ -40,7 +45,18 @@ export default {
         };
       }
     });
-
+    const client = new DiscussServiceClient({
+      authClient: new GoogleAuth().fromAPIKey(process.env.PALM2_KEY),
+    });
+    let res = await client.generateMessage({
+      model: "models/chat-bison-001",
+      temperature: temperature || 0.2,
+      prompt: {
+        messages: messages,
+      },
+    });
+    console.log(res);
+    return res;
     let response = await axios({
       method: "post",
       url: `https://us-central1-aiplatform.googleapis.com/v1/projects/turingai-4354f/locations/us-central1/publishers/google/models/${

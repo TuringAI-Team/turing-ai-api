@@ -30,6 +30,21 @@ title: Kandinsky 2.1
   - Required: false
   - Default: 4
 
+- **width**
+  - Type: number
+  - Required: false
+  - Default: 512
+
+- **height**
+  - Type: number
+  - Required: false
+  - Default: 512
+
+- **cfg_scale**
+  - Type: number
+  - Required: false
+  - Default: 4
+
 ## Examples
 
 <CodeGroup title="Kandinsky 2.1 example">
@@ -48,7 +63,10 @@ title: Kandinsky 2.1
   "steps": 100,
   "number": 1,
   "negative_prompt": "string",
-  "guidance_scale": 4
+  "guidance_scale": 4,
+  "width": 512,
+  "height": 512,
+  "cfg_scale": 4
 },
     })
   })();
