@@ -224,8 +224,10 @@ export default {
             event.emit("data", result);
           })
           .catch((err) => {
+            let error = err;
+            if (err.response) error = err.response.data;
             result.status = "failed";
-            result.error = err;
+            result.error = error;
             event.emit("data", result);
           });
         return event;
@@ -280,8 +282,10 @@ export default {
             event.emit("data", result);
           })
           .catch((err) => {
+            let error = err;
+            if (err.response) error = err.response.data;
             result.status = "failed";
-            result.error = err;
+            result.error = error;
             event.emit("data", result);
           });
         return event;
@@ -310,8 +314,10 @@ export default {
             event.emit("data", result);
           })
           .catch((err) => {
+            let error = err;
+            if (err.response) error = err.response.data;
             result.status = "failed";
-            result.error = err;
+            result.error = error;
             event.emit("data", result);
           });
         return event;
