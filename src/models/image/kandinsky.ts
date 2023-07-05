@@ -185,7 +185,7 @@ export default {
           });
         }
         result.status = "done";
-        result.progress = 1;
+        result.progress = null;
         event.emit("data", result);
       });
       return event;
