@@ -180,9 +180,10 @@ export default {
             base64: base64,
             id: randomUUID(),
             seed: Math.floor(Math.random() * 100000000),
+            status: "success",
           });
         }
-        result.status = "success";
+        result.status = "done";
         result.progress = 1;
         event.emit("data", result);
       });

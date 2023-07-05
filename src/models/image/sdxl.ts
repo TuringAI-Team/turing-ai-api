@@ -207,7 +207,7 @@ export default {
           let newBalance = await getBalance();
           let cost = (originalBalance - newBalance) / 100;
           result.cost = cost;
-          result.status = "success";
+          result.status = "done";
           event.emit("data", result);
         });
         return event;
@@ -248,7 +248,7 @@ export default {
           let newBalance = await getBalance();
           let cost = (originalBalance - newBalance) / 100;
           result.cost = cost;
-          result.status = "success";
+          result.status = "done";
           event.emit("data", result);
         });
       }
@@ -262,7 +262,7 @@ export default {
           let newBalance = await getBalance();
           let cost = (originalBalance - newBalance) / 100;
           result.cost = cost;
-          result.status = "success";
+          result.status = "done";
           event.emit("data", result);
         });
       }
