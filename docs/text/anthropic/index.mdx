@@ -9,13 +9,13 @@ title: Anthropic Models
 
 - **messages**
   - Type: array
-  - Required: false
+  - Required: true
 
 - **model**
   - Type: string
-  - Required: true
-  - Options: claude-v1, claude-instant
-  - Default: claude-instant
+  - Required: false
+  - Options: claude-1, claude-instant-1
+  - Default: claude-instant-1
 
 - **max_tokens**
   - Type: number
@@ -26,6 +26,10 @@ title: Anthropic Models
   - Type: number
   - Required: false
   - Default: 0.9
+
+- **stream**
+  - Type: boolean
+  - Required: false
 
 ## Examples
 
@@ -41,7 +45,8 @@ title: Anthropic Models
         Authorization: "Bearer YOUR_API_KEY",
       },
       data: {
-  "model": "claude-instant",
+  "messages": "array",
+  "model": "claude-instant-1",
   "max_tokens": 512,
   "temperature": 0.9
 },
@@ -58,7 +63,8 @@ title: Anthropic Models
       "Authorization": "Bearer YOUR_API_KEY",
     },
     data=json.dumps({
-  "model": "claude-instant",
+  "messages": "array",
+  "model": "claude-instant-1",
   "max_tokens": 512,
   "temperature": 0.9
 }),

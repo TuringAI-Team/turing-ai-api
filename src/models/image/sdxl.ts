@@ -2,6 +2,7 @@ import log from "../../utils/log.js";
 import axios from "axios";
 const apiHost = "https://api.stability.ai";
 import FormData from "form-data";
+import { EventEmitter } from "events";
 
 export default {
   data: {
@@ -118,6 +119,11 @@ export default {
         type: "number",
         required: false,
       },
+      stream: {
+        type: "boolean",
+        required: false,
+        default: false,
+      },
     },
   },
   execute: async (data) => {
@@ -134,6 +140,7 @@ export default {
       height,
       number,
       strength,
+      stream,
     } = data;
     if (!model) model = "sdxl";
     let response: any = {};
@@ -148,41 +155,117 @@ export default {
         text: data.negative_prompt,
         weight: -1,
       });
+    let event;
+    let result = {
+      cost: null,
+      results: [],
+      status: "generating",
+      progress: 0,
+    };
+    if (stream) {
+      event = new EventEmitter();
+      event.emit("data", result);
+      //  after 5s change progress to 0.46
+      setTimeout(() => {
+        result.progress = 0.46;
+        event.emit("data", result);
+      }, 5000);
+    }
     let originalBalance = await getBalance();
     if (action === "generate") {
-      response = await generate(
-        prompts,
-        model,
-        width,
-        height,
-        steps,
-        number,
-        cfg_scale,
-        sampler,
-        seed,
-        style
-      );
+      if (!stream) {
+        response = await generate(
+          prompts,
+          model,
+          width,
+          height,
+          steps,
+          number,
+          cfg_scale,
+          sampler,
+          seed,
+          style
+        );
+        response = response.artifacts;
+        let newBalance = await getBalance();
+        let cost = (originalBalance - newBalance) / 100;
+        return { ...response, cost };
+      } else {
+        generate(
+          prompts,
+          model,
+          width,
+          height,
+          steps,
+          number,
+          cfg_scale,
+          sampler,
+          seed,
+          style
+        ).then(async (response) => {
+          result.results = response.artifacts;
+          let newBalance = await getBalance();
+          let cost = (originalBalance - newBalance) / 100;
+          result.cost = cost;
+          result.status = "done";
+          event.emit("data", result);
+        });
+        return event;
+      }
     }
     if (image) {
       // image i s base64, transforming to binary
       image = Buffer.from(image, "base64");
     }
     if (action === "img2img") {
-      response = await img2img(
-        prompts,
-        model,
-        image,
-        strength,
-        number,
-        steps,
-        "image_strength",
-        style,
-        cfg_scale,
-        sampler
-      );
+      if (!stream) {
+        response = await img2img(
+          prompts,
+          model,
+          image,
+          strength,
+          number,
+          steps,
+          "image_strength",
+          style,
+          cfg_scale,
+          sampler
+        );
+      } else {
+        img2img(
+          prompts,
+          model,
+          image,
+          strength,
+          number,
+          steps,
+          "image_strength",
+          style,
+          cfg_scale,
+          sampler
+        ).then(async (response) => {
+          result.results = response.artifacts;
+          let newBalance = await getBalance();
+          let cost = (originalBalance - newBalance) / 100;
+          result.cost = cost;
+          result.status = "done";
+          event.emit("data", result);
+        });
+      }
     }
     if (action === "upscale") {
-      response = await upscale(image, width, height);
+      if (!stream) {
+        response = await upscale(image, width, height);
+      } else {
+        upscale(image, width, height).then(async (response) => {
+          result.results = response.artifacts;
+          let newBalance = await getBalance();
+          let cost = (originalBalance - newBalance) / 100;
+          result.cost = cost;
+          result.status = "done";
+          event.emit("data", result);
+        });
+      }
     }
     response = response.artifacts;
     response = {

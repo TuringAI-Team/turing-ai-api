@@ -45,18 +45,9 @@ export default {
         };
       }
     });
-    const client = new DiscussServiceClient({
-      authClient: new GoogleAuth().fromAPIKey(process.env.PALM2_KEY),
-    });
-    let res = await client.generateMessage({
-      model: "models/chat-bison-001",
-      temperature: temperature || 0.2,
-      prompt: {
-        messages: messages,
-      },
-    });
-    console.log(res);
-    return res;
+    const client = new GoogleAuth().fromAPIKey(process.env.PALM2_KEY);
+    const token = await client.getAccessToken();
+    console.log(token);
     let response = await axios({
       method: "post",
       url: `https://us-central1-aiplatform.googleapis.com/v1/projects/turingai-4354f/locations/us-central1/publishers/google/models/${
