@@ -167,6 +167,7 @@ export default {
                 base64: base64,
                 id: randomUUID(),
                 seed: Math.floor(Math.random() * 100000000),
+                status: "success",
               };
             })
           );
