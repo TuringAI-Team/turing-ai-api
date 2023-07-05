@@ -206,16 +206,22 @@ export default {
           seed,
           style
         ).then(async (response) => {
-          result.results = response.artifacts.map((artifact) => {
-            let newStatus = artifact.status;
-            if (newStatus == "SUCCESS") newStatus = "success";
-            if (newStatus == "CONTENT_FILTERED") newStatus = "filtered";
-            delete artifact.status;
-            return {
-              ...artifact,
-              status: newStatus,
-            };
-          });
+          result.results = response.artifacts
+            .map((artifact) => {
+              let newStatus = artifact.status;
+              if (newStatus == "SUCCESS") newStatus = "success";
+              if (newStatus == "CONTENT_FILTERED") newStatus = "filtered";
+              delete artifact.status;
+              return {
+                ...artifact,
+                status: newStatus,
+              };
+            })
+            .catch((err) => {
+              result.status = "failed";
+              result.error = err;
+              event.emit("data", result);
+            });
           let newBalance = await getBalance();
           let cost = (originalBalance - newBalance) / 100;
           result.cost = cost;
@@ -256,16 +262,22 @@ export default {
           cfg_scale,
           sampler
         ).then(async (response) => {
-          result.results = response.artifacts.map((artifact) => {
-            let newStatus = artifact.status;
-            if (newStatus == "SUCCESS") newStatus = "success";
-            if (newStatus == "CONTENT_FILTERED") newStatus = "filtered";
-            delete artifact.status;
-            return {
-              ...artifact,
-              status: newStatus,
-            };
-          });
+          result.results = response.artifacts
+            .map((artifact) => {
+              let newStatus = artifact.status;
+              if (newStatus == "SUCCESS") newStatus = "success";
+              if (newStatus == "CONTENT_FILTERED") newStatus = "filtered";
+              delete artifact.status;
+              return {
+                ...artifact,
+                status: newStatus,
+              };
+            })
+            .catch((err) => {
+              result.status = "failed";
+              result.error = err;
+              event.emit("data", result);
+            });
           let newBalance = await getBalance();
           let cost = (originalBalance - newBalance) / 100;
           result.cost = cost;
