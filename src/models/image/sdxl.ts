@@ -3,6 +3,7 @@ import axios from "axios";
 const apiHost = "https://api.stability.ai";
 import FormData from "form-data";
 import { EventEmitter } from "events";
+import { randomUUID } from "crypto";
 
 export default {
   data: {
@@ -161,6 +162,7 @@ export default {
       results: [],
       status: "generating",
       progress: 0,
+      id: randomUUID(),
     };
     if (stream) {
       event = new EventEmitter();

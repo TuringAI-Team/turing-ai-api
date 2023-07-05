@@ -64,6 +64,7 @@ export default {
       results: [],
       status: "generating",
       progress: 0,
+      id: randomUUID(),
     };
     if (stream) {
       event = new EventEmitter();
