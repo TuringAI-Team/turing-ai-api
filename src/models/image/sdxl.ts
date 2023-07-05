@@ -215,6 +215,7 @@ export default {
               return {
                 ...artifact,
                 status: newStatus,
+                id: randomUUID(),
               };
             });
             let newBalance = await getBalance();
@@ -273,6 +274,7 @@ export default {
               return {
                 ...artifact,
                 status: newStatus,
+                id: randomUUID(),
               };
             });
             let newBalance = await getBalance();
@@ -305,6 +307,7 @@ export default {
               return {
                 ...artifact,
                 status: newStatus,
+                id: randomUUID(),
               };
             });
             let newBalance = await getBalance();
