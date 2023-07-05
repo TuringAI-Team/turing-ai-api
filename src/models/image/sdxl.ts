@@ -163,6 +163,7 @@ export default {
       status: "generating",
       progress: 0,
       id: randomUUID(),
+      error: null,
     };
     if (stream) {
       event = new EventEmitter();
@@ -205,7 +206,16 @@ export default {
           seed,
           style
         ).then(async (response) => {
-          result.results = response.artifacts;
+          result.results = response.artifacts.map((artifact) => {
+            let newStatus = artifact.status;
+            if (newStatus == "SUCCESS") newStatus = "success";
+            if (newStatus == "CONTENT_FILTERED") newStatus = "filtered";
+            delete artifact.status;
+            return {
+              ...artifact,
+              status: newStatus,
+            };
+          });
           let newBalance = await getBalance();
           let cost = (originalBalance - newBalance) / 100;
           result.cost = cost;
@@ -246,7 +256,16 @@ export default {
           cfg_scale,
           sampler
         ).then(async (response) => {
-          result.results = response.artifacts;
+          result.results = response.artifacts.map((artifact) => {
+            let newStatus = artifact.status;
+            if (newStatus == "SUCCESS") newStatus = "success";
+            if (newStatus == "CONTENT_FILTERED") newStatus = "filtered";
+            delete artifact.status;
+            return {
+              ...artifact,
+              status: newStatus,
+            };
+          });
           let newBalance = await getBalance();
           let cost = (originalBalance - newBalance) / 100;
           result.cost = cost;
@@ -260,14 +279,29 @@ export default {
       if (!stream) {
         response = await upscale(image, width, height);
       } else {
-        upscale(image, width, height).then(async (response) => {
-          result.results = response.artifacts;
-          let newBalance = await getBalance();
-          let cost = (originalBalance - newBalance) / 100;
-          result.cost = cost;
-          result.status = "done";
-          event.emit("data", result);
-        });
+        upscale(image, width, height)
+          .then(async (response) => {
+            result.results = response.artifacts.map((artifact) => {
+              let newStatus = artifact.status;
+              if (newStatus == "SUCCESS") newStatus = "success";
+              if (newStatus == "CONTENT_FILTERED") newStatus = "filtered";
+              delete artifact.status;
+              return {
+                ...artifact,
+                status: newStatus,
+              };
+            });
+            let newBalance = await getBalance();
+            let cost = (originalBalance - newBalance) / 100;
+            result.cost = cost;
+            result.status = "done";
+            event.emit("data", result);
+          })
+          .catch((err) => {
+            result.status = "failed";
+            result.error = err;
+            event.emit("data", result);
+          });
         return event;
       }
     }
