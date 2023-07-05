@@ -75,7 +75,7 @@ async function request(req, res) {
       execution.on("data", (data) => {
         console.log(data);
         res.write("data: " + JSON.stringify(data) + "\n\n");
-        if (data.done || data.status == "done") {
+        if (data.done || data.status == "success") {
           res.end();
         }
       });

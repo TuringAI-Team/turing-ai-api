@@ -182,7 +182,7 @@ export default {
             seed: Math.floor(Math.random() * 100000000),
           });
         }
-        result.status = "done";
+        result.status = "success";
         result.progress = 1;
         event.emit("data", result);
       });
