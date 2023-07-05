@@ -154,6 +154,7 @@ export default {
         let spentInSec = (Date.now() - start) / 1000;
         let cost = spentInSec * 0.00025;
         result.cost = cost;
+        console.log(response.data);
         if (data.number && data.number > 1) {
           result.results = await Promise.all(
             response.data.output.images.map(async (x) => {
