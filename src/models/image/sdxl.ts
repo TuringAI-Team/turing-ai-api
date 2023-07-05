@@ -208,7 +208,7 @@ export default {
         )
           .then(async (response) => {
             result.results = response.artifacts.map((artifact) => {
-              let newStatus = artifact.status;
+              let newStatus = artifact.finishReason;
               if (newStatus == "SUCCESS") newStatus = "success";
               if (newStatus == "CONTENT_FILTERED") newStatus = "filtered";
               delete artifact.status;
@@ -266,7 +266,7 @@ export default {
         )
           .then(async (response) => {
             result.results = response.artifacts.map((artifact) => {
-              let newStatus = artifact.status;
+              let newStatus = artifact.finishReason;
               if (newStatus == "SUCCESS") newStatus = "success";
               if (newStatus == "CONTENT_FILTERED") newStatus = "filtered";
               delete artifact.status;
@@ -298,7 +298,7 @@ export default {
         upscale(image, width, height)
           .then(async (response) => {
             result.results = response.artifacts.map((artifact) => {
-              let newStatus = artifact.status;
+              let newStatus = artifact.finishReason;
               if (newStatus == "SUCCESS") newStatus = "success";
               if (newStatus == "CONTENT_FILTERED") newStatus = "filtered";
               delete artifact.status;
