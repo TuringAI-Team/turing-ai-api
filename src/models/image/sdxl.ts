@@ -225,9 +225,7 @@ export default {
           })
           .catch((err) => {
             let error = err;
-            if (err.response) error = err.response.data;
-            if (err.response.data.error.message)
-              error = err.response.data.error.message;
+            if (err.response) error = err.response.data.message;
             result.status = "failed";
             result.error = error;
             event.emit("data", result);
@@ -285,9 +283,7 @@ export default {
           })
           .catch((err) => {
             let error = err;
-            if (err.response) error = err.response.data;
-            if (err.response.data.error.message)
-              error = err.response.data.error.message;
+            if (err.response) error = err.response.data.message;
             result.status = "failed";
             result.error = error;
             event.emit("data", result);
@@ -319,9 +315,8 @@ export default {
           })
           .catch((err) => {
             let error = err;
-            if (err.response) error = err.response.data;
-            if (err.response.data.error.message)
-              error = err.response.data.error.message;
+            if (err.response) error = err.response.data.message;
+
             result.status = "failed";
             result.error = error;
             event.emit("data", result);
