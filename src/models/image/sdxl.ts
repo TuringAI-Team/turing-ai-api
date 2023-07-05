@@ -253,6 +253,7 @@ export default {
           result.status = "done";
           event.emit("data", result);
         });
+        return event;
       }
     }
     if (action === "upscale") {
@@ -267,6 +268,7 @@ export default {
           result.status = "done";
           event.emit("data", result);
         });
+        return event;
       }
     }
     response = response.artifacts;
