@@ -123,7 +123,7 @@ export default {
       stream: {
         type: "boolean",
         required: false,
-        default: false,
+        default: true,
       },
     },
   },
@@ -157,6 +157,9 @@ export default {
         weight: -1,
       });
     let event;
+    if (stream == null ) {
+      stream = true
+    }
     let result = {
       cost: null,
       results: [],
