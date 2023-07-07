@@ -27,6 +27,7 @@ jobs:
             cd /home/loick/github/turing-api-new
             npm run git
             npm i
+            rm -r dist
             nvm use 18
             npm run build
             pm2 reload TuringAPINew
