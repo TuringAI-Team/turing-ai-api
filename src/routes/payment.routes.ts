@@ -66,6 +66,7 @@ router.post("/pay", key, geo, async (req, res) => {
   } else {
     customer = customer.id;
   }
+  console.log(customer);
   try {
     let data: any = {
       return_url: `https://app.turing.sh/pay/success`,
@@ -123,7 +124,9 @@ router.post("/pay", key, geo, async (req, res) => {
     } else {
       data.product_id = productId;
     }
+    console.log(data);
     const payment = await Sellix.payments.create(data);
+    console.log(payment);
 
     res.status(200).json({ ...payment, success: true });
   } catch (e: any) {
