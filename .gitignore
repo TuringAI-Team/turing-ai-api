@@ -105,3 +105,4 @@ dist
 
 temp/
 temp/**/*
+g-keyfile.json
