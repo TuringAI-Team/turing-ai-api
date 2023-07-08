@@ -87,7 +87,7 @@ async function request(req, res) {
     if (error.response && error.response.data) {
       resultError = error.response.data;
     }
-    console.log(resultError);
+    console.log(error);
     res.status(500).json({ success: false, error: resultError });
   }
 }

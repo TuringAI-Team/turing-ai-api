@@ -26,32 +26,80 @@
     [
       "Text Models",
       [
-        ["Alan", "/text/alan"],
-        ["Anthropic Models", "/text/anthropic"],
-        ["Text Filter", "/text/filter"],
-        ["Google Models", "/text/google"],
-        ["OpenAI Models", "/text/gpt"],
-        ["Huggingface based models", "/text/huggingface"],
-        ["Other models", "/text/other"],
-        ["Translate text", "/text/translate"]
+        [
+          "Alan",
+          "/text/alan"
+        ],
+        [
+          "Anthropic Models",
+          "/text/anthropic"
+        ],
+        [
+          "Text Filter",
+          "/text/filter"
+        ],
+        [
+          "Google Models",
+          "/text/google"
+        ],
+        [
+          "OpenAI Models",
+          "/text/gpt"
+        ],
+        [
+          "Huggingface based models",
+          "/text/huggingface"
+        ],
+        [
+          "Other models",
+          "/text/other"
+        ],
+        [
+          "Translate text",
+          "/text/translate"
+        ]
       ]
     ],
     [
       "Image Models",
       [
-        ["Controlnet", "/image/controlnet"],
-        ["Dall-e 2", "/image/dall-e"],
-        ["Kandinsky 2.1", "/image/kandinsky"],
-        ["Stable Diffusion XL", "/image/sdxl"],
-        ["Stablehorde", "/image/sh"]
+        [
+          "Controlnet",
+          "/image/controlnet"
+        ],
+        [
+          "Dall-e 2",
+          "/image/dall-e"
+        ],
+        [
+          "Kandinsky 2.1",
+          "/image/kandinsky"
+        ],
+        [
+          "Stable Diffusion XL",
+          "/image/sdxl"
+        ],
+        [
+          "Stablehorde",
+          "/image/sh"
+        ]
       ]
     ],
     [
       "Audio Models",
       [
-        ["Music generation", "/audio/music"],
-        ["Speech to text", "/audio/stt"],
-        ["Text to speech", "/audio/tts"]
+        [
+          "Music generation",
+          "/audio/music"
+        ],
+        [
+          "Speech to text",
+          "/audio/stt"
+        ],
+        [
+          "Text to speech",
+          "/audio/tts"
+        ]
       ]
     ]
   ]
