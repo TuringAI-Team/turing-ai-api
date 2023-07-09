@@ -123,6 +123,7 @@ export async function getChartImage(chart, filter, period, type) {
         });
       }
     } else {
+      console.log(data, key);
       data.forEach((d: any) => {
         if (d.data[key]) dataset.data.push(d.data[key]);
       });
