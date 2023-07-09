@@ -53,9 +53,8 @@ const convertToVideo = (
     const outputFilePath = "output.mp4"; // Temporary output video file path
     ffmpeg()
       .input(imageFilePath)
+      .inputFPS(1 / duration) // Set frame rate to 1 frame per second
       .input(audioFilePath)
-      .inputOptions("-loop 1")
-      .duration(duration)
       .output(outputFilePath)
       .on("end", () => {
         // Read the resulting video file and convert it to base64
