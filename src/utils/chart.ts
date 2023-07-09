@@ -19,7 +19,8 @@ export async function getChartImage(chart, filter, period, type) {
   if (!availableCharts.includes(chart)) throw new Error("Invalid chart");
   if (!availableTypes.includes(type)) throw new Error("Invalid type of chart");
   let chartImage = new ChartJsImage();
-  let timeStart: any = new Date(Date.now() - ms(period));
+  let timeStart: any = Date.now() - ms(period);
+  timeStart = new Date(timeStart);
   timeStart = timeStart.toISOString();
   console.log(timeStart);
   let { data, error } = await supabase
