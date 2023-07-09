@@ -35,6 +35,8 @@ export async function getChartImage(chart, filter, period, type) {
   });
 
   let metricData = data.map((d: any) => d.data);
+  console.log(metricData);
+  if (metricData.length === 0) throw new Error("No data found");
 
   let data1 = metricData[0];
   console.log(data1);
