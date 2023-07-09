@@ -34,10 +34,15 @@ export default {
       cp: false,
       toxic: false,
     };
-
-    var res = await openai.createModeration({
-      input: text,
-    });
+    var res;
+    try {
+      res = await openai.createModeration({
+        input: text,
+      });
+    } catch (e) {
+      console.log(e);
+      res = {};
+    }
     if (filters.find((f) => f === "nsfw")) {
       let isNsfw = false;
 
