@@ -37,6 +37,7 @@ export async function getChartImage(chart, filter, period, type) {
   let metricData = data.map((d: any) => d.data);
 
   let data1 = metricData[0];
+  console.log(data1);
   let keys = Object.keys(data1);
   let newKeys = [];
   let keysToRemove = [];
