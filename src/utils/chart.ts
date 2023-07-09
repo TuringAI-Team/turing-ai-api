@@ -123,7 +123,6 @@ export async function getChartImage(chart, filter, period, type) {
         });
       }
     } else {
-      console.log(data, key);
       data.forEach((d: any) => {
         if (d.data[key]) dataset.data.push(d.data[key]);
       });
@@ -176,6 +175,5 @@ async function extractData(period, chart) {
     let dateB = new Date(b.time);
     return dateA.getTime() - dateB.getTime();
   });
-  data = data.map((d: any) => d.data);
   return data;
 }
