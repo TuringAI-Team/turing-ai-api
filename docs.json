@@ -82,6 +82,10 @@
         [
           "Stablehorde",
           "/image/sh"
+        ],
+        [
+          "Image vision",
+          "/image/vision"
         ]
       ]
     ],

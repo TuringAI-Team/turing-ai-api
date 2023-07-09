@@ -132,7 +132,7 @@ export default {
       results: [],
     };
     console.log(res);
-    let maxTime = 30;
+    let maxTime = 45;
     if (res.id) {
       if (data.stream == null) data.stream = true;
       if (data.stream) {

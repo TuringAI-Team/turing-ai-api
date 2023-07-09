@@ -1,0 +1,55 @@
+---
+title: Image vision
+---
+
+# Image vision
+
+## Parameters
+
+
+- **model**
+  - Type: array
+  - Required: true
+  - Options: blip2, ocr
+  - Default: blip2
+
+- **image**
+  - Type: string
+  - Required: true
+
+## Examples
+
+<CodeGroup title="Image vision example">
+  ```typescript
+  import axios from "axios";
+  (async () => {
+    let response = await axios({
+      method: "post",
+      url: 'https://api.turing.sh/image/vision',
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer YOUR_API_KEY",
+      },
+      data: {
+  "model": "blip2",
+  "image": "string"
+},
+    })
+  })();
+  ```
+  ```python
+  import requests
+  import json
+  response = requests.post(
+    "https://api.turing.sh/image/vision",
+    headers={
+      "Content-Type": "application/json",
+      "Authorization": "Bearer YOUR_API_KEY",
+    },
+    data=json.dumps({
+  "model": "blip2",
+  "image": "string"
+}),
+  )
+  ```
+</CodeGroup>
