@@ -12,6 +12,7 @@ router.post("/:chart", key, turnstile, async (req: Request, res: Response) => {
     let result = await getChartImage(chart, filter, period, type);
     res.json({ success: true, ...result });
   } catch (error) {
+    console.log(error);
     res.json({ error: error, success: false }).status(400);
   }
 });
