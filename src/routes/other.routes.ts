@@ -55,6 +55,7 @@ const convertToVideo = (
       .input(imageFilePath)
       .inputFPS(1 / duration) // Set frame rate to 1 frame per second
       .input(audioFilePath)
+      .duration(duration) // Set image duration to match audio duration
       .output(outputFilePath)
       .on("end", () => {
         // Read the resulting video file and convert it to base64
