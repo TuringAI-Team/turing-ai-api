@@ -45,6 +45,39 @@ export async function getChartImage(chart, filter, period, type) {
     return dateA.getTime() - dateB.getTime();
   });
 
+  // if period ms > 2d, then we need to group data by day
+  if (ms(period) > ms("2d")) {
+    let newData = [];
+    let lastDate = new Date(data[0].time);
+    let lastDateDay = lastDate.getDate();
+    let lastDateMonth = lastDate.getMonth();
+    let lastDateYear = lastDate.getFullYear();
+    let lastDateKey = `${lastDateDay}-${lastDateMonth}-${lastDateYear}`;
+    let lastDateData = data[0].data;
+    for (let i = 1; i < data.length; i++) {
+      let date = new Date(data[i].time);
+      let dateDay = date.getDate();
+      let dateMonth = date.getMonth();
+      let dateYear = date.getFullYear();
+      let dateKey = `${dateDay}-${dateMonth}-${dateYear}`;
+      if (dateKey == lastDateKey) {
+        lastDateData = {
+          ...lastDateData,
+          ...data[i].data,
+        };
+      } else {
+        newData.push({
+          time: lastDate,
+          data: lastDateData,
+        });
+        lastDate = date;
+        lastDateKey = dateKey;
+        lastDateData = data[i].data;
+      }
+    }
+    data = newData;
+  }
+
   let metricData = data.map((d: any) => d.data);
   if (metricData.length === 0) throw new Error("No data found");
 
