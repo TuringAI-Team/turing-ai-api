@@ -3,7 +3,7 @@ import { Configuration, OpenAIApi } from "openai";
 import { nsfwWords, underagedCebs, youngWords } from "../../utils/keywords.js";
 const availableFilters = ["nsfw", "cp", "toxicity"];
 const configuration = new Configuration({
-  apiKey: process.env.OPENAI_KEY,
+  apiKey: process.env.OPENAI_API_KEY,
 });
 const openai = new OpenAIApi(configuration);
 export default {
