@@ -21,6 +21,7 @@ export async function getChartImage(chart, filter, period, type) {
   let chartImage = new ChartJsImage();
   let timeStart: any = new Date(Date.now() - ms(period));
   timeStart = timeStart.toISOString();
+  console.log(timeStart);
   let { data, error } = await supabase
     .from("metrics")
     .select("*")
