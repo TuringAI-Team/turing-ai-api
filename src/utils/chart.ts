@@ -20,6 +20,7 @@ export async function getChartImage(chart, filter, period, type) {
   if (!availableTypes.includes(type)) throw new Error("Invalid type of chart");
   let chartImage = new ChartJsImage();
   let { data } = await supabase.from("metrics").select("*").eq("type", chart);
+  console.log(data.length);
   data = data.filter((d: any) => {
     let date = new Date(d.time);
     let now = new Date();
