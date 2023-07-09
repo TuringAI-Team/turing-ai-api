@@ -54,7 +54,8 @@ const convertToVideo = (
     ffmpeg()
       .input(imageFilePath)
       .input(audioFilePath)
-      .inputOptions(`-loop 1 -framerate 1/${duration} -t ${duration}`) // Set image duration
+      .inputOptions("-loop 1")
+      .duration(duration)
       .output(outputFilePath)
       .on("end", () => {
         // Read the resulting video file and convert it to base64
