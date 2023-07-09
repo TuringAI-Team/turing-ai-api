@@ -19,6 +19,7 @@ export async function getChartImage(chart, filter, period, type) {
   if (!availableCharts.includes(chart)) throw new Error("Invalid chart");
   if (!availableTypes.includes(type)) throw new Error("Invalid type of chart");
   let chartImage = new ChartJsImage();
+  console.log(ms(period));
   let timeStart: any = Date.now() - ms(period);
   console.log(timeStart);
   timeStart = new Date(timeStart);
