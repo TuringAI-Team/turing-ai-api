@@ -25,7 +25,7 @@ export async function getChartImage(chart, filter, period, type) {
     .eq("type", chart)
     // filter  data by period at ssupabase using bigger or equal operator than the period start
     .gte("time", new Date(Date.now() - ms(period)).toISOString());
-  console.log(data, new Date(Date.now() - ms(period)), error);
+  console.log(error);
   data = data.filter((d: any) => {
     let date = new Date(d.time);
     let now = new Date();
@@ -33,7 +33,6 @@ export async function getChartImage(chart, filter, period, type) {
     let periodMs = ms(period);
     return diff <= periodMs;
   });
-  console.log(data);
   //sort by data, old first , recent last
   data = data.sort((a: any, b: any) => {
     let dateA = new Date(a.time);
