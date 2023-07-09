@@ -26,7 +26,7 @@ router.put("/user/:id", key, async (req, res) => {
     ...req.body,
   });
 
-  if (result.error)
+  if (result?.error)
     return res.json({ error: result.error, success: false }).status(400);
   res.json({ success: true }).status(200);
 });
