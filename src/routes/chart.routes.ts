@@ -10,6 +10,10 @@ router.post("/:chart", key, turnstile, async (req: Request, res: Response) => {
   let { filter, period, type = "line" } = req.body;
   try {
     if (!period) period = "1d";
+    if (period == "1w") period = "7";
+    if (period == "2w") period = "14d";
+    if (period == "1m") period = "30d";
+    if (period == "3m") period = "90d";
     let result = await getChartImage(chart, filter, period, type);
     res.json({ success: true, ...result });
   } catch (error) {
