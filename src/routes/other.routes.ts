@@ -12,10 +12,10 @@ router.post(
   key,
   turnstile,
   async (req: Request, res: Response) => {
-    let { audio, image } = req.body;
+    let { audio, image, duration } = req.body;
     try {
       // generate  a video from an audio and an image
-      convertToVideo(audio, image, (videoBase64) => {
+      convertToVideo(audio, image, duration, (videoBase64) => {
         res.json({ success: true, videoBase64 });
       });
     } catch (error) {
@@ -25,10 +25,11 @@ router.post(
   }
 );
 
-async function convertToVideo(audio, image, callback) {
+async function convertToVideo(audio, image, duration, callback) {
   //  convert audio to video with ffmpeg using image as background
   // audio is a base64 string
   // image is a base64 string
+  // duration is the number of seconds of the video
   // callback is a function that will be called with the video base64 string
   let audioBuffer = Buffer.from(audio, "base64");
   let imageBuffer = Buffer.from(image, "base64");
@@ -47,7 +48,9 @@ async function convertToVideo(audio, image, callback) {
       "-vf scale=1280:720",
     ])
     // be sure the image is visible
-    .inputOptions(["-loop 1", "-framerate 2"])
+    .inputOptions(["-loop 1", "-t " + duration])
+    // duration of the video is the same as the audio
+    .duration(duration)
     .output(videoPath)
     .on("end", function () {
       let videoBuffer = fs.readFileSync(videoPath);
