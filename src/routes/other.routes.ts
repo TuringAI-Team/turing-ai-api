@@ -25,53 +25,36 @@ router.post(
   }
 );
 
-const convertToVideo = (
-  audioBase64: string,
-  imageBase64: string,
-  callback: (videoBase64: string) => void
-) => {
-  // Convert base64 audio to a temporary file
-  const audioBuffer = Buffer.from(audioBase64, "base64");
-  const audioFilePath = "temp_audio.mp3"; // Temporary audio file path
-  fs.writeFileSync(audioFilePath, audioBuffer);
-
-  // Convert base64 image to a temporary file
-  const imageBuffer = Buffer.from(imageBase64, "base64");
-  const imageFilePath = "temp_image.jpg"; // Temporary image file path
-  fs.writeFileSync(imageFilePath, imageBuffer);
-
-  // Get the duration of the audio file
-  const audioDuration = ffmpeg.ffprobe(audioFilePath, (err, metadata) => {
-    if (err) {
-      console.error("Error getting audio duration:", err);
-      return;
-    }
-
-    const duration = metadata.format.duration;
-
-    // Create the video using ffmpeg
-    const outputFilePath = "output.mp4"; // Temporary output video file path
-    ffmpeg()
-      .input(imageFilePath)
-      .inputFPS(1 / duration) // Set frame rate to 1 frame per second
-      .input(audioFilePath)
-      .duration(duration) // Set image duration to match audio duration
-      .output(outputFilePath)
-      .on("end", () => {
-        // Read the resulting video file and convert it to base64
-        const videoBuffer = fs.readFileSync(outputFilePath);
-        const videoBase64 = videoBuffer.toString("base64");
-
-        // Cleanup temporary files
-        fs.unlinkSync(audioFilePath);
-        fs.unlinkSync(imageFilePath);
-        fs.unlinkSync(outputFilePath);
-
-        // Invoke the callback with the video base64
-        callback(videoBase64);
-      })
-      .run();
-  });
-};
+async function convertToVideo(audio, image, callback) {
+  //  convert audio to video with ffmpeg using image as background
+  // audio is a base64 string
+  // image is a base64 string
+  // callback is a function that will be called with the video base64 string
+  let audioBuffer = Buffer.from(audio, "base64");
+  let imageBuffer = Buffer.from(image, "base64");
+  let audioPath = "./audio.mp3";
+  let imagePath = "./image.jpg";
+  let videoPath = "./video.mp4";
+  fs.writeFileSync(audioPath, audioBuffer);
+  fs.writeFileSync(imagePath, imageBuffer);
+  ffmpeg()
+    .input(audioPath)
+    .input(imagePath)
+    .outputOptions([
+      "-c:v libx264",
+      "-c:a aac",
+      "-shortest",
+      "-vf scale=1280:720",
+    ])
+    // be sure the image is visible
+    .inputOptions(["-loop 1", "-framerate 2"])
+    .output(videoPath)
+    .on("end", function () {
+      let videoBuffer = fs.readFileSync(videoPath);
+      let videoBase64 = videoBuffer.toString("base64");
+      callback(videoBase64);
+    })
+    .run();
+}
 
 export default router;
