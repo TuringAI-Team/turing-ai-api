@@ -27,6 +27,7 @@ export async function getChartImage(chart, filter, period, type) {
     let periodMs = ms(period);
     return diff <= periodMs;
   });
+  console.log(data);
   //sort by data, old first , recent last
   data = data.sort((a: any, b: any) => {
     let dateA = new Date(a.time);
@@ -35,7 +36,6 @@ export async function getChartImage(chart, filter, period, type) {
   });
 
   let metricData = data.map((d: any) => d.data);
-  console.log(metricData);
   if (metricData.length === 0) throw new Error("No data found");
 
   let data1 = metricData[0];
