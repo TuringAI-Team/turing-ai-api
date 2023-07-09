@@ -25,7 +25,7 @@ export async function getChartImage(chart, filter, period, type) {
     .eq("type", chart)
     // filter  data by period at ssupabase using bigger or equal operator than the period start
     .gte("time", new Date(Date.now() - ms(period)));
-  console.log(data.length);
+  console.log(data, new Date(Date.now() - ms(period)));
   data = data.filter((d: any) => {
     let date = new Date(d.time);
     let now = new Date();
