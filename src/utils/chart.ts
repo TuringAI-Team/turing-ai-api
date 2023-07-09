@@ -210,12 +210,7 @@ export async function getChartImage(chart, filter, period, type) {
   chartImage.setWidth(width);
   let base64 = await chartImage.toDataUrl();
 
-  try {
-    let shortUrl = await chartImage.getShortUrl();
-    return { image: base64, shortUrl };
-  } catch (error) {
-    return { image: base64 };
-  }
+  return { image: base64 };
 }
 
 async function extractData(period, chart) {
