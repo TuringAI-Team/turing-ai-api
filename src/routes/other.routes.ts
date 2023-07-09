@@ -25,7 +25,7 @@ router.post(
   }
 );
 
-const convertToVideo = async (
+const convertToVideo = (
   audioBase64: string,
   imageBase64: string,
   callback: (videoBase64: string) => void
@@ -40,26 +40,37 @@ const convertToVideo = async (
   const imageFilePath = "temp_image.jpg"; // Temporary image file path
   fs.writeFileSync(imageFilePath, imageBuffer);
 
-  // Create the video using ffmpeg
-  const outputFilePath = "output.mp4"; // Temporary output video file path
-  ffmpeg()
-    .input(imageFilePath)
-    .input(audioFilePath)
-    .output(outputFilePath)
-    .on("end", () => {
-      // Read the resulting video file and convert it to base64
-      const videoBuffer = fs.readFileSync(outputFilePath);
-      const videoBase64 = videoBuffer.toString("base64");
+  // Get the duration of the audio file
+  const audioDuration = ffmpeg.ffprobe(audioFilePath, (err, metadata) => {
+    if (err) {
+      console.error("Error getting audio duration:", err);
+      return;
+    }
 
-      // Cleanup temporary files
-      fs.unlinkSync(audioFilePath);
-      fs.unlinkSync(imageFilePath);
-      fs.unlinkSync(outputFilePath);
+    const duration = metadata.format.duration;
 
-      // Invoke the callback with the video base64
-      callback(videoBase64);
-    })
-    .run();
+    // Create the video using ffmpeg
+    const outputFilePath = "output.mp4"; // Temporary output video file path
+    ffmpeg()
+      .input(imageFilePath)
+      .input(audioFilePath)
+      .inputOptions(`-loop 1 -framerate 1/${duration} -t ${duration}`) // Set image duration
+      .output(outputFilePath)
+      .on("end", () => {
+        // Read the resulting video file and convert it to base64
+        const videoBuffer = fs.readFileSync(outputFilePath);
+        const videoBase64 = videoBuffer.toString("base64");
+
+        // Cleanup temporary files
+        fs.unlinkSync(audioFilePath);
+        fs.unlinkSync(imageFilePath);
+        fs.unlinkSync(outputFilePath);
+
+        // Invoke the callback with the video base64
+        callback(videoBase64);
+      })
+      .run();
+  });
 };
 
 export default router;
