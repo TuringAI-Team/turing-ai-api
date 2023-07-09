@@ -159,25 +159,33 @@ export default {
         });
 
         let interval = setInterval(async () => {
-          let check = await checkRequest(res.id);
-          result.progress = ((check.wait_time / maxTime) * 100) / 100;
-          result.wait_time = check.wait_time;
-          result.queue_position = check.queue_position;
-          if (check.queue_position >= 1) result.status = "queued";
-          if (check.done) {
-            result.status = "done";
-            result.progress = null;
-            result.results = check.generations.map((x) => {
-              return {
-                seed: x.seed,
-                id: x.id,
-                base64: x.img,
-                status: x.censored ? "filtered" : "success",
-              };
-            });
+          try {
+            let check = await checkRequest(res.id);
+            result.progress = ((check.wait_time / maxTime) * 100) / 100;
+            result.wait_time = check.wait_time;
+            result.queue_position = check.queue_position;
+            if (check.queue_position >= 1) result.status = "queued";
+            if (check.done) {
+              result.status = "done";
+              result.progress = null;
+              result.results = check.generations.map((x) => {
+                return {
+                  seed: x.seed,
+                  id: x.id,
+                  base64: x.img,
+                  status: x.censored ? "filtered" : "success",
+                };
+              });
+              clearInterval(interval);
+            }
+            stream.emit("data", result);
+          } catch (e) {
             clearInterval(interval);
+            stream.emit("data", {
+              status: "failed",
+              error: e,
+            });
           }
-          stream.emit("data", result);
         }, 10000);
         return stream;
       } else {
