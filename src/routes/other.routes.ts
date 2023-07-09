@@ -2,7 +2,7 @@ import express from "express";
 import { Request, Response } from "express";
 import turnstile from "../middlewares/captchas/turnstile.js";
 import key from "../middlewares/key.js";
-import * as ffmpeg from "fluent-ffmpeg";
+import ffmpeg from "fluent-ffmpeg";
 import * as fs from "fs";
 
 const router = express.Router();
