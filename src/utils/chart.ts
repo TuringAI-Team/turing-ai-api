@@ -21,7 +21,7 @@ export async function getChartImage(chart, filter, period, type) {
   const chartImage = new ChartJsImage();
   let data = await extractData(period, chart);
 
-  let data1 = data[0];
+  let data1 = data[0].data;
 
   let keys = Object.keys(data1);
 
