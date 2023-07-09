@@ -45,6 +45,8 @@ export default {
         };
       }
     });
+    // filter messages that are not null
+    messages = messages.filter((message) => message != null);
     const auth = new GoogleAuth({
       keyFilename: "./g-keyfile.json", // Path to your service account key file
       scopes: ["https://www.googleapis.com/auth/cloud-platform"],
