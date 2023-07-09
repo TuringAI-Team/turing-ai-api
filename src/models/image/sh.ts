@@ -142,6 +142,10 @@ export default {
           result.progress = ((check.wait_time / maxTime) * 100) / 100;
           result.queue_position = check.queue_position;
           if (check.queue_position >= 1) result.status = "queued";
+          if (check.wait_time == 0) {
+            result.status = "generating";
+            result.progress = 0.99;
+          }
           if (check.done) {
             result.status = "done";
             result.progress = null;
@@ -165,6 +169,10 @@ export default {
             result.wait_time = check.wait_time;
             result.queue_position = check.queue_position;
             if (check.queue_position >= 1) result.status = "queued";
+            if (check.wait_time == 0) {
+              result.status = "generating";
+              result.progress = 0.99;
+            }
             if (check.done) {
               result.status = "done";
               result.progress = null;
