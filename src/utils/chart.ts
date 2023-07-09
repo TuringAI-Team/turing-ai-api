@@ -113,17 +113,18 @@ export async function getChartImage(chart, filter, period, type) {
       if (key.split(".").length == 3) {
         let subSubKey = key.split(".")[2];
         data.forEach((d: any) => {
-          if (d[parentKey][subKey][subSubKey])
-            dataset.data.push(d[parentKey][subKey][subSubKey]);
+          if (d.data[parentKey][subKey][subSubKey])
+            dataset.data.push(d.data[parentKey][subKey][subSubKey]);
         });
       } else {
         data.forEach((d: any) => {
-          if (d[parentKey][subKey]) dataset.data.push(d[parentKey][subKey]);
+          if (d.data[parentKey][subKey])
+            dataset.data.push(d.data[parentKey][subKey]);
         });
       }
     } else {
       data.forEach((d: any) => {
-        if (d[key]) dataset.data.push(d[key]);
+        if (d.data[key]) dataset.data.push(d.data[key]);
       });
     }
 
@@ -174,6 +175,5 @@ async function extractData(period, chart) {
     let dateB = new Date(b.time);
     return dateA.getTime() - dateB.getTime();
   });
-  data = data.map((d: any) => d.data);
   return data;
 }
