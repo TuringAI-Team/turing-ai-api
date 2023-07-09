@@ -59,11 +59,14 @@ export default {
           stream: true,
         })
         .then(async (streamEv) => {
+          let fullCompletion = "";
           for await (const completion of streamEv) {
             let com: any = completion;
             if (com.stop_reason) {
               com.done = true;
             }
+            fullCompletion += com.completion;
+            com.completion = fullCompletion;
             event.emit("data", com);
           }
         });
