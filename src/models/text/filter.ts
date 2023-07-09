@@ -47,8 +47,8 @@ export default {
       let isNsfw = false;
 
       if (
-        res.data.results[0].categories["sexual"] ||
-        res.data.results[0].categories["sexual/minors"]
+        res?.data?.results[0].categories["sexual"] ||
+        res?.data?.results[0].categories["sexual/minors"]
       ) {
         isNsfw = true;
       }
@@ -61,11 +61,11 @@ export default {
       let isNsfw = false;
       let isYouth = false;
       let isCP = false;
-      if (res.data.results[0].categories["sexual"]) {
+      if (res?.data?.results[0].categories["sexual"]) {
         isNsfw = true;
       }
 
-      if (res.data.results[0].categories["sexual/minors"]) {
+      if (res?.data?.results[0].categories["sexual/minors"]) {
         isYouth = true;
         isCP = true;
       }
@@ -85,10 +85,10 @@ export default {
     } else if (filters.find((f) => f === "toxicity")) {
       let isToxic = false;
       if (
-        res.data.results[0].categories["hate"] ||
-        res.data.results[0].categories["harrassment"] ||
-        res.data.results[0].categories["self-harm"] ||
-        res.data.results[0].categories["violence"]
+        res?.data?.results[0].categories["hate"] ||
+        res?.data?.results[0].categories["harrassment"] ||
+        res?.data?.results[0].categories["self-harm"] ||
+        res?.data?.results[0].categories["violence"]
       ) {
         isToxic = true;
       }
