@@ -7,8 +7,9 @@ import { getChartImage } from "../utils/chart.js";
 const router = express.Router();
 router.post("/:chart", key, turnstile, async (req: Request, res: Response) => {
   let { chart } = req.params;
-  let { filter, period = "1d", type = "line" } = req.body;
+  let { filter, period, type = "line" } = req.body;
   try {
+    if (!period) period = "1d";
     let result = await getChartImage(chart, filter, period, type);
     res.json({ success: true, ...result });
   } catch (error) {
