@@ -19,7 +19,12 @@ export async function getChartImage(chart, filter, period, type) {
   if (!availableCharts.includes(chart)) throw new Error("Invalid chart");
   if (!availableTypes.includes(type)) throw new Error("Invalid type of chart");
   let chartImage = new ChartJsImage();
-  let { data } = await supabase.from("metrics").select("*").eq("type", chart);
+  let { data } = await supabase
+    .from("metrics")
+    .select("*")
+    .eq("type", chart)
+    // filter  data by period at ssupabase using bigger or equal operator than the period start
+    .gte("date", new Date(Date.now() - ms(period)));
   console.log(data.length);
   data = data.filter((d: any) => {
     let date = new Date(d.time);
