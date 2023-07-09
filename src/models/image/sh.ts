@@ -141,6 +141,7 @@ export default {
         checkRequest(res.id).then((check) => {
           result.progress = ((check.wait_time / maxTime) * 100) / 100;
           result.queue_position = check.queue_position;
+          if (check.queue_position >= 1) result.status = "queued";
           if (check.done) {
             result.status = "done";
             result.progress = null;
@@ -159,8 +160,10 @@ export default {
 
         let interval = setInterval(async () => {
           let check = await checkRequest(res.id);
+          result.progress = ((check.wait_time / maxTime) * 100) / 100;
           result.wait_time = check.wait_time;
           result.queue_position = check.queue_position;
+          if (check.queue_position >= 1) result.status = "queued";
           if (check.done) {
             result.status = "done";
             result.progress = null;
