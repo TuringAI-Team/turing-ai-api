@@ -3,13 +3,14 @@ title: Stablehorde
 ---
 
 # Stablehorde
-
+POST *https://api.turing.sh/image/sh*
 ## Parameters
 
 
 - **prompt**
   - Type: string
   - Required: true
+  - Description: Prompt to generate the image
 
 - **negative_prompt**
   - Type: string
@@ -18,6 +19,7 @@ title: Stablehorde
 - **image**
   - Type: string
   - Required: false
+  - Description: Image URL for the model to use when doing img2img
 
 - **width**
   - Type: number

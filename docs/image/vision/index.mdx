@@ -3,19 +3,21 @@ title: Image vision
 ---
 
 # Image vision
-
+POST *https://api.turing.sh/image/vision*
 ## Parameters
 
 
 - **model**
   - Type: array
   - Required: true
+  - Description: Model to use for the analysis
   - Options: blip2, ocr
   - Default: blip2
 
 - **image**
   - Type: string
   - Required: true
+  - Description: Image URL for the model to process
 
 ## Examples
 
@@ -31,7 +33,9 @@ title: Image vision
         Authorization: "Bearer YOUR_API_KEY",
       },
       data: {
-  "model": "blip2",
+  "model": [
+    "blip2"
+  ],
   "image": "string"
 },
     })
@@ -47,7 +51,9 @@ title: Image vision
       "Authorization": "Bearer YOUR_API_KEY",
     },
     data=json.dumps({
-  "model": "blip2",
+  "model": [
+    "blip2"
+  ],
   "image": "string"
 }),
   )

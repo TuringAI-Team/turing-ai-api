@@ -3,23 +3,26 @@ title: Speech to text
 ---
 
 # Speech to text
-
+POST *https://api.turing.sh/audio/stt*
 ## Parameters
 
 
 - **model**
   - Type: string
   - Required: false
+  - Description: Model to use for speech to text
   - Options: whisper, fast-whisper, gladia
   - Default: fast-whisper
 
 - **audio**
   - Type: string
   - Required: true
+  - Description: Audio URL to transcribe
 
 - **diarization**
   - Type: boolean
   - Required: false
+  - Description: Whether to use diarization or not
 
 - **type**
   - Type: string

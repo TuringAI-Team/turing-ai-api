@@ -1,39 +1,39 @@
 ---
-title: Text Filter
+title: Zelescope
 ---
 
-# Text Filter
-POST *https://api.turing.sh/text/filter*
+# Zelescope
+POST *https://api.turing.sh/video/zelescope*
+<Warning>This model is not yet implemented</Warning>
+
 ## Parameters
 
 
-- **text**
+- **prompt**
   - Type: string
   - Required: true
-  - Description: Text you want to filter
 
-- **filters**
-  - Type: array
-  - Required: true
-  - Description: Filters you want to apply
-  - Options: nsfw, cp, toxicity
+- **duration**
+  - Type: number
+  - Required: false
+  - Default: 10
 
 ## Examples
 
-<CodeGroup title="Text Filter example">
+<CodeGroup title="Zelescope example">
   ```typescript
   import axios from "axios";
   (async () => {
     let response = await axios({
       method: "post",
-      url: 'https://api.turing.sh/text/filter',
+      url: 'https://api.turing.sh/video/zelescope',
       headers: {
         "Content-Type": "application/json",
         Authorization: "Bearer YOUR_API_KEY",
       },
       data: {
-  "text": "string",
-  "filters": "nsfw"
+  "prompt": "string",
+  "duration": 10
 },
     })
   })();
@@ -42,14 +42,14 @@ POST *https://api.turing.sh/text/filter*
   import requests
   import json
   response = requests.post(
-    "https://api.turing.sh/text/filter",
+    "https://api.turing.sh/video/zelescope",
     headers={
       "Content-Type": "application/json",
       "Authorization": "Bearer YOUR_API_KEY",
     },
     data=json.dumps({
-  "text": "string",
-  "filters": "nsfw"
+  "prompt": "string",
+  "duration": 10
 }),
   )
   ```

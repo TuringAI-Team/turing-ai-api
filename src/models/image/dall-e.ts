@@ -9,7 +9,7 @@ export default {
         type: "string",
         required: false,
       },
-      samples: {
+      number: {
         type: "number",
         required: true,
         options: [1, 2, 3, 4],
@@ -23,6 +23,7 @@ export default {
       image: {
         type: "string",
         required: false,
+        description: "Image you want to vary",
       },
     },
   },
@@ -33,12 +34,12 @@ export default {
     const openai = new OpenAIApi(configuration);
     let {
       prompt,
-      samples,
+      number,
       size,
       image,
     }: {
       prompt: string;
-      samples: number;
+      number: number;
       size: any;
       image: File;
     } = data;
@@ -46,7 +47,7 @@ export default {
     if (!image) {
       response = await openai.createImage({
         prompt,
-        n: samples,
+        n: number,
         size,
       });
       var imagesArr = response.data.data.map((d, i) => {
@@ -54,7 +55,7 @@ export default {
       });
       return { images: imagesArr };
     } else {
-      response = await openai.createImageVariation(image, samples, size);
+      response = await openai.createImageVariation(image, number, size);
       var imagesArr = response.data.data.map((d, i) => {
         return { attachment: d.url, name: `result-${i}.png` };
       });

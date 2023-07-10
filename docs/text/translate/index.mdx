@@ -3,22 +3,25 @@ title: Translate text
 ---
 
 # Translate text
-
+POST *https://api.turing.sh/text/translate*
 ## Parameters
 
 
 - **text**
   - Type: string
   - Required: true
+  - Description: Text to translate
 
 - **from**
   - Type: string
   - Required: false
+  - Description: Language code to translate from
   - Default: auto
 
 - **to**
   - Type: string
   - Required: true
+  - Description: Language code to translate to
 
 - **ai**
   - Type: string

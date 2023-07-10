@@ -8,15 +8,18 @@ export default {
       text: {
         type: "string",
         required: true,
+        description: "Text to translate",
       },
       from: {
         type: "string",
         required: false,
         default: "auto",
+        description: "Language code to translate from",
       },
       to: {
         type: "string",
         required: true,
+        description: "Language code to translate to",
       },
       ai: {
         type: "string",

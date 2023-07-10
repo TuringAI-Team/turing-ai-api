@@ -6,7 +6,7 @@ export default {
     parameters: {
       prompt: {
         type: "string",
-        required: false,
+        required: true,
       },
       model: {
         type: "string",
@@ -24,7 +24,7 @@ export default {
       },
       image: {
         type: "string",
-        required: false,
+        required: true,
       },
     },
   },

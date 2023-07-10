@@ -76,6 +76,7 @@ export default {
       style: {
         type: "string",
         required: false,
+        description: "Style to use for generating the image",
         options: [
           "3d-model",
           "analog-film",

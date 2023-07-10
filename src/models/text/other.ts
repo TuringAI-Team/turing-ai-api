@@ -2,6 +2,7 @@ export default {
   data: {
     name: "other",
     fullName: "Other models",
+    alert: "This model is not yet implemented",
     parameters: {
       messages: {
         type: "array",

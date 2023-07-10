@@ -3,7 +3,7 @@ title: Text to speech
 ---
 
 # Text to speech
-
+POST *https://api.turing.sh/audio/tts*
 ## Parameters
 
 
@@ -16,19 +16,24 @@ title: Text to speech
 - **voice**
   - Type: string
   - Required: true
+  - Description: Voice to use (elevenlabs only)
+  - Default: adam
 
 - **text**
   - Type: string
   - Required: true
+  - Description: Text to convert to speech
 
 - **language**
   - Type: string
   - Required: true
+  - Description: Language code to use (google only)
   - Default: en
 
 - **slow**
   - Type: boolean
   - Required: false
+  - Description: Speak slowly (google only)
 
 ## Examples
 
@@ -45,7 +50,7 @@ title: Text to speech
       },
       data: {
   "model": "google",
-  "voice": "string",
+  "voice": "adam",
   "text": "string",
   "language": "en"
 },
@@ -63,7 +68,7 @@ title: Text to speech
     },
     data=json.dumps({
   "model": "google",
-  "voice": "string",
+  "voice": "adam",
   "text": "string",
   "language": "en"
 }),

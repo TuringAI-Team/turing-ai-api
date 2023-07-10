@@ -9,6 +9,7 @@ export default {
       prompt: {
         type: "string",
         required: true,
+        description: "Prompt to generate the image",
       },
       negative_prompt: {
         type: "string",
@@ -17,6 +18,7 @@ export default {
       image: {
         type: "string",
         required: false,
+        description: "Image URL for the model to use when doing img2img",
       },
       width: {
         type: "number",

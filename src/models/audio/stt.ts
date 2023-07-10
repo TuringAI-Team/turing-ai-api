@@ -11,15 +11,18 @@ export default {
         required: false,
         options: ["whisper", "fast-whisper", "gladia"],
         default: "fast-whisper",
+        description: "Model to use for speech to text",
       },
       audio: {
         type: "string",
         required: true,
+        description: "Audio URL to transcribe",
       },
       diarization: {
         type: "boolean",
         required: false,
         default: false,
+        description: "Whether to use diarization or not",
       },
       type: {
         type: "string",

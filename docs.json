@@ -105,6 +105,15 @@
           "/audio/tts"
         ]
       ]
+    ],
+    [
+      "Video Models",
+      [
+        [
+          "Zelescope",
+          "/video/zelescope"
+        ]
+      ]
     ]
   ]
 }

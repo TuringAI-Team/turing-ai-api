@@ -8,7 +8,8 @@ export default {
     parameters: {
       prompt: {
         type: "string",
-        required: false,
+        required: true,
+        description: "Prompt to generate the image",
       },
       steps: {
         type: "number",
@@ -59,8 +60,8 @@ export default {
       negative_prompt =
         "disfigured mouth, disfigured teeth, half head, half face, blury, side looking, old, wrinkle, child, no face, pencil, full body, sharp, far away, overlapping, duplication, nude, disfigured, kitsch, oversaturated, grain, low-res, Deformed, blurry, bad anatomy, poorly drawn face, mutation, mutated, extra limb, ugly, poorly drawn hands, missing limb, blurry, floating limbs, disconnected limbs, malformed hands, blur, out of focus, long body, disgusting, poorly drawn, childish, mutilated, mangled, surreal, out of frame, duplicate, 2 faces";
     let event = null;
-    if (stream == null ) {
-      stream = true
+    if (stream == null) {
+      stream = true;
     }
     let result = {
       cost: null,

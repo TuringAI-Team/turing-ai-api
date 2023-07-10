@@ -14,11 +14,13 @@ export default {
       text: {
         type: "string",
         required: true,
+        description: "Text you want to filter",
       },
       filters: {
         type: "array",
         required: true,
         options: availableFilters,
+        description: "Filters you want to apply",
       },
     },
   },

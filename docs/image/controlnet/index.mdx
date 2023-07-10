@@ -3,13 +3,13 @@ title: Controlnet
 ---
 
 # Controlnet
-
+POST *https://api.turing.sh/image/controlnet*
 ## Parameters
 
 
 - **prompt**
   - Type: string
-  - Required: false
+  - Required: true
 
 - **model**
   - Type: string
@@ -19,7 +19,7 @@ title: Controlnet
 
 - **image**
   - Type: string
-  - Required: false
+  - Required: true
 
 ## Examples
 
@@ -35,7 +35,9 @@ title: Controlnet
         Authorization: "Bearer YOUR_API_KEY",
       },
       data: {
-  "model": "normal"
+  "prompt": "string",
+  "model": "normal",
+  "image": "string"
 },
     })
   })();
@@ -50,7 +52,9 @@ title: Controlnet
       "Authorization": "Bearer YOUR_API_KEY",
     },
     data=json.dumps({
-  "model": "normal"
+  "prompt": "string",
+  "model": "normal",
+  "image": "string"
 }),
   )
   ```

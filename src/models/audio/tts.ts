@@ -15,20 +15,25 @@ export default {
       voice: {
         type: "string",
         required: true,
+        default: "adam",
+        description: "Voice to use (elevenlabs only)",
       },
       text: {
         type: "string",
         required: true,
+        description: "Text to convert to speech",
       },
       language: {
         type: "string",
         required: true,
         default: "en",
+        description: "Language code to use (google only)",
       },
       slow: {
         type: "boolean",
         required: false,
         default: false,
+        description: "Speak slowly (google only)",
       },
     },
   },

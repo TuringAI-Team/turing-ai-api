@@ -26,6 +26,7 @@ export default {
   data: {
     name: "alan",
     fullName: "Alan",
+    alert: "This model is unfinished and is not working yet.",
     parameters: {
       userName: {
         type: "string",
