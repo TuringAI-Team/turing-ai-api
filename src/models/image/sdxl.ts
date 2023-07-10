@@ -157,8 +157,8 @@ export default {
         weight: -1,
       });
     let event;
-    if (stream == null ) {
-      stream = true
+    if (stream == null) {
+      stream = true;
     }
     let result = {
       cost: null,
@@ -321,6 +321,7 @@ export default {
           })
           .catch((err) => {
             let error = err;
+            console.log(err);
             if (err.response) error = err.response.data.message;
 
             result.status = "failed";
