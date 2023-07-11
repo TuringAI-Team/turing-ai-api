@@ -22,6 +22,7 @@ export default {
           "claude-instant-1",
           "claude-1-100k",
           "claude-instant-1-100k",
+          "claude-2",
         ],
         default: "claude-instant-1",
       },

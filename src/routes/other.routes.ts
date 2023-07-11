@@ -4,6 +4,7 @@ import turnstile from "../middlewares/captchas/turnstile.js";
 import key from "../middlewares/key.js";
 import ffmpeg from "fluent-ffmpeg";
 import * as fs from "fs";
+import { generateKey } from "../utils/key.js";
 
 const router = express.Router();
 
@@ -24,6 +25,17 @@ router.post(
     }
   }
 );
+
+router.post("/key", key, turnstile, async (req: Request, res: Response) => {
+  let superKey = req.headers.superKey;
+  if (superKey == process.env.SUPER_KEY) {
+    let { name, userId } = req.body;
+    let key = await generateKey(name, userId);
+    res.json({ success: true, key });
+  } else {
+    res.json({ success: false, error: "no permissions" });
+  }
+});
 
 async function convertToVideo(audio, image, duration, callback) {
   //  convert audio to video with ffmpeg using image as background

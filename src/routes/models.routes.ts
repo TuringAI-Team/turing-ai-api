@@ -22,6 +22,7 @@ router.post(
 );
 
 async function request(req, res) {
+  console.log(req.user);
   let { type, ai } = req.params;
   const body = req.body;
   if (!ai) {
