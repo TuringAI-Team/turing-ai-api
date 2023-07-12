@@ -50,7 +50,7 @@
     "mathjs": "^11.8.2",
     "mermaid": "^10.2.4",
     "openai": "^3.3.0",
-    "puppeteer": "^20.8.1",
+    "puppeteer": "^19.11.1",
     "rabbitmq-client": "^4.1.0",
     "redis": "^4.6.7",
     "replicate-api": "^0.4.4",
