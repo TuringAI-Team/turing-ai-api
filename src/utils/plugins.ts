@@ -5,6 +5,7 @@ import { evaluate, round } from "mathjs";
 import { Octokit } from "@octokit/rest";
 import { getCompilers, fromString } from "wandbox-api-updated";
 import puppeteer from "puppeteer";
+import fs from "fs";
 import supabase from "../db/supabase.js";
 import delay from "delay";
 
@@ -550,7 +551,9 @@ const pluginList = [
       properties: {
         markdownDiagram: {
           type: "string",
-          description: `The markdown diagram, mindmap or chart to generate.\n\nFor MINDMAPS here you have an example:\nmindmap\n  root((mindmap))\n    Origins\n      Long history\n      ::icon(fa fa-book)\n      Popularisation\n        British popular psychology author Tony Buzan\n    Research\n      On effectiveness<br/>and features\n      On Automatic creation\n        Uses\n            Creative techniques\n            Strategic planning\n            Argument mapping\n    Tools\n      Pen and paper\n      Mermaid`,
+          description:
+            `The markdown diagram, mindmap or chart to generate.\n\nFor MINDMAPS here you have the docs:\n` +
+            fs.readFileSync("./mermaid.md", "utf8"),
         },
         // diagrams do not exist
       },
