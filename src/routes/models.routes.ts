@@ -74,7 +74,6 @@ async function request(req, res) {
     let execution = await aiObject.execute(body);
     if (body.stream) {
       execution.on("data", (data) => {
-        console.log(data);
         res.write("data: " + JSON.stringify(data) + "\n\n");
         if (data.done || data.status == "done" || data.status == "failed") {
           res.end();
