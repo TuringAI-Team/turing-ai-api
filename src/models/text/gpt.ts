@@ -77,6 +77,7 @@ async function streams(data) {
       error: null,
       finishReason: null,
       toolResult: null,
+      toolInput: null,
     };
 
     for (let i = 0; i < data.plugins.length; i++) {
@@ -116,6 +117,7 @@ async function streams(data) {
             pluginInfo.parameters.required.length == 0
           ) {
             console.log(`args ${JSON.stringify(args)}`);
+            result.toolInput = args;
             let pluginResponse;
             try {
               pluginResponse = await pluginInfo.function(args);

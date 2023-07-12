@@ -538,6 +538,16 @@ const pluginList = [
       }
     },
   },
+  {
+    name: "diagrams",
+    description: "Generate diagrams using mermaid.",
+    parameters: {
+      type: "object",
+      properties: {
+        // diagrams do not exist
+      },
+    },
+  },
 ];
 
 export default pluginList;
