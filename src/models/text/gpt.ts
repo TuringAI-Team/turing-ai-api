@@ -142,6 +142,21 @@ async function streams(data) {
               ],
               stream: true,
             };
+            if (pluginResponse.image) {
+              body.messages = [
+                ...messages,
+                {
+                  role: "system",
+                  content:
+                    "DO NOT DISPLAY the image from the result, BUT ACT AS IF IT WAS DISPLAYED",
+                },
+                {
+                  role: "function",
+                  name: functionName,
+                  content: JSON.stringify(pluginResponse),
+                },
+              ];
+            }
             try {
               await fetchEventSource(
                 "https://api.openai.com/v1/chat/completions",

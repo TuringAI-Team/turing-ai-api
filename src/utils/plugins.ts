@@ -570,8 +570,6 @@ const pluginList = [
         console.log(data);
         result = {
           image: data.publicUrl,
-          display:
-            "DO NOT display the image in the message. BUT, ACT as it is displayed.",
         };
         return result;
       } catch (error) {
