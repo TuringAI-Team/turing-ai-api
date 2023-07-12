@@ -553,7 +553,7 @@ const pluginList = [
           type: "string",
           description:
             `The markdown diagram, mindmap or chart to generate.\n\nFor MINDMAPS here you have the docs:\n` +
-            fs.readFileSync("./mermaid.md", "utf8"),
+            fs.readFileSync("./dist/utils/mermaid.md", "utf8"),
         },
         // diagrams do not exist
       },
