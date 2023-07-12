@@ -12,7 +12,7 @@ import delay from "delay";
 
 let __dirname = path.resolve();
 
-let pathMermaid = path.join(__dirname, "./dist/utils/mermaid.md");
+let pathMermaid = path.join(__dirname, "./mermaid.md");
 
 let compilers: any = await getCompilers();
 compilers = compilers.map((c) => c.name);
