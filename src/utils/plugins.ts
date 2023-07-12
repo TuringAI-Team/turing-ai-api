@@ -586,7 +586,7 @@ const pluginList = [
 // Render the diagram as an image
 async function renderDiagram(diagramCode) {
   const browser = await puppeteer.launch({
-    headless: true,
+    headless: "new",
   });
   const page = await browser.newPage();
 
@@ -607,8 +607,9 @@ async function renderDiagram(diagramCode) {
         </body>
         </html>
       `);
+  console.log(await page.content());
   // wait  30s
-  await delay(10000);
+  await delay(5000);
   // log html content
   console.log(await page.content());
   // take screenshot
