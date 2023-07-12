@@ -570,7 +570,8 @@ const pluginList = [
         console.log(data);
         result = {
           image: data.publicUrl,
-          display: "Display by inserting the image url in your message.",
+          display:
+            "Display by inserting the image url in your message without any markdown tag.",
         };
         return result;
       } catch (error) {
