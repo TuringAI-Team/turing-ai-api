@@ -571,7 +571,7 @@ const pluginList = [
         result = {
           image: data.publicUrl,
           display:
-            "Display by inserting the image url in your message without any markdown tag.",
+            "Do not display the image in the message but act as it is displayed.",
         };
         return result;
       } catch (error) {
