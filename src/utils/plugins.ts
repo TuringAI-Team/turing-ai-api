@@ -4,7 +4,6 @@ import yts from "yt-search";
 import { evaluate, round } from "mathjs";
 import { Octokit } from "@octokit/rest";
 import { getCompilers, fromString } from "wandbox-api-updated";
-import mermaid from "mermaid";
 import puppeteer from "puppeteer";
 import supabase from "../db/supabase.js";
 import delay from "delay";
@@ -559,10 +558,8 @@ const pluginList = [
       required: ["markdownDiagram"],
     },
     function: async (params) => {
-      mermaid.initialize({
-        startOnLoad: false,
-      });
       let markdownDiagram = params.markdownDiagram;
+      console.log(markdownDiagram);
       let result: any = {};
       try {
         // Call the renderDiagram function and log the result
@@ -577,6 +574,7 @@ const pluginList = [
         };
         return result;
       } catch (error) {
+        console.log(error);
         result = { error: error };
       }
     },
