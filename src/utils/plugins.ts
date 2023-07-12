@@ -610,6 +610,7 @@ async function renderDiagram(diagramCode) {
   // wait  30s
   await delay(10000);
   // log html content
+  console.log(await page.content());
   // take screenshot
   let ss = await page.screenshot({ type: "png" });
 
