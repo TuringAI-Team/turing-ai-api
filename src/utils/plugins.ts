@@ -529,6 +529,7 @@ const pluginList = [
           });
 
           result = response;
+          result.display = true;
         } catch (error) {
           result = { error: error };
         }
