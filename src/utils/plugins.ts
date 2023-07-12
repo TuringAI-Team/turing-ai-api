@@ -502,7 +502,7 @@ const pluginList = [
       properties: {
         language: {
           type: "string",
-          description: `The language to execute the code in. It can be ${compilers.join(
+          description: `The language to execute the code in. It can only be ${compilers.join(
             ", "
           )}`,
         },
@@ -517,6 +517,7 @@ const pluginList = [
     function: async (params) => {
       let language = params.language;
       let code = params.code;
+      if (language == "javascript") language = "nodejs-16.14.0";
       let result: any = {};
       let compiler = compilers.find((c) => c === language);
       if (compiler) {
