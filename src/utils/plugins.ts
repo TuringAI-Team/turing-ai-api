@@ -544,14 +544,13 @@ const pluginList = [
   },
   {
     name: "diagrams",
-    description:
-      "Generate diagrams using mermaid. It returns the image url you can use to display the diagram. For displaying the diagram JUST WRITE THE IMAGE URL you receive.",
+    description: "Generate diagrams, charts and mindmaps using mermaid.",
     parameters: {
       type: "object",
       properties: {
         markdownDiagram: {
           type: "string",
-          description: "The markdown diagram to generate.",
+          description: "The markdown diagram, mindmap or chart to generate.",
         },
         // diagrams do not exist
       },
