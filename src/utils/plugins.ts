@@ -546,7 +546,7 @@ const pluginList = [
   {
     name: "diagrams",
     description:
-      "Generate diagrams using mermaid. It returns the image url you can use to display the diagram. For displaying the diagram JUST WRITE THE IMAGE URL without any markdown image tag.",
+      "Generate diagrams using mermaid. It returns the image url you can use to display the diagram. For displaying the diagram JUST WRITE THE IMAGE URL you receive.",
     parameters: {
       type: "object",
       properties: {
@@ -571,8 +571,8 @@ const pluginList = [
         await supabase.storage.from("diagrams").upload(name, png);
         let { data } = supabase.storage.from("diagrams").getPublicUrl(name);
         result = {
-          imageUrl: data.publicUrl,
-          display: true,
+          image: data.publicUrl,
+          display: "Display by inserting the image url in your message.",
         };
         return result;
       } catch (error) {
@@ -607,8 +607,9 @@ async function renderDiagram(diagramCode) {
         </html>
       `);
   // wait  30s
-  await delay(10000);
+  await delay(5000);
   // log html content
+  console.log(await page.content());
   // take screenshot
   let ss = await page.screenshot({ type: "png" });
 

@@ -42,6 +42,7 @@ export default {
         type: "array",
         required: false,
         default: [],
+        options: pluginList.map((p) => p.name),
       },
       stream: {
         type: "boolean",
