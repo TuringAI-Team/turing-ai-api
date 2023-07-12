@@ -66,14 +66,18 @@ export default {
         })
         .then(async (streamEv) => {
           let fullCompletion = "";
+          let num = 0;
           for await (const completion of streamEv) {
             let com: any = completion;
+            num++;
             if (com.stop_reason) {
               com.done = true;
             }
             fullCompletion += com.completion;
             com.completion = fullCompletion;
-            event.emit("data", com);
+            if (num >= 10 || com.stop_reason) {
+              event.emit("data", com);
+            }
           }
         });
       return event;
