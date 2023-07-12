@@ -571,7 +571,7 @@ const pluginList = [
         result = {
           image: data.publicUrl,
           display:
-            "Do not display the image in the message but act as it is displayed.",
+            "DO NOT display the image in the message. But, ACT as it is displayed.",
         };
         return result;
       } catch (error) {
