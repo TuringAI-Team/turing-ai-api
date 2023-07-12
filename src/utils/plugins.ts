@@ -550,23 +550,7 @@ const pluginList = [
       properties: {
         markdownDiagram: {
           type: "string",
-          description: `The markdown diagram, mindmap or chart to generate.\n\nFor MINDMAPS here you have an example:\nmindmap
-          root((mindmap))
-            Origins
-              Long history
-              ::icon(fa fa-book)
-              Popularisation
-                British popular psychology author Tony Buzan
-            Research
-              On effectiveness<br/>and features
-              On Automatic creation
-                Uses
-                    Creative techniques
-                    Strategic planning
-                    Argument mapping
-            Tools
-              Pen and paper
-              Mermaid`,
+          description: `The markdown diagram, mindmap or chart to generate.\n\nFor MINDMAPS here you have an example:\nmindmap\n  root((mindmap))\n    Origins\n      Long history\n      ::icon(fa fa-book)\n      Popularisation\n        British popular psychology author Tony Buzan\n    Research\n      On effectiveness<br/>and features\n      On Automatic creation\n        Uses\n            Creative techniques\n            Strategic planning\n            Argument mapping\n    Tools\n      Pen and paper\n      Mermaid`,
         },
         // diagrams do not exist
       },
