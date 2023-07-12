@@ -4,6 +4,10 @@ import yts from "yt-search";
 import { evaluate, round } from "mathjs";
 import { Octokit } from "@octokit/rest";
 import { getCompilers, fromString } from "wandbox-api-updated";
+import mermaid from "mermaid";
+import puppeteer from "puppeteer";
+import supabase from "../db/supabase.js";
+import delay from "delay";
 
 let compilers: any = await getCompilers();
 compilers = compilers.map((c) => c.name);
@@ -541,14 +545,76 @@ const pluginList = [
   },
   {
     name: "diagrams",
-    description: "Generate diagrams using mermaid.",
+    description:
+      "Generate diagrams using mermaid. It returns the image url you can use to display the diagram. For displaying the diagram JUST WRITE THE IMAGE URL without any markdown image tag.",
     parameters: {
       type: "object",
       properties: {
+        markdownDiagram: {
+          type: "string",
+          description: "The markdown diagram to generate.",
+        },
         // diagrams do not exist
       },
+      required: ["markdownDiagram"],
+    },
+    function: async (params) => {
+      mermaid.initialize({
+        startOnLoad: false,
+      });
+      let markdownDiagram = params.markdownDiagram;
+      let result: any = {};
+      try {
+        // Call the renderDiagram function and log the result
+        let png = await renderDiagram(markdownDiagram);
+        let name = `${Date.now()}.png`;
+        await supabase.storage.from("diagrams").upload(name, png);
+        let { data } = supabase.storage.from("diagrams").getPublicUrl(name);
+        result = {
+          imageUrl: data.publicUrl,
+          display: true,
+        };
+        return result;
+      } catch (error) {
+        result = { error: error };
+      }
     },
   },
 ];
+
+// Render the diagram as an image
+async function renderDiagram(diagramCode) {
+  const browser = await puppeteer.launch({
+    headless: "new",
+  });
+  const page = await browser.newPage();
+
+  await page.setContent(`
+        <html>
+        <head>
+          <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+        </head>
+        <body>
+            <pre class="mermaid">
+              ${diagramCode}
+            </pre>
+
+          <script type="module">
+            import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+            mermaid.initialize({ startOnLoad: true });
+          </script>
+        </body>
+        </html>
+      `);
+  // wait  30s
+  await delay(10000);
+  // log html content
+  // take screenshot
+  let ss = await page.screenshot({ type: "png" });
+
+  await browser.close();
+
+  return ss;
+}
 
 export default pluginList;

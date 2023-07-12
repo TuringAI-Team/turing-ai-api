@@ -15,12 +15,14 @@ const availableCharts = [
 ];
 const availableTypes = ["line", "bar"];
 
-export async function getChartImage(chart, filter, period, type) {
+export async function getChartImage(chart, filter, period: any, type) {
   if (!availableCharts.includes(chart)) throw new Error("Invalid chart");
   if (!availableTypes.includes(type)) throw new Error("Invalid type of chart");
   let chartImage = new ChartJsImage();
   console.log(period);
-  let timeStart: any = Date.now() - ms(period);
+  let periodMs: any = ms(period);
+
+  let timeStart: any = Date.now() - periodMs;
   timeStart = new Date(timeStart);
   timeStart = timeStart.toISOString();
   console.log(timeStart);
@@ -35,7 +37,6 @@ export async function getChartImage(chart, filter, period, type) {
     let date = new Date(d.time);
     let now = new Date();
     let diff = now.getTime() - date.getTime();
-    let periodMs = ms(period);
     return diff <= periodMs;
   });
   //sort by data, old first , recent last
@@ -46,7 +47,7 @@ export async function getChartImage(chart, filter, period, type) {
   });
 
   // if period ms > 2d, then we need to group data by day so all the data from the same day is grouped together as 1 data point
-  if (ms(period) > ms("2d")) {
+  if (periodMs > ms("2d")) {
     let newData = [];
     let lastDay = null;
     let lastData = null;
@@ -253,7 +254,7 @@ async function extractData(period, chart) {
     let date = new Date(d.time);
     let now = new Date();
     let diff = now.getTime() - date.getTime();
-    let periodMs = ms(period);
+    let periodMs: any = ms(period);
     return diff <= periodMs;
   });
   //sort by data, old first , recent last

@@ -5,6 +5,7 @@ import key from "../middlewares/key.js";
 import ffmpeg from "fluent-ffmpeg";
 import * as fs from "fs";
 import { generateKey } from "../utils/key.js";
+import { pub } from "../db/mq.js";
 
 const router = express.Router();
 
@@ -71,5 +72,25 @@ async function convertToVideo(audio, image, duration, callback) {
     })
     .run();
 }
+router.post("/top-vote", key, async (req: Request, res: Response) => {
+  let body = req.body;
+  let botId = "1053015370115588147";
+  if (body.bot == botId && body.type == "upvote") {
+    let userId = body.user;
+    console.log(`User ${userId} just voted!`);
+    await pub.send(
+      {
+        exchange: "messages",
+        routingKey: "message",
+      },
+      JSON.stringify({
+        id: "vote",
+        data: userId,
+      })
+    );
+  }
+
+  res.status(200).json({ success: true });
+});
 
 export default router;
