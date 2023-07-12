@@ -46,12 +46,14 @@
     "hcaptcha": "^0.1.1",
     "helmet": "^7.0.0",
     "jsonwebtoken": "^9.0.0",
+    "lang-detector": "^1.0.6",
     "mathjs": "^11.8.2",
     "openai": "^3.3.0",
     "rabbitmq-client": "^4.1.0",
     "redis": "^4.6.7",
     "replicate-api": "^0.4.4",
     "uuid": "^9.0.0",
+    "wandbox-api-updated": "^1.0.4",
     "yt-search": "^2.10.4"
   },
   "devDependencies": {

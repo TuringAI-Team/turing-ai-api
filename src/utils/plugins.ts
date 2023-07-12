@@ -3,7 +3,23 @@ import axios from "axios";
 import yts from "yt-search";
 import { evaluate, round } from "mathjs";
 import { Octokit } from "@octokit/rest";
+import { getCompilers, fromString } from "wandbox-api-updated";
 
+let compilers: any = await getCompilers();
+compilers = compilers.map((c) => c.name);
+// it has many versions of the same compiler, so we remove the duplicates and keep the latest version name is  language-version
+let uniqueCompilers: any = [];
+compilers = compilers.forEach((c: string, i: number) => {
+  let [language, version] = c.split("-");
+  if (uniqueCompilers.find((x) => x.language == language)) return;
+  uniqueCompilers.push({
+    language: language,
+    version: version,
+    full: c,
+  });
+});
+compilers = uniqueCompilers;
+compilers = compilers.map((c: any) => c.full);
 const octokit = new Octokit({
   auth: process.env.GITHUB_TOKEN, // token from github, you get it from your profile settings -> developer settings -> personal access tokens
 });
@@ -476,6 +492,49 @@ const pluginList = [
         }
       }
       return result;
+    },
+  },
+  {
+    name: "code-interpreter",
+    description: "Execute code in different languages using wandbox.",
+    parameters: {
+      type: "object",
+      properties: {
+        language: {
+          type: "string",
+          description: `The language to execute the code in. It can be ${compilers.join(
+            ", "
+          )}`,
+        },
+        code: {
+          type: "string",
+          description: "The code to execute.",
+        },
+      },
+
+      required: ["language", "code"],
+    },
+    function: async (params) => {
+      let language = params.language;
+      let code = params.code;
+      let result: any = {};
+      let compiler = compilers.find((c) => c === language);
+      if (compiler) {
+        try {
+          let response = await fromString({
+            compiler: compiler,
+            code: code,
+            save: false,
+          });
+
+          result = response;
+        } catch (error) {
+          result = { error: error };
+        }
+        return result;
+      } else {
+        return { error: "Invalid language." };
+      }
     },
   },
 ];

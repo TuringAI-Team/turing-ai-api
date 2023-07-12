@@ -76,6 +76,7 @@ async function streams(data) {
       cost: 0,
       error: null,
       finishReason: null,
+      toolResult: null,
     };
 
     for (let i = 0; i < data.plugins.length; i++) {
@@ -122,6 +123,7 @@ async function streams(data) {
               console.error(e);
               pluginResponse = `Error: ${e}`;
             }
+            result.toolResult = pluginResponse;
             console.log(`pluginResponse ${JSON.stringify(pluginResponse)}`);
             let body = {
               temperature: data.temperature || 0.9,
