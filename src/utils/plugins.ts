@@ -570,6 +570,7 @@ const pluginList = [
         let name = `${Date.now()}.png`;
         await supabase.storage.from("diagrams").upload(name, png);
         let { data } = supabase.storage.from("diagrams").getPublicUrl(name);
+        console.log(data);
         result = {
           image: data.publicUrl,
           display: "Display by inserting the image url in your message.",
@@ -607,7 +608,7 @@ async function renderDiagram(diagramCode) {
         </html>
       `);
   // wait  30s
-  await delay(5000);
+  await delay(10000);
   // log html content
   // take screenshot
   let ss = await page.screenshot({ type: "png" });
