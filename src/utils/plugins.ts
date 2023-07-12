@@ -586,6 +586,7 @@ const pluginList = [
 async function renderDiagram(diagramCode) {
   const browser = await puppeteer.launch({
     headless: "new",
+    args: ["--no-sandbox"],
   });
   const page = await browser.newPage();
 
