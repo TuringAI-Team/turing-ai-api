@@ -532,7 +532,7 @@ const pluginList = [
           });
 
           result = response;
-          result.display = true;
+          result.display = "Display the program output in your reply message.";
         } catch (error) {
           result = { error: error };
         }
