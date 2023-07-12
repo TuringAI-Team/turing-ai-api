@@ -6,8 +6,13 @@ import { Octokit } from "@octokit/rest";
 import { getCompilers, fromString } from "wandbox-api-updated";
 import puppeteer from "puppeteer";
 import fs from "fs";
+import path from "path";
 import supabase from "../db/supabase.js";
 import delay from "delay";
+
+let __dirname = path.resolve();
+
+let pathMermaid = path.join(__dirname, "./dist/utils/mermaid.md");
 
 let compilers: any = await getCompilers();
 compilers = compilers.map((c) => c.name);
@@ -553,7 +558,7 @@ const pluginList = [
           type: "string",
           description:
             `The markdown diagram, mindmap or chart to generate.\n\nFor MINDMAPS here you have the docs:\n` +
-            fs.readFileSync("./dist/utils/mermaid.md", "utf8"),
+            fs.readFileSync(pathMermaid, "utf8"),
         },
         // diagrams do not exist
       },
