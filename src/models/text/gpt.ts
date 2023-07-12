@@ -143,12 +143,13 @@ async function streams(data) {
               stream: true,
             };
             if (pluginResponse.image) {
+              console.log("image");
               body.messages = [
                 ...messages,
                 {
                   role: "system",
                   content:
-                    "DO NOT DISPLAY the image from the result, BUT ACT AS IF IT WAS DISPLAYED",
+                    "DO NOT DISPLAY the image from the result, BUT ACT AS IF IT WAS DISPLAYED. DO NOT INSERT THE IMAGE URL INTO THE CHAT.",
                 },
                 {
                   role: "function",
