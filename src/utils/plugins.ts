@@ -576,6 +576,7 @@ const pluginList = [
       } catch (error) {
         console.log(error);
         result = { error: error };
+        return result;
       }
     },
   },
