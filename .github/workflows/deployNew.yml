@@ -14,8 +14,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      # Install Node.js and PM2
-
       # Connect to remote server via SSH to start the bot using PM2
       - name: Start API with PM2
         uses: appleboy/ssh-action@master
