@@ -23,6 +23,7 @@ jobs:
           password: ${{ secrets.PASSWORD }}
           script: |
             cd /home/trident/github/turing-api-new
+            nvm use 20
             npm run git
             npm i
             rm -r dist
