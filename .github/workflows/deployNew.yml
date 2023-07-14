@@ -15,7 +15,7 @@ jobs:
         uses: actions/checkout@v2
 
       # Connect to remote server via SSH to start the bot using PM2
-      - name: Start API with PM2
+      - name: Build and reload API
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.HOST }}
