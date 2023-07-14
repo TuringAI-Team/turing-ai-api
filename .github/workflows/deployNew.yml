@@ -29,6 +29,6 @@ jobs:
             npm run git
             npm i
             rm -r dist
-            nvm use 18
+            nvm use 20
             npm run build
             pm2 reload TuringAPINew
