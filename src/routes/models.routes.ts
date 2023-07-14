@@ -28,6 +28,10 @@ async function request(req, res) {
   if (!ai) {
     ai = body.ai;
   }
+  if (ai == "alan") {
+    ai = "gpt";
+    body.plugins = ["google"];
+  }
   let typeObj = client[type];
   if (body.stream) {
     res.set("content-type", "text/event-stream");
