@@ -27,8 +27,9 @@ router.post(
   }
 );
 
-router.post("/key", key, turnstile, async (req: Request, res: Response) => {
-  let superKey = req.headers.superKey;
+router.post("/key", key, async (req: Request, res: Response) => {
+  let { superKey } = req.headers;
+  console.log(req.headers, superKey);
   if (superKey == process.env.SUPER_KEY) {
     let { name, userId } = req.body;
     let key = await generateKey(name, userId);
