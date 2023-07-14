@@ -97,7 +97,10 @@ async function request(req, res) {
 }
 
 router.get("/", (req, res) => {
-  res.json({ success: true, message: "Welcome to the API, docs at /docs" });
+  res.json({
+    success: true,
+    message: "Welcome to the API, docs at https://docs.turing.sh",
+  });
 });
 
 export default router;
