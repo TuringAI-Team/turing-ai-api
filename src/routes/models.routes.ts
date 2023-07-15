@@ -80,6 +80,7 @@ async function request(req, res) {
       execution.on("data", (data) => {
         res.write("data: " + JSON.stringify(data) + "\n\n");
         if (data.done || data.status == "done" || data.status == "failed") {
+          console.log(data.error);
           res.end();
         }
       });
