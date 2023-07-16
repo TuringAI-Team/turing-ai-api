@@ -4,6 +4,9 @@ import turnstile from "../middlewares/captchas/turnstile.js";
 import key from "../middlewares/key.js";
 import client from "../index.js";
 import log from "../utils/log.js";
+import redisClient from "../db/redis.js";
+import { update } from "../utils/db.js";
+import delay from "delay";
 
 const router = express.Router();
 
@@ -22,7 +25,6 @@ router.post(
 );
 
 async function request(req, res) {
-  console.log(req.user);
   let { type, ai } = req.params;
   const body = req.body;
   if (!ai) {
@@ -77,15 +79,20 @@ async function request(req, res) {
     }*/
     let execution = await aiObject.execute(body);
     if (body.stream) {
-      execution.on("data", (data) => {
+      execution.on("data", async (data) => {
         res.write("data: " + JSON.stringify(data) + "\n\n");
         if (data.done || data.status == "done" || data.status == "failed") {
-          console.log(data.error);
           res.end();
+          if (data.cost) {
+            await applyCost(data.cost, ai, type, req.user);
+          }
         }
       });
     } else {
       res.status(200).json({ success: true, ...execution });
+      if (execution.cost) {
+        await applyCost(execution.cost, ai, type, req.user);
+      }
     }
   } catch (error: any) {
     let resultError = error;
@@ -103,5 +110,45 @@ router.get("/", (req, res) => {
     message: "Welcome to the API, docs at https://docs.turing.sh",
   });
 });
+
+async function applyCost(cost, ai, type, user) {
+  console.log(`Cost: ${cost}$`);
+  //  add a 20% fee
+  let totalCost = cost * 1.2;
+  cost = 0.5;
+  if (user && user.id != "530102778408861706") {
+    let updatedUser: any = await redisClient.get(`users:${user.id}`);
+    updatedUser = JSON.parse(updatedUser);
+    let plan = updatedUser.plan;
+    console.log(plan.used);
+    plan.used += totalCost;
+    plan.expenses.push({
+      data: {
+        model: ai,
+        tokens: {},
+      },
+      time: Date.now(),
+      type: type,
+      used: totalCost,
+    });
+    await update("update", {
+      collection: "users",
+      id: user.id,
+      plan,
+    });
+    await delay(3000);
+    let up = JSON.parse(await redisClient.get(`users:${user.id}`)).plan;
+    console.log(
+      up.used,
+      up.expenses
+        .map((e) => {
+          if (e.type != "chat") {
+            return e;
+          }
+        })
+        .filter((e) => e != undefined)
+    );
+  }
+}
 
 export default router;

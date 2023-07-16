@@ -10,10 +10,6 @@ import path from "path";
 import supabase from "../db/supabase.js";
 import delay from "delay";
 
-let __dirname = path.resolve();
-
-let pathMermaid = path.join(__dirname, "./mermaid.md");
-
 let compilers: any = await getCompilers();
 compilers = compilers.map((c) => c.name);
 // it has many versions of the same compiler, so we remove the duplicates and keep the latest version name is  language-version
@@ -556,9 +552,7 @@ const pluginList = [
       properties: {
         markdownDiagram: {
           type: "string",
-          description:
-            `The markdown diagram, mindmap or chart to generate.\n\nFor MINDMAPS here you have the docs:\n` +
-            fs.readFileSync(pathMermaid, "utf8"),
+          description: `The markdown diagram, mindmap or chart to generate.`,
         },
         // diagrams do not exist
       },

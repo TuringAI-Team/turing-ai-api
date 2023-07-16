@@ -42,6 +42,9 @@ export default {
         to,
       },
     });
-    return response.data;
+    return {
+      ...response.data,
+      cost: 0,
+    };
   },
 };

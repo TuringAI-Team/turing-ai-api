@@ -28,11 +28,10 @@ router.post(
 );
 
 router.post("/key", key, async (req: Request, res: Response) => {
-  let { superKey } = req.headers;
-  console.log(req.headers, superKey);
-  if (superKey == process.env.SUPER_KEY) {
-    let { name, userId } = req.body;
-    let key = await generateKey(name, userId);
+  let { secret } = req.headers;
+  if (secret == process.env.SUPER_KEY) {
+    let { name, user } = req.body;
+    let key = await generateKey(user, name);
     res.json({ success: true, key });
   } else {
     res.json({ success: false, error: "no permissions" });

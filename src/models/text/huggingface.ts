@@ -42,10 +42,16 @@ export default {
       });
       prompt += `${modelInfo.stop}`;
       let result = await huggingface(model, prompt, stop);
-      return result;
+      return {
+        ...result,
+        cost: 0,
+      };
     } else {
       let result = await huggingface(model, prompt, stop);
-      return result;
+      return {
+        ...result,
+        cost: 0,
+      };
     }
   },
 };
@@ -71,7 +77,7 @@ export async function huggingface(model, input, stop) {
     }
   }
 
-  return { response: oldText };
+  return { result: oldText };
 }
 export async function textGeneration(model: string, body: object) {
   const response = await axios({

@@ -64,6 +64,10 @@
       "Image Models",
       [
         [
+          "Anything models",
+          "/image/anything"
+        ],
+        [
           "Controlnet",
           "/image/controlnet"
         ],

@@ -7,7 +7,15 @@ export default async function (req, res, next) {
     return res.status(400).json({ error: "Captcha token is required" });
   }
   try {
-    let valid = await checkCaptchaToken(token, req);
+    let valid: any = await checkCaptchaToken(token, req);
+    if (valid.error) {
+      return res.status(400).json({ error: valid.error });
+    }
+    if (valid.user) {
+      req.user = valid.user;
+      req.keyId = valid.apiId;
+      return next();
+    }
     if (valid) {
       return next();
     }

@@ -1,5 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { EventEmitter } from "events";
+import { getPromptLength } from "../../utils/tokenizer.js";
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
 });
@@ -72,9 +73,24 @@ export default {
             num++;
             if (com.stop_reason) {
               com.done = true;
+              let promptTokens = getPromptLength(prompt);
+              let completionTokens = getPromptLength(com.result);
+              let pricePerK = {
+                prompt: 1.63,
+                completion: 5.51,
+              };
+              if (!model.includes("instant")) {
+                pricePerK.prompt = 11.02;
+                pricePerK.completion = 32.68;
+              }
+              let promptCost = (promptTokens / 1000000) * pricePerK.prompt;
+              let completionCOst =
+                (completionTokens / 1000000) * pricePerK.completion;
+              com.cost = promptCost + completionCOst;
             }
             fullCompletion += com.completion;
             com.completion = fullCompletion;
+            com.result = fullCompletion;
             if (num >= 10 || com.stop_reason) {
               event.emit("data", com);
             }
@@ -87,7 +103,20 @@ export default {
         max_tokens_to_sample: max_tokens,
         prompt: prompt,
       });
-      return completion;
+      let promptTokens = getPromptLength(prompt);
+      let completionTokens = getPromptLength(completion.completion);
+      let pricePerK = {
+        prompt: 1.63,
+        completion: 5.51,
+      };
+      if (!model.includes("instant")) {
+        pricePerK.prompt = 11.02;
+        pricePerK.completion = 32.68;
+      }
+      let promptCost = (promptTokens / 1000000) * pricePerK.prompt;
+      let completionCOst = (completionTokens / 1000000) * pricePerK.completion;
+      let cost = promptCost + completionCOst;
+      return { ...completion, result: completion.completion, cost };
     }
   },
 };

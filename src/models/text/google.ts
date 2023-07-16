@@ -1,6 +1,7 @@
 import axios from "axios";
 import { GoogleAuth } from "google-auth-library";
 import { DiscussServiceClient } from "@google-ai/generativelanguage";
+import { getPromptLength } from "../../utils/tokenizer.js";
 
 export default {
   data: {
@@ -82,6 +83,14 @@ export default {
         },
       },
     });
-    return response.data;
+    let cost = 0;
+    let promptLength = getPromptLength(
+      messages.map((message) => message.content).join(" ")
+    );
+    let result = response.data.predictions[0].candidates[0].content;
+    let resultLength = getPromptLength(result);
+    let pricePerK = 0.0003;
+    cost = (promptLength + resultLength) * pricePerK;
+    return { ...response.data, cost: cost, result };
   },
 };

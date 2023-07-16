@@ -27,6 +27,7 @@ export default {
       text: null,
     };
     let { model, image } = data;
+    let cost = 0;
     if (model.includes("blip2")) {
       let url = await translateModels("blip2");
       let res = await request(url, `runsync`, {
@@ -37,7 +38,10 @@ export default {
       if (res.output) {
         result.description = res.output.captions[0].caption;
       }
-    } else if (model.includes("ocr")) {
+      let executionTime = res.executionTime;
+      cost = (executionTime / 1000) * 0.0004;
+    }
+    if (model.includes("ocr")) {
       // OCR_KEY
       let res = await axios({
         url: `https://api.ocr.space/parse/ImageUrl?url=${image}&OCREngine=1&scale=true`,
@@ -70,6 +74,6 @@ export default {
 
       result.text = text;
     }
-    return result;
+    return { ...result, cost };
   },
 };

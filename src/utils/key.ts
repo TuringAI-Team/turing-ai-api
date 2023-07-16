@@ -6,6 +6,7 @@ import redisClient from "../db/redis.js";
 export async function generateKey(
   userId: string,
   name: string,
+  allowedPaths?: Array<String>,
   ips?: Array<String>
 ) {
   let id = uuidv4();
@@ -17,21 +18,42 @@ export async function generateKey(
     "captcha-token": captchaToken,
     ips,
     created_at: new Date(),
+    allowedPaths: allowedPaths || [
+      "/text/*",
+      "/image/*",
+      "/video/*",
+      "/audio/*",
+    ],
     lastUsed: Date.now(),
     name,
     userId: userId,
   };
+  let userExists = await redisClient.get(`users:${userId}`);
+  if (!userExists) {
+    let { data, error } = await supabase
+      .from("users_new")
+      .select("*")
+      .eq("id", userId);
+    if (error) {
+      console.log(error);
+      return false;
+    }
+    if (data.length == 0) {
+      return false;
+    }
+    redisClient.set(`users:${userId}`, JSON.stringify(data[0]));
+  }
   let { data, error } = await supabase.from("api_keys").insert([
     {
       ...d,
     },
   ]);
-  redisClient.set(apiToken, JSON.stringify(d));
+  redisClient.set(`api:${apiToken}`, JSON.stringify(d));
   if (error) {
     console.log(error);
     return false;
   }
-  return { apiToken, captchaToken };
+  return { apiToken, captchaToken, id };
 }
 
 export async function checkCaptchaToken(token: string, req) {
@@ -66,18 +88,52 @@ export async function checkCaptchaToken(token: string, req) {
           return false;
         }
       }
-      /*
-      let data: any = await redisClient.get(decoded["apiToken"]);
-      if (!data) {
-        return false;
-      }
+
+      var data = req.apiData;
       if (data) {
-        data = JSON.parse(data);
-        let user = await redisClient.get(`users:${data.userId}`);
+        var user;
+        if (data.userId != "530102778408861706") {
+          user = await redisClient.get(`users:${data.userId}`);
+          user = JSON.parse(user);
+          if (!user) {
+            let { data: d, error } = await supabase
+              .from("users_new")
+              .select("*")
+              .eq("id", data.userId);
+            if (error) {
+              console.log(error);
+              return false;
+            }
+            if (d.length == 0) {
+              return false;
+            }
+            redisClient.set(`users:${data.userId}`, JSON.stringify(d[0]));
+            user = d[0];
+          }
+          if (user?.plan?.total) {
+            let current = user.plan.total - user.plan.used;
+            if (current <= 0.1) {
+              console.log("Plan limit reached");
+              return {
+                error: "Plan limit reached",
+              };
+            }
+          } else {
+            return {
+              error: "Plan limit reached",
+            };
+          }
+        } else {
+          user = {
+            id: "530102778408861706",
+          };
+        }
+
         return {
-          user: JSON.parse(user),
+          user: user,
+          apiId: data.id,
         };
-      }*/
+      }
       return true;
     }
   } catch (e) {
