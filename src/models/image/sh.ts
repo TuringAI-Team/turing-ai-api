@@ -133,7 +133,6 @@ export default {
       queue_position: res.queue_position,
       results: [],
     };
-    console.log(res);
     let maxTime = 45;
     if (res.id) {
       if (data.stream == null) data.stream = true;

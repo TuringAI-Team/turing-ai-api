@@ -12,6 +12,7 @@ import PaymentRoutes from "./routes/payment.routes.js";
 import DataRoutes from "./routes/data.routes.js";
 import RunpodRoutes from "./routes/runpod.routes.js";
 import ModelRoutes from "./routes/models.routes.js";
+import KeyRoutes from "./routes/key.routes.js";
 
 const app: Application = express();
 
@@ -59,6 +60,7 @@ app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
 app.set("port", process.env.PORT || 3000);
 
+app.use("/key", KeyRoutes);
 app.use("/other", OtherRoutes);
 app.use("/chart", ChartRoutes);
 app.use("/payments", PaymentRoutes);

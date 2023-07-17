@@ -27,17 +27,6 @@ router.post(
   }
 );
 
-router.post("/key", key, async (req: Request, res: Response) => {
-  let { secret } = req.headers;
-  if (secret == process.env.SUPER_KEY) {
-    let { name, user } = req.body;
-    let key = await generateKey(user, name);
-    res.json({ success: true, key });
-  } else {
-    res.json({ success: false, error: "no permissions" });
-  }
-});
-
 async function convertToVideo(audio, image, duration, callback) {
   //  convert audio to video with ffmpeg using image as background
   // audio is a base64 string
