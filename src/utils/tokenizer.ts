@@ -8,6 +8,7 @@ export const encoder = get_encoding("cl100k_base");
  * @returns Length of the prompt, in tokens
  */
 export const getPromptLength = (content: string): number => {
+  if (!content) return 0;
   content = content
     .replaceAll("<|endoftext|>", "<|im_end|>")
     .replaceAll("<|endofprompt|>", "<|im_end|>");
