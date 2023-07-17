@@ -112,12 +112,11 @@ router.get("/", (req, res) => {
 });
 
 async function applyCost(cost, ai, type, user) {
-  console.log(`Cost: ${cost}$`);
   //  add a 20% fee
   let totalCost = cost * 1.2;
-  cost = 0.5;
-  console.log(user);
   if (user && user.id != "530102778408861706") {
+    console.log(`Cost: ${cost}$`);
+
     let updatedUser: any = await redisClient.get(`users:${user.id}`);
     updatedUser = JSON.parse(updatedUser);
     let plan = updatedUser.plan;
