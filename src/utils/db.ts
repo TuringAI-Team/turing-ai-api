@@ -26,6 +26,16 @@ export async function update(action: "update" | "vote", data: any) {
         data: d,
       })
     );
+    await pub.send(
+      {
+        exchange: "messages:dev",
+        routingKey: "message",
+      },
+      JSON.stringify({
+        id: action,
+        data: d,
+      })
+    );
   } catch (e) {
     console.log(e);
     return { error: e };
