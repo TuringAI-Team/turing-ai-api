@@ -89,10 +89,10 @@ async function request(req, res) {
         }
       });
     } else {
-      res.status(200).json({ success: true, ...execution });
       if (execution.cost) {
-        await applyCost(execution.cost, ai, type, req.user);
+        applyCost(execution.cost, ai, type, req.user);
       }
+      res.status(200).json({ success: true, ...execution });
     }
   } catch (error: any) {
     let resultError = error;
@@ -139,16 +139,7 @@ async function applyCost(cost, ai, type, user) {
     });
     await delay(3000);
     let up = JSON.parse(await redisClient.get(`users:${user.id}`)).plan;
-    console.log(
-      up.used,
-      up.expenses
-        .map((e) => {
-          if (e.type != "chat") {
-            return e;
-          }
-        })
-        .filter((e) => e != undefined)
-    );
+    console.log(up.used);
   }
 }
 
