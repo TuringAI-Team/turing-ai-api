@@ -89,7 +89,7 @@ async function request(req, res) {
         }
       });
     } else {
-      if (execution.cost) {
+      if (execution?.cost) {
         applyCost(execution.cost, ai, type, req.user);
       }
       res.status(200).json({ success: true, ...execution });
