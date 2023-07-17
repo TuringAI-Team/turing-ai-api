@@ -83,6 +83,7 @@ async function request(req, res) {
         res.write("data: " + JSON.stringify(data) + "\n\n");
         if (data.done || data.status == "done" || data.status == "failed") {
           res.end();
+          console.log(data.cost);
           if (data.cost) {
             await applyCost(data.cost, ai, type, req.user);
           }
@@ -116,6 +117,7 @@ async function applyCost(cost, ai, type, user) {
   //  add a 20% fee
   let totalCost = cost * 1.2;
   cost = 0.5;
+  console.log(user);
   if (user && user.id != "530102778408861706") {
     let updatedUser: any = await redisClient.get(`users:${user.id}`);
     updatedUser = JSON.parse(updatedUser);
