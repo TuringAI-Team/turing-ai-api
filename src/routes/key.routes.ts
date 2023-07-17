@@ -51,7 +51,7 @@ router.get("/u/:user", key, secret, async (req: Request, res: Response) => {
     .from("api_keys")
     .select("*")
     .eq("userId", user)
-    .order("createdAt", { ascending: false });
+    .order("created_at", { ascending: false });
   if (error) {
     res.json({ success: false, error });
     return;
