@@ -125,10 +125,11 @@ async function applyCost(cost, ai, type, user) {
     plan.expenses.push({
       data: {
         model: ai,
+        type,
         tokens: {},
       },
       time: Date.now(),
-      type: type,
+      type: "api",
       used: totalCost,
     });
     await update("update", {
