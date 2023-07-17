@@ -115,7 +115,7 @@ async function applyCost(cost, ai, type, user) {
   //  add a 20% fee
   let totalCost = cost * 1.2;
   if (user && user.id != "530102778408861706") {
-    console.log(`Cost: ${cost}$`);
+    console.log(`Cost: ${totalCost}$`);
 
     let updatedUser: any = await redisClient.get(`users:${user.id}`);
     updatedUser = JSON.parse(updatedUser);
