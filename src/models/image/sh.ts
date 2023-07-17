@@ -286,6 +286,10 @@ async function generateAsync(data) {
       formatData.params.n = 2;
     }
   }
+  if (data.model.includes("SDXL")) {
+    formatData.params.width = 1024;
+    formatData.params.height = 1024;
+  }
   if (data.strength) {
     formatData.params.denoising_strength = data.strength;
   }
