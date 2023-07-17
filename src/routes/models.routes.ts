@@ -83,9 +83,8 @@ async function request(req, res) {
         res.write("data: " + JSON.stringify(data) + "\n\n");
         if (data.done || data.status == "done" || data.status == "failed") {
           res.end();
-          console.log(data.cost);
           if (data.cost) {
-            await applyCost(data.cost, ai, type, req.user);
+            applyCost(data.cost, ai, type, req.user);
           }
         }
       });
