@@ -160,22 +160,28 @@ export default {
         let cost = spentInSec * 0.00025;
         result.cost = cost;
         if (data.number && data.number > 1) {
-          result.results = await Promise.all(
-            response.data.output.images.map(async (x) => {
-              let res = await axios.get(x, {
-                responseType: "arraybuffer",
-                // change time out to 2 min
-                timeout: 120000,
-              });
-              let base64 = Buffer.from(res.data, "binary").toString("base64");
-              return {
-                base64: base64,
-                id: randomUUID(),
-                seed: Math.floor(Math.random() * 100000000),
-                status: "success",
-              };
-            })
-          );
+          try {
+            result.results = await Promise.all(
+              response.data.output.images.map(async (x) => {
+                let res = await axios.get(x, {
+                  responseType: "arraybuffer",
+                  // change time out to 2 min
+                  timeout: 120000,
+                });
+                let base64 = Buffer.from(res.data, "binary").toString("base64");
+                return {
+                  base64: base64,
+                  id: randomUUID(),
+                  seed: Math.floor(Math.random() * 100000000),
+                  status: "success",
+                };
+              })
+            );
+          } catch (e: any) {
+            console.log(e);
+            console.log(response.data);
+            throw new Error(e);
+          }
         } else {
           let res = await axios.get(response.data.output.image_url, {
             responseType: "arraybuffer",
