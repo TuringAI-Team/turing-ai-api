@@ -71,7 +71,6 @@ async function convertToVideo(audio, image, duration, callback) {
 }
 router.post("/top-vote", topgg, async (req: Request, res: Response) => {
   let body = req.body;
-  console.log(body);
   let botId = "1053015370115588147";
   if (body.bot == botId && body.type == "upvote") {
     let userId = body.user;
