@@ -104,6 +104,15 @@ async function request(req, res) {
   }
 }
 
+router.get("/list", (req, res) => {
+  let types = Object.keys(client);
+  let result = {};
+  types.forEach((t) => {
+    result[t] = client[t].map((a) => a.data);
+  });
+  res.json({ success: true, types: result });
+});
+
 router.get("/", (req, res) => {
   res.json({
     success: true,
