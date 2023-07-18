@@ -85,6 +85,8 @@ router.post("/top-vote", topgg, async (req: Request, res: Response) => {
         data: userId,
       })
     );
+  } else {
+    console.log("body");
   }
 
   res.status(200).json({ success: true });
