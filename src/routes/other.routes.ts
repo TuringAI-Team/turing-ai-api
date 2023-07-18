@@ -10,6 +10,7 @@ import { pub } from "../db/mq.js";
 const router = express.Router();
 
 async function topgg(req, res, next) {
+  console.log(req.headers.authorization);
   if (req.headers.authorization == process.env.TOPGG_AUTH) {
     next();
   } else {
