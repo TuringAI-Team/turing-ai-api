@@ -96,6 +96,7 @@ export default {
       }
       result.toxic = isToxic;
     }
+    return result;
   },
 };
 
