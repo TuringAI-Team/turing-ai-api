@@ -47,6 +47,8 @@ export default {
     let prompt = "";
     messages.forEach((message) => {
       if (message.role == "user") prompt += `User: ${message.content}\n`;
+      else if (message.role == "system")
+        prompt += `System: ${message.content}\n`;
       else prompt += `Assistant: ${message.content}`;
     });
     prompt += "Assistant:";
