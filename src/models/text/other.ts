@@ -62,11 +62,11 @@ export default {
     result.id = res.id;
     result.status = "queued";
     event.emit("data", result);
-    await delay(1200);
+    await delay(2000);
     result = await checkStatus(modelId, res.id);
     event.emit("data", result);
     while (!result.done) {
-      await delay(3000);
+      await delay(5000);
       result = await checkStatus(modelId, res.id);
       event.emit("data", result);
     }
