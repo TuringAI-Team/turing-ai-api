@@ -3,7 +3,7 @@ export async function translateModels(model) {
   let models = {
     blip2: "v2/22whrikqknoc11",
     musicgen: "v2/zeeocl74aergso",
-    openchat: "v2/12w578r78ak2v8",
+    llama2: "v2/39i5i1rtqkm7vk",
   };
   if (!models[model]) {
     throw new Error("Model not found");

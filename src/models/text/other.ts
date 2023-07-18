@@ -14,7 +14,7 @@ export default {
       model: {
         type: "string",
         required: true,
-        options: ["openchat"],
+        options: ["llama2"],
       },
       max_tokens: {
         type: "number",
@@ -44,17 +44,18 @@ export default {
       status: null,
       done: false,
     };
-    let prompt = "<s>";
+    let prompt = "";
     messages.forEach((message) => {
-      if (message.role == "user")
-        prompt += `User: ${message.content}<|end_of_turn|>`;
-      else prompt += `Assistant GPT4: ${message.content}`;
+      if (message.role == "user") prompt += `User: ${message.content}\n`;
+      else prompt += `Assistant: ${message.content}`;
     });
+    prompt += "Assistant:";
     let res = await request(modelId, "run", {
       input: {
         prompt: prompt,
         temperature: temperature,
         max_new_tokens: max_tokens,
+        stop: ["User:"],
       },
     });
     result.id = res.id;
@@ -85,6 +86,9 @@ async function checkStatus(modelId, id) {
   } else if (res.status.includes("COMPLETED")) {
     result.status = "done";
     result.result = res.output;
+    if (result.result.includes("\nUser:")) {
+      result.result = result.result.split("\nUser:")[0];
+    }
     res.done = true;
     let pricePerS = 0.00038;
     result.cost = res.executionTime * pricePerS;
