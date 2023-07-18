@@ -101,8 +101,8 @@ export default {
             guidance_scale: guidance_scale,
             negative_prompt: negative_prompt,
             num_outputs: data.number || 1,
-            w: data.width || 512,
-            h: data.height || 512,
+            width: data.width || 512,
+            height: data.height || 512,
           },
         },
       });
@@ -149,8 +149,8 @@ export default {
             guidance_scale: guidance_scale,
             negative_prompt: negative_prompt,
             num_outputs: data.number || 1,
-            w: data.width || 512,
-            h: data.height || 512,
+            width: data.width || 512,
+            height: data.height || 512,
           },
         },
       }).then(async (response) => {
