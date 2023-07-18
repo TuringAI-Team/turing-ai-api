@@ -91,7 +91,7 @@ async function checkStatus(modelId, id) {
     if (result.result.includes("\nUser:")) {
       result.result = result.result.split("\nUser:")[0];
     }
-    res.done = true;
+    result.done = true;
     let pricePerS = 0.00038;
     result.cost = res.executionTime * pricePerS;
   }
