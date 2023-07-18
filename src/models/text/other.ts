@@ -58,6 +58,7 @@ export default {
         stop: ["User:"],
       },
     });
+    console.log(res);
     result.id = res.id;
     result.status = "queued";
     event.emit("data", result);
@@ -81,6 +82,7 @@ async function checkStatus(modelId, id) {
     done: false,
     id: id,
   };
+  console.log(res);
   if (res.status.toLowerCase().includes("progress")) {
     result.status = "generating";
   } else if (res.status.includes("COMPLETED")) {
