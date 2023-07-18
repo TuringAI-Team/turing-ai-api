@@ -97,7 +97,7 @@ export default {
         data: {
           input: {
             prompt: prompt,
-            num_inference_steps: `${steps}` || "50",
+            num_inference_steps: steps || 50,
             guidance_scale: guidance_scale,
             negative_prompt: negative_prompt,
             num_outputs: data.number || 1,
@@ -145,7 +145,7 @@ export default {
         data: {
           input: {
             prompt: prompt,
-            num_inference_steps: `${steps}` || "50",
+            num_inference_steps: steps || 50,
             guidance_scale: guidance_scale,
             negative_prompt: negative_prompt,
             num_outputs: data.number || 1,
