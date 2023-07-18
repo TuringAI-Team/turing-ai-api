@@ -10,7 +10,6 @@ import { pub } from "../db/mq.js";
 const router = express.Router();
 
 async function topgg(req, res, next) {
-  console.log(req.headers.authorization);
   if (req.headers.authorization == process.env.TOPGG_AUTH) {
     next();
   } else {
@@ -72,6 +71,7 @@ async function convertToVideo(audio, image, duration, callback) {
 }
 router.post("/top-vote", topgg, async (req: Request, res: Response) => {
   let body = req.body;
+  console.log(body);
   let botId = "1053015370115588147";
   if (body.bot == botId && body.type == "upvote") {
     let userId = body.user;
@@ -86,8 +86,6 @@ router.post("/top-vote", topgg, async (req: Request, res: Response) => {
         data: userId,
       })
     );
-  } else {
-    console.log("body");
   }
 
   res.status(200).json({ success: true });
