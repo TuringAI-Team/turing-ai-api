@@ -50,26 +50,27 @@ export default {
       else prompt += `Assistant: ${message.content}`;
     });
     prompt += "Assistant:";
-    let res = await request(modelId, "run", {
+    request(modelId, "run", {
       input: {
         prompt: prompt,
         temperature: temperature,
         max_new_tokens: max_tokens,
         stop: ["User:"],
       },
-    });
-    console.log(res);
-    result.id = res.id;
-    result.status = "queued";
-    event.emit("data", result);
-    await delay(2000);
-    result = await checkStatus(modelId, res.id);
-    event.emit("data", result);
-    while (!result.done) {
-      await delay(5000);
+    }).then(async (res) => {
+      result.id = res.id;
+      result.status = "queued";
+      event.emit("data", result);
+      await delay(2000);
       result = await checkStatus(modelId, res.id);
       event.emit("data", result);
-    }
+      while (!result.done) {
+        await delay(5000);
+        result = await checkStatus(modelId, res.id);
+        event.emit("data", result);
+      }
+    });
+    return event;
   },
 };
 
@@ -82,7 +83,6 @@ async function checkStatus(modelId, id) {
     done: false,
     id: id,
   };
-  console.log(res);
   if (res.status.toLowerCase().includes("progress")) {
     result.status = "generating";
   } else if (res.status.includes("COMPLETED")) {
