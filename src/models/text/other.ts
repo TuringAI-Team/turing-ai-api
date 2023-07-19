@@ -95,7 +95,7 @@ async function checkStatus(modelId, id) {
     }
     result.done = true;
     let pricePerS = 0.0004;
-    result.cost = res.executionTime * pricePerS;
+    result.cost = (res.executionTime / 1000) * pricePerS;
     console.log(result.cost);
   }
   return result;
