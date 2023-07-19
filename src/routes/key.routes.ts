@@ -91,6 +91,9 @@ router.get(
       id: d.id,
       apiToken: d["api-token"],
       captchaToken: d["captcha-token"],
+      name: d.name,
+      created_at: d.created_at,
+      last_used: d.lastUsed,
     };
     res.json({ success: true, key: keyData });
   }

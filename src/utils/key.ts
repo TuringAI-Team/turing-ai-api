@@ -53,7 +53,7 @@ export async function generateKey(
     console.log(error);
     return false;
   }
-  return { apiToken, captchaToken, id };
+  return { apiToken, captchaToken, id, name };
 }
 
 export async function checkCaptchaToken(token: string, req) {
