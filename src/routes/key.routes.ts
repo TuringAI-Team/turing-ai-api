@@ -93,7 +93,7 @@ router.get(
       captchaToken: d["captcha-token"],
       name: d.name,
       createdAt: d.created_at,
-      last_used: d.lastUsed,
+      lastUsed: d.lastUsed,
     };
     res.json({ success: true, key: keyData });
   }
