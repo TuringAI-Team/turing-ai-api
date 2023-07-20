@@ -52,7 +52,7 @@ async function convertToVideo(audio, image, duration, callback) {
     .input(audioPath)
     .input(imagePath)
     .outputOptions([
-      "-c:v libopenh264",
+      "-c:v libx264",
       "-c:a aac",
       "-shortest",
       "-vf scale=1280:720",
