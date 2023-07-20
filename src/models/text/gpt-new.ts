@@ -15,7 +15,7 @@ const openai = new OpenAIApi(configuration);
 
 export default {
   data: {
-    name: "gpt",
+    name: "gpt-new",
     fullName: "OpenAI models",
     parameters: {
       messages: {
