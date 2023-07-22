@@ -24,6 +24,11 @@ export default {
         options: availableFilters,
         description: "Filters you want to apply",
       },
+      stream: {
+        type: "boolean",
+        required: false,
+        default: false,
+      },
     },
   },
   execute: async (data) => {
@@ -42,14 +47,14 @@ export default {
     };
     event.emit("data", result);
     var res;
-    try {
+    /* try {
       res = await openai.createModeration({
         input: text,
       });
     } catch (e) {
       console.log(e);
       res = {};
-    }
+    }*/
     if (filters.find((f) => f === "nsfw")) {
       let isNsfw = false;
 
