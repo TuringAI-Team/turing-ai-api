@@ -47,14 +47,14 @@ export default {
     };
     event.emit("data", result);
     var res;
-    /* try {
+    try {
       res = await openai.createModeration({
         input: text,
       });
     } catch (e) {
       console.log(e);
       res = {};
-    }*/
+    }
     if (filters.find((f) => f === "nsfw")) {
       let isNsfw = false;
 
@@ -107,7 +107,9 @@ export default {
       result.toxic = isToxic;
     }
     result.done = true;
-    event.emit("data", result);
+    setTimeout(() => {
+      event.emit("data", result);
+    }, 1000);
     return event;
   },
 };
