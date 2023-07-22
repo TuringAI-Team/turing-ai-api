@@ -47,13 +47,14 @@ export default {
       stream: {
         type: "boolean",
         required: false,
-        default: true,
+        default: false,
       },
     },
   },
   execute: async (data) => {
     let { messages, model, max_tokens, temperature, plugins, pw, stream } =
       data;
+    console.log(`stream ${stream}`);
 
     return await streams(data);
   },
