@@ -383,14 +383,20 @@ router.post("/webhook", async (req, res) => {
 
 router.post("/guilds", async (req, res) => {
   let accessToken = req.body.accessToken;
-  let response = await axios({
-    url: `https://discord.com/api/v8/users/@me/guilds?limit=200`,
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
-  });
-  let guilds = response.data;
-  res.status(response.status).json(guilds);
+  try {
+    let response = await axios({
+      url: `https://discord.com/api/v8/users/@me/guilds?limit=200`,
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    let guilds = response.data;
+
+    res.status(response.status).json(guilds);
+  } catch (e: any) {
+    res.status(500).json({ error: e.response.data });
+  }
 });
 
 export default router;
