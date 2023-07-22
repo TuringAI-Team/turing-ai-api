@@ -121,7 +121,7 @@ export default {
       },
     }).then(async (response) => {
       let spentInSec = (Date.now() - start) / 1000;
-      let cost = spentInSec * 0.00025;
+      let cost = (response.data.executionTime / 1000) * 0.00025;
       result.cost = cost;
       if (data.number && data.number > 1) {
         try {
@@ -162,7 +162,7 @@ export default {
       result.status = "done";
       result.progress = null;
       console.log(
-        `result for ${prompt} is ${result.status} with cost ${result.cost} and ${result.results.length} images on ${response.data.executionTime}ms`
+        `result for ${prompt} is ${result.status} with cost ${result.cost} and ${result.results.length} images on ${response.data.executionTime}ms and ${response.data.delayTime}ms delay`
       );
       event.emit("data", result);
     });
