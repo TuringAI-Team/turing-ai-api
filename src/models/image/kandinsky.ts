@@ -169,7 +169,9 @@ export default {
       }
       result.status = "done";
       result.progress = null;
-      console.log(`result is ${JSON.stringify(result)}`);
+      console.log(
+        `result for ${prompt} is ${result.status} with cost ${result.cost} and ${result.results.length} images`
+      );
       event.emit("data", result);
     });
     return event;
