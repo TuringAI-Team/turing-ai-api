@@ -38,7 +38,7 @@ export default {
       model = "chat-bison";
     }
     let event = new EventEmitter();
-    let res = {
+    let res: any = {
       cost: 0,
       done: false,
       result: "",
@@ -101,6 +101,10 @@ export default {
       cost = (promptLength + resultLength) * pricePerK;
       res.cost = cost;
       res.done = true;
+      res = {
+        ...res,
+        ...response.data,
+      };
       event.emit("data", res);
     });
 
