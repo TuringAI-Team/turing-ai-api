@@ -43,6 +43,10 @@
           "/text/google"
         ],
         [
+          "OpenAI models",
+          "/text/gpt-new"
+        ],
+        [
           "OpenAI Models",
           "/text/gpt"
         ],

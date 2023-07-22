@@ -47,6 +47,12 @@ POST *https://api.turing.sh/image/kandinsky*
   - Required: false
   - Default: 4
 
+- **model_version**
+  - Type: string
+  - Required: false
+  - Options: 2.1, 2.2
+  - Default: 2.2
+
 - **stream**
   - Type: boolean
   - Required: false
@@ -74,6 +80,7 @@ POST *https://api.turing.sh/image/kandinsky*
   "width": 512,
   "height": 512,
   "cfg_scale": 4,
+  "model_version": "2.2",
   "stream": true
 },
     })
@@ -97,6 +104,7 @@ POST *https://api.turing.sh/image/kandinsky*
   "width": 512,
   "height": 512,
   "cfg_scale": 4,
+  "model_version": "2.2",
   "stream": true
 }),
   )

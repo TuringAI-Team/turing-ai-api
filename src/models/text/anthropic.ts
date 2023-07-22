@@ -56,67 +56,45 @@ export default {
       else prompt += `${Anthropic.AI_PROMPT} ${message.content}`;
     });
     prompt += `${Anthropic.AI_PROMPT}`;
-    if (stream) {
-      const event = new EventEmitter();
-      anthropic.completions
-        .create({
-          model: model,
-          max_tokens_to_sample: max_tokens,
-          prompt: prompt,
-          stream: true,
-        })
-        .then(async (streamEv) => {
-          let fullCompletion = "";
-          let num = 0;
-          for await (const completion of streamEv) {
-            let com: any = completion;
-            num++;
-            if (com.stop_reason) {
-              com.done = true;
-              let promptTokens = getPromptLength(prompt);
-              let completionTokens = getPromptLength(com.result);
-              let pricePerK = {
-                prompt: 1.63,
-                completion: 5.51,
-              };
-              if (!model.includes("instant")) {
-                pricePerK.prompt = 11.02;
-                pricePerK.completion = 32.68;
-              }
-              let promptCost = (promptTokens / 1000000) * pricePerK.prompt;
-              let completionCOst =
-                (completionTokens / 1000000) * pricePerK.completion;
-              com.cost = promptCost + completionCOst;
-            }
-            fullCompletion += com.completion;
-            com.completion = fullCompletion;
-            com.result = fullCompletion;
-            if (num >= 10 || com.stop_reason) {
-              event.emit("data", com);
-            }
-          }
-        });
-      return event;
-    } else {
-      const completion = await anthropic.completions.create({
+    const event = new EventEmitter();
+    anthropic.completions
+      .create({
         model: model,
         max_tokens_to_sample: max_tokens,
         prompt: prompt,
+        stream: true,
+      })
+      .then(async (streamEv) => {
+        let fullCompletion = "";
+        let num = 0;
+        for await (const completion of streamEv) {
+          let com: any = completion;
+          num++;
+          if (com.stop_reason) {
+            com.done = true;
+            let promptTokens = getPromptLength(prompt);
+            let completionTokens = getPromptLength(com.result);
+            let pricePerK = {
+              prompt: 1.63,
+              completion: 5.51,
+            };
+            if (!model.includes("instant")) {
+              pricePerK.prompt = 11.02;
+              pricePerK.completion = 32.68;
+            }
+            let promptCost = (promptTokens / 1000000) * pricePerK.prompt;
+            let completionCOst =
+              (completionTokens / 1000000) * pricePerK.completion;
+            com.cost = promptCost + completionCOst;
+          }
+          fullCompletion += com.completion;
+          com.completion = fullCompletion;
+          com.result = fullCompletion;
+          if (num >= 10 || com.stop_reason) {
+            event.emit("data", com);
+          }
+        }
       });
-      let promptTokens = getPromptLength(prompt);
-      let completionTokens = getPromptLength(completion.completion);
-      let pricePerK = {
-        prompt: 1.63,
-        completion: 5.51,
-      };
-      if (!model.includes("instant")) {
-        pricePerK.prompt = 11.02;
-        pricePerK.completion = 32.68;
-      }
-      let promptCost = (promptTokens / 1000000) * pricePerK.prompt;
-      let completionCOst = (completionTokens / 1000000) * pricePerK.completion;
-      let cost = promptCost + completionCOst;
-      return { ...completion, result: completion.completion, cost };
-    }
+    return event;
   },
 };

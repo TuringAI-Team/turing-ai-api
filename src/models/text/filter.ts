@@ -1,6 +1,8 @@
 import axios from "axios";
 import { Configuration, OpenAIApi } from "openai";
 import { nsfwWords, underagedCebs, youngWords } from "../../utils/keywords.js";
+import { EventEmitter } from "events";
+
 const availableFilters = ["nsfw", "cp", "toxicity"];
 const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
@@ -30,12 +32,15 @@ export default {
     if (filters.length === 0) {
       throw new Error("No valid filters provided");
     }
+    let event = new EventEmitter();
     let result = {
       nsfw: false,
       youth: false,
       cp: false,
       toxic: false,
+      done: false,
     };
+    event.emit("data", result);
     var res;
     try {
       res = await openai.createModeration({
@@ -96,7 +101,9 @@ export default {
       }
       result.toxic = isToxic;
     }
-    return result;
+    result.done = true;
+    event.emit("data", result);
+    return event;
   },
 };
 

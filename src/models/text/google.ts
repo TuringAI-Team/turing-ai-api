@@ -2,6 +2,7 @@ import axios from "axios";
 import { GoogleAuth } from "google-auth-library";
 import { DiscussServiceClient } from "@google-ai/generativelanguage";
 import { getPromptLength } from "../../utils/tokenizer.js";
+import { EventEmitter } from "events";
 
 export default {
   data: {
@@ -36,6 +37,12 @@ export default {
     if (!model) {
       model = "chat-bison";
     }
+    let event = new EventEmitter();
+    let res = {
+      cost: 0,
+      done: false,
+      result: "",
+    };
     // get message that is message.role == "system"
     let message = messages.find((message) => message.role == "system");
     messages = messages.map((message) => {
@@ -52,11 +59,11 @@ export default {
       keyFilename: "./g-keyfile.json", // Path to your service account key file
       scopes: ["https://www.googleapis.com/auth/cloud-platform"],
     });
-
+    event.emit("data", res);
     const client = await auth.getClient();
     let token: any = await client.getAccessToken();
     token = token.token;
-    let response = await axios({
+    axios({
       method: "post",
       url: `https://us-central1-aiplatform.googleapis.com/v1/projects/turingai-4354f/locations/us-central1/publishers/google/models/${
         model == "chat-bison" ? "chat-bison@001" : "chat-bison@001"
@@ -82,15 +89,21 @@ export default {
           topK: 40,
         },
       },
+    }).then((response) => {
+      let cost = 0;
+      let promptLength = getPromptLength(
+        messages.map((message) => message.content).join(" ")
+      );
+      let result = response.data.predictions[0].candidates[0].content;
+      res.result = result;
+      let resultLength = getPromptLength(result);
+      let pricePerK = 0.0003;
+      cost = (promptLength + resultLength) * pricePerK;
+      res.cost = cost;
+      res.done = true;
+      event.emit("data", res);
     });
-    let cost = 0;
-    let promptLength = getPromptLength(
-      messages.map((message) => message.content).join(" ")
-    );
-    let result = response.data.predictions[0].candidates[0].content;
-    let resultLength = getPromptLength(result);
-    let pricePerK = 0.0003;
-    cost = (promptLength + resultLength) * pricePerK;
-    return { ...response.data, cost: cost, result };
+
+    return event;
   },
 };

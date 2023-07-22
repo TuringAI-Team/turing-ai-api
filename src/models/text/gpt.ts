@@ -55,11 +55,7 @@ export default {
     let { messages, model, max_tokens, temperature, plugins, pw, stream } =
       data;
 
-    if (stream == true) {
-      return await streams(data);
-    } else {
-      return await rest(data);
-    }
+    return await streams(data);
   },
 };
 

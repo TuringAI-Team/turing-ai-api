@@ -1,4 +1,11 @@
 import { Configuration, OpenAIApi } from "openai";
+import { EventEmitter } from "events";
+import { randomUUID } from "crypto";
+
+const configuration = new Configuration({
+  apiKey: process.env.OPENAI_KEY,
+});
+const openai = new OpenAIApi(configuration);
 
 export default {
   data: {
@@ -25,13 +32,14 @@ export default {
         required: false,
         description: "Image you want to vary",
       },
+      stream: {
+        type: "boolean",
+        required: false,
+        default: false,
+      },
     },
   },
   execute: async (data) => {
-    const configuration = new Configuration({
-      apiKey: process.env.OPENAI_KEY,
-    });
-    const openai = new OpenAIApi(configuration);
     let {
       prompt,
       number,
@@ -43,23 +51,60 @@ export default {
       size: any;
       image: File;
     } = data;
-    let response;
+    let event = new EventEmitter();
+    let result = {
+      cost: null,
+      results: [],
+      status: "generating",
+      progress: 0,
+      id: randomUUID(),
+      done: false,
+    };
+    event.emit("data", result);
+    if (size == "512x512") result.cost = 0.018;
+    if (size == "256x256") result.cost = 0.016;
+    if (size == "1024x1024") result.cost = 0.02;
+
     if (!image) {
-      response = await openai.createImage({
-        prompt,
-        n: number,
-        size,
-      });
-      var imagesArr = response.data.data.map((d, i) => {
-        return { attachment: d.url, name: `result-${i}.png` };
-      });
-      return { images: imagesArr };
+      openai
+        .createImage({
+          prompt,
+          n: number,
+          size,
+        })
+        .then((res) => {
+          var imagesArr = res.data.data.map((d, i) => {
+            return {
+              attachment: d.url,
+              name: `result-${i}.png`,
+              id: randomUUID(),
+            };
+          });
+          result.results = imagesArr;
+          result.status = "done";
+          result.progress = null;
+          result.done = true;
+          event.emit("data", result);
+        });
+
+      return event;
     } else {
-      response = await openai.createImageVariation(image, number, size);
-      var imagesArr = response.data.data.map((d, i) => {
-        return { attachment: d.url, name: `result-${i}.png` };
+      openai.createImageVariation(image, number, size).then((res) => {
+        var imagesArr = res.data.data.map((d, i) => {
+          return {
+            attachment: d.url,
+            name: `result-${i}.png`,
+            id: randomUUID(),
+          };
+        });
+        result.results = imagesArr;
+        result.status = "done";
+        result.progress = null;
+        result.done = true;
+        event.emit("data", result);
       });
-      return { images: imagesArr };
+
+      return event;
     }
   },
 };

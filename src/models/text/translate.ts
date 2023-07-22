@@ -1,4 +1,5 @@
 import axios from "axios";
+import { EventEmitter } from "events";
 
 export default {
   data: {
@@ -33,7 +34,14 @@ export default {
     let { text, from, to } = data;
     let endpoint = "gtranslate";
     if (data.ai) endpoint = "mtranslate";
-    let response = await axios({
+    let result = {
+      cost: 0,
+      result: "",
+      done: false,
+    };
+    let event = new EventEmitter();
+    event.emit("data", result);
+    let response = axios({
       url: "https://api.pawan.krd/gtranslate",
       method: "GET",
       params: {
@@ -41,10 +49,11 @@ export default {
         from,
         to,
       },
+    }).then((res) => {
+      result.result = res.data.translated;
+      result.done = true;
+      event.emit("data", result);
     });
-    return {
-      ...response.data,
-      cost: 0,
-    };
+    return event;
   },
 };

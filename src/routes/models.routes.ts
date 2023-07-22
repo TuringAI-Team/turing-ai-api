@@ -92,7 +92,15 @@ async function request(req, res) {
       if (execution?.cost) {
         applyCost(execution.cost, ai, type, req.user);
       }
-      res.status(200).json({ success: true, ...execution });
+      new Promise((resolve) => {
+        execution.on("data", (data) => {
+          if (data.done || data.status == "done" || data.status == "failed") {
+            resolve(data);
+          }
+        });
+      }).then((d: any) => {
+        res.json({ success: true, ...d });
+      });
     }
   } catch (error: any) {
     let resultError = error;

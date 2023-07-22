@@ -1,4 +1,6 @@
 import { predict } from "replicate-api";
+import { EventEmitter } from "events";
+
 export default {
   data: {
     name: "controlnet",
@@ -26,6 +28,11 @@ export default {
         type: "string",
         required: true,
       },
+      stream: {
+        type: "boolean",
+        required: false,
+        default: false,
+      },
     },
   },
   execute: async (data) => {
@@ -34,7 +41,14 @@ export default {
       model,
       image,
     }: { prompt: string; model: string; image: any } = data;
-    const prediction = await predict({
+    let event = new EventEmitter();
+    let result = {
+      cost: 0,
+      url: "",
+      done: false,
+    };
+    event.emit("data", result);
+    predict({
       model: `jagilley/controlnet-${model}`, // The model name
       input: {
         image: image,
@@ -42,9 +56,13 @@ export default {
       }, // The model specific input
       token: process.env.REPLICATE_API_KEY, // You need a token from replicate.com
       poll: true, // Wait for the model to finish
+    }).then((prediction: any) => {
+      if (prediction.error) throw new Error(prediction.error);
+      result.url = prediction.output;
+      result.done = true;
+      result.cost = 0.003;
+      event.emit("data", result);
     });
-
-    if (prediction.error) throw new Error(prediction.error);
-    return prediction.output;
+    return event;
   },
 };

@@ -1,4 +1,5 @@
 import axios from "axios";
+import { EventEmitter } from "events";
 
 export default {
   data: {
@@ -30,6 +31,13 @@ export default {
   },
   execute: async (data) => {
     let { messages, prompt, chat, model, stop } = data;
+    let event = new EventEmitter();
+    let result = {
+      cost: 0,
+      done: false,
+      result: "",
+    };
+    event.emit("data", result);
     if (chat) {
       let prompt = ``;
       let modelInfo = await getModelinfo(model);
@@ -41,22 +49,21 @@ export default {
         }
       });
       prompt += `${modelInfo.stop}`;
-      let result = await huggingface(model, prompt, stop);
-      return {
-        ...result,
-        cost: 0,
-      };
+      let result = huggingface(model, prompt, stop, event);
+      return event;
     } else {
-      let result = await huggingface(model, prompt, stop);
-      return {
-        ...result,
-        cost: 0,
-      };
+      let result = huggingface(model, prompt, stop, event);
+      return event;
     }
   },
 };
 
-export async function huggingface(model, input, stop) {
+export async function huggingface(model, input, stop, event) {
+  let result = {
+    cost: 0,
+    done: false,
+    result: "",
+  };
   let oldText;
   let loop = true;
   while (loop) {
@@ -66,6 +73,7 @@ export async function huggingface(model, input, stop) {
     let answer = response.generated_text.split(stop)[1];
     if (answer == oldText) {
       loop = false;
+      result.done = true;
     } else {
       if (!oldText) {
         oldText = answer;
@@ -75,6 +83,8 @@ export async function huggingface(model, input, stop) {
         input += answer;
       }
     }
+    result.result = oldText;
+    event.emit("data", result);
   }
 
   return { result: oldText };

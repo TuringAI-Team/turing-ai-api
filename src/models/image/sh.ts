@@ -135,12 +135,37 @@ export default {
     };
     let maxTime = 45;
     if (res.id) {
-      if (data.stream == null) data.stream = true;
-      if (data.stream) {
-        let stream = new EventEmitter();
-        stream.emit("data", result);
-        checkRequest(res.id).then((check) => {
+      let stream = new EventEmitter();
+      stream.emit("data", result);
+      checkRequest(res.id).then((check) => {
+        result.progress = ((check.wait_time / maxTime) * 100) / 100;
+        result.queue_position = check.queue_position;
+        if (check.queue_position >= 1) result.status = "queued";
+        if (check.wait_time == 0) {
+          result.status = "generating";
+          result.progress = 0.99;
+        }
+        if (check.done) {
+          result.status = "done";
+          result.progress = null;
+          result.results = check.generations.map((x) => {
+            return {
+              seed: x.seed,
+              id: x.id,
+              base64: x.img,
+              status: x.censored ? "filtered" : "success",
+            };
+          });
+          stream.emit("data", result);
+          return;
+        }
+      });
+
+      let interval = setInterval(async () => {
+        try {
+          let check = await checkRequest(res.id);
           result.progress = ((check.wait_time / maxTime) * 100) / 100;
+          result.wait_time = check.wait_time;
           result.queue_position = check.queue_position;
           if (check.queue_position >= 1) result.status = "queued";
           if (check.wait_time == 0) {
@@ -158,83 +183,18 @@ export default {
                 status: x.censored ? "filtered" : "success",
               };
             });
-            stream.emit("data", result);
-            return;
-          }
-        });
-
-        let interval = setInterval(async () => {
-          try {
-            let check = await checkRequest(res.id);
-            result.progress = ((check.wait_time / maxTime) * 100) / 100;
-            result.wait_time = check.wait_time;
-            result.queue_position = check.queue_position;
-            if (check.queue_position >= 1) result.status = "queued";
-            if (check.wait_time == 0) {
-              result.status = "generating";
-              result.progress = 0.99;
-            }
-            if (check.done) {
-              result.status = "done";
-              result.progress = null;
-              result.results = check.generations.map((x) => {
-                return {
-                  seed: x.seed,
-                  id: x.id,
-                  base64: x.img,
-                  status: x.censored ? "filtered" : "success",
-                };
-              });
-              clearInterval(interval);
-            }
-            stream.emit("data", result);
-          } catch (e) {
             clearInterval(interval);
-            stream.emit("data", {
-              status: "failed",
-              error: e,
-            });
           }
-        }, 10000);
-        return stream;
-      } else {
-        let check = await checkRequest(res.id);
-        result.wait_time = check.wait_time;
-        result.queue_position = check.queue_position;
-
-        if (check.done) {
-          result.status = "done";
-          result.progress = null;
-          result.results = check.generations.map((x) => {
-            return {
-              seed: x.seed,
-              id: x.id,
-              base64: x.img,
-              status: x.censored ? "filtered" : "success",
-            };
+          stream.emit("data", result);
+        } catch (e) {
+          clearInterval(interval);
+          stream.emit("data", {
+            status: "failed",
+            error: e,
           });
-          return result;
         }
-        while (!result.done) {
-          let check = await checkRequest(res.id);
-          result.wait_time = check.wait_time;
-          result.queue_position = check.queue_position;
-          if (check.done) {
-            result.status = "done";
-            result.progress = null;
-            result.results = check.generations.map((x) => {
-              return {
-                seed: x.seed,
-                id: x.id,
-                base64: x.img,
-                status: x.censored ? "filtered" : "success",
-              };
-            });
-            return result;
-          }
-        }
-        return result;
-      }
+      }, 10000);
+      return stream;
     } else {
       throw new Error("Failed to generate image");
     }

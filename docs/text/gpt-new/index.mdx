@@ -1,9 +1,9 @@
 ---
-title: Other models
+title: OpenAI models
 ---
 
-# Other models
-POST *https://api.turing.sh/text/other*
+# OpenAI models
+POST *https://api.turing.sh/text/gpt-new*
 ## Parameters
 
 
@@ -14,40 +14,43 @@ POST *https://api.turing.sh/text/other*
 - **model**
   - Type: string
   - Required: true
-  - Options: llama2
+  - Options: gpt-3.5-turbo, gpt-4, gpt-3.5-turbo-16k
 
 - **max_tokens**
   - Type: number
   - Required: false
-  - Default: 300
+  - Default: 512
 
 - **temperature**
   - Type: number
   - Required: false
-  - Default: 0.7
+  - Default: 0.9
 
-- **stream**
-  - Type: boolean
+- **plugins**
+  - Type: array
   - Required: false
+  - Options: google, youtube-search, weather, wikipedia, tenor, alphavantage-stocks, alphavantage-crypto, alphavantage-forex, free-games, tasty, world-news, calculator, github, code-interpreter, diagrams
+  - Default: 
 
 ## Examples
 
-<CodeGroup title="Other models example">
+<CodeGroup title="OpenAI models example">
   ```typescript
   import axios from "axios";
   (async () => {
     let response = await axios({
       method: "post",
-      url: 'https://api.turing.sh/text/other',
+      url: 'https://api.turing.sh/text/gpt-new',
       headers: {
         "Content-Type": "application/json",
         Authorization: "Bearer YOUR_API_KEY",
       },
       data: {
   "messages": "array",
-  "model": "llama2",
-  "max_tokens": 300,
-  "temperature": 0.7
+  "model": "gpt-3.5-turbo",
+  "max_tokens": 512,
+  "temperature": 0.9,
+  "plugins": []
 },
     })
   })();
@@ -56,16 +59,17 @@ POST *https://api.turing.sh/text/other*
   import requests
   import json
   response = requests.post(
-    "https://api.turing.sh/text/other",
+    "https://api.turing.sh/text/gpt-new",
     headers={
       "Content-Type": "application/json",
       "Authorization": "Bearer YOUR_API_KEY",
     },
     data=json.dumps({
   "messages": "array",
-  "model": "llama2",
-  "max_tokens": 300,
-  "temperature": 0.7
+  "model": "gpt-3.5-turbo",
+  "max_tokens": 512,
+  "temperature": 0.9,
+  "plugins": []
 }),
   )
   ```

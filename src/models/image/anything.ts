@@ -70,129 +70,78 @@ export default {
       progress: 0,
       id: randomUUID(),
     };
-    if (stream) {
-      event = new EventEmitter();
+    event = new EventEmitter();
+    event.emit("data", result);
+    //  after 5s change progress to 0.46
+    setTimeout(() => {
+      result.progress = 0.46;
       event.emit("data", result);
-      //  after 5s change progress to 0.46
-      setTimeout(() => {
-        result.progress = 0.46;
-        event.emit("data", result);
-      }, 5000);
-      //  after 10s change progress to 0.92
-      setTimeout(() => {
-        result.progress = 0.92;
-        event.emit("data", result);
-      }, 10000);
-    }
+    }, 5000);
+    //  after 10s change progress to 0.92
+    setTimeout(() => {
+      result.progress = 0.92;
+      event.emit("data", result);
+    }, 10000);
     let start = Date.now();
-    if (!stream) {
-      let response = await axios({
-        url: "https://api.runpod.ai/v2/sd-anything-v4/runsync",
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${process.env.RUNPOD_KEY}`,
+
+    axios({
+      url: "https://api.runpod.ai/v2/sd-anything-v4/runsync",
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${process.env.RUNPOD_KEY}`,
+      },
+      data: {
+        input: {
+          prompt: prompt,
+          num_inference_steps: steps || 50,
+          guidance_scale: guidance_scale,
+          negative_prompt: negative_prompt,
+          num_outputs: data.number || 1,
+          width: data.width || 512,
+          height: data.height || 512,
         },
-        data: {
-          input: {
-            prompt: prompt,
-            num_inference_steps: steps || 50,
-            guidance_scale: guidance_scale,
-            negative_prompt: negative_prompt,
-            num_outputs: data.number || 1,
-            width: data.width || 512,
-            height: data.height || 512,
-          },
-        },
-      });
+      },
+    }).then(async (response) => {
       let spentInSec = (Date.now() - start) / 1000;
       let cost = spentInSec * 0.00025;
       result.cost = cost;
       if (data.number && data.number > 1) {
+        console.log(response.data);
         result.results = await Promise.all(
           response.data.output.map(async (x) => {
             let res = await axios.get(x.image, {
               responseType: "arraybuffer",
+              // change time out to 2 min
+              timeout: 120000,
             });
             let base64 = Buffer.from(res.data, "binary").toString("base64");
             return {
               base64: base64,
+              id: randomUUID(),
               seed: x.seed,
+              status: "success",
             };
           })
         );
       } else {
         let res = await axios.get(response.data.output.image, {
           responseType: "arraybuffer",
+          timeout: 120000,
         });
         let base64 = Buffer.from(res.data, "binary").toString("base64");
         result.results.push({
           base64: base64,
+          id: randomUUID(),
           seed: response.data.output.seed,
+          status: "success",
         });
       }
-      return result;
-    } else {
-      axios({
-        url: "https://api.runpod.ai/v2/sd-anything-v4/runsync",
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${process.env.RUNPOD_KEY}`,
-        },
-        data: {
-          input: {
-            prompt: prompt,
-            num_inference_steps: steps || 50,
-            guidance_scale: guidance_scale,
-            negative_prompt: negative_prompt,
-            num_outputs: data.number || 1,
-            width: data.width || 512,
-            height: data.height || 512,
-          },
-        },
-      }).then(async (response) => {
-        let spentInSec = (Date.now() - start) / 1000;
-        let cost = spentInSec * 0.00025;
-        result.cost = cost;
-        if (data.number && data.number > 1) {
-          console.log(response.data);
-          result.results = await Promise.all(
-            response.data.output.map(async (x) => {
-              let res = await axios.get(x.image, {
-                responseType: "arraybuffer",
-                // change time out to 2 min
-                timeout: 120000,
-              });
-              let base64 = Buffer.from(res.data, "binary").toString("base64");
-              return {
-                base64: base64,
-                id: randomUUID(),
-                seed: x.seed,
-                status: "success",
-              };
-            })
-          );
-        } else {
-          let res = await axios.get(response.data.output.image, {
-            responseType: "arraybuffer",
-            timeout: 120000,
-          });
-          let base64 = Buffer.from(res.data, "binary").toString("base64");
-          result.results.push({
-            base64: base64,
-            id: randomUUID(),
-            seed: response.data.output.seed,
-            status: "success",
-          });
-        }
-        result.status = "done";
-        result.progress = null;
-        event.emit("data", result);
-      });
-      return event;
-    }
+      result.status = "done";
+      result.progress = null;
+      event.emit("data", result);
+    });
+    return event;
   },
 };
