@@ -62,6 +62,11 @@ export default {
 async function streams(data) {
   let { messages, model, max_tokens, temperature, plugins, pw, stream } = data;
   const event = new EventEmitter();
+  let log = false;
+  // random probabilite of 33% to log
+  if (Math.random() < 0.33) {
+    log = true;
+  }
   if (data.plugins && data.plugins.length > 0) {
     let functions = [];
     let messages = data.messages;
@@ -258,7 +263,9 @@ async function streams(data) {
             if (finishReason) {
               result.finishReason = finishReason;
             }
-            console.log(`result ${JSON.stringify(result)}`);
+            if (log) {
+              console.log(`result ${JSON.stringify(result)}`);
+            }
             event.emit("data", result);
           }
         },
