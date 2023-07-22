@@ -258,6 +258,7 @@ async function streams(data) {
             if (finishReason) {
               result.finishReason = finishReason;
             }
+            console.log(`result ${JSON.stringify(result)}`);
             event.emit("data", result);
           }
         },
