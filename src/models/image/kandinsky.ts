@@ -95,15 +95,7 @@ export default {
         event.emit("data", result);
       }
     }, 5000);
-    //  after 10s change progress to 0.92
-    setTimeout(() => {
-      if (result.status == "generating" || result.status != "done") {
-        console.log("here", result.status);
 
-        result.progress = 0.92;
-        event.emit("data", result);
-      }
-    }, 10000);
     let start = Date.now();
 
     axios({
