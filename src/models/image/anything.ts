@@ -108,7 +108,6 @@ export default {
       let cost = spentInSec * 0.00025;
       result.cost = cost;
       if (data.number && data.number > 1) {
-        console.log(response.data);
         result.results = await Promise.all(
           response.data.output.map(async (x) => {
             let res = await axios.get(x.image, {

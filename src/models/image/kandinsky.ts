@@ -123,7 +123,6 @@ export default {
       let spentInSec = (Date.now() - start) / 1000;
       let cost = (response.data.executionTime / 1000) * 0.00025;
       result.cost = cost;
-      let st = Date.now();
       if (data.number && data.number > 1) {
         try {
           result.results = await Promise.all(
