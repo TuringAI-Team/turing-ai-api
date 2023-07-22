@@ -167,9 +167,9 @@ export default {
           status: "success",
         });
       }
-      console.log(`result is ${JSON.stringify(result)}`);
       result.status = "done";
       result.progress = null;
+      console.log(`result is ${JSON.stringify(result)}`);
       event.emit("data", result);
     });
     return event;
