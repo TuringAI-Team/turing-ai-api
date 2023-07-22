@@ -90,13 +90,17 @@ export default {
     event.emit("data", result);
     //  after 5s change progress to 0.46
     setTimeout(() => {
-      result.progress = 0.46;
-      event.emit("data", result);
+      if (result.status == "generating") {
+        result.progress = 0.46;
+        event.emit("data", result);
+      }
     }, 5000);
     //  after 10s change progress to 0.92
     setTimeout(() => {
-      result.progress = 0.92;
-      event.emit("data", result);
+      if (result.status == "generating") {
+        result.progress = 0.92;
+        event.emit("data", result);
+      }
     }, 10000);
     let start = Date.now();
 
