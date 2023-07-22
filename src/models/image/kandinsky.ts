@@ -162,7 +162,7 @@ export default {
       result.status = "done";
       result.progress = null;
       console.log(
-        `result for ${prompt} is ${result.status} with cost ${result.cost} and ${result.results.length} images on ${response.data.executionTime}ms and ${response.data.delayTime}ms delay`
+        `result for ${prompt} is ${result.status} with cost ${result.cost} and ${result.results.length} images on ${response.data.executionTime}ms and ${response.data.delayTime}ms delay, total ${spentInSec}sec`
       );
       event.emit("data", result);
     });
