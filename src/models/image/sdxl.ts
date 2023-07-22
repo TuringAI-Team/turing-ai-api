@@ -157,7 +157,7 @@ export default {
         text: data.negative_prompt,
         weight: -1,
       });
-    let event;
+    let event = new EventEmitter();
     if (stream == null) {
       stream = true;
     }
