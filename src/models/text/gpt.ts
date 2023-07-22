@@ -54,7 +54,6 @@ export default {
   execute: async (data) => {
     let { messages, model, max_tokens, temperature, plugins, pw, stream } =
       data;
-    console.log(`stream ${stream}`);
 
     return await streams(data);
   },
