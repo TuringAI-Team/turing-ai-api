@@ -69,7 +69,6 @@ export default {
       stream,
       model_version,
     } = data;
-    console.log(`generating image for ${prompt}`);
     if (!negative_prompt)
       negative_prompt =
         "disfigured mouth, disfigured teeth, half head, half face, blury, side looking, old, wrinkle, child, no face, pencil, full body, sharp, far away, overlapping, duplication, nude, disfigured, kitsch, oversaturated, grain, low-res, Deformed, blurry, bad anatomy, poorly drawn face, mutation, mutated, extra limb, ugly, poorly drawn hands, missing limb, blurry, floating limbs, disconnected limbs, malformed hands, blur, out of focus, long body, disgusting, poorly drawn, childish, mutilated, mangled, surreal, out of frame, duplicate, 2 faces";
@@ -161,12 +160,8 @@ export default {
           status: "success",
         });
       }
-      console.log(`spent ${Date.now() - st}ms to get images`);
       result.status = "done";
       result.progress = null;
-      console.log(
-        `result for ${prompt} is ${result.status} with cost ${result.cost} and ${result.results.length} images on ${response.data.executionTime}ms and ${response.data.delayTime}ms delay, total ${spentInSec}sec`
-      );
       event.emit("data", result);
     });
     return event;
