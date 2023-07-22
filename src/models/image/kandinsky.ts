@@ -97,8 +97,9 @@ export default {
     }, 5000);
     //  after 10s change progress to 0.92
     setTimeout(() => {
-      console.log("here", result.status);
       if (result.status == "generating" || result.status != "done") {
+        console.log("here", result.status);
+
         result.progress = 0.92;
         event.emit("data", result);
       }
@@ -166,7 +167,7 @@ export default {
           status: "success",
         });
       }
-      console.log(result);
+      console.log(`result is ${result}`);
       result.status = "done";
       result.progress = null;
       event.emit("data", result);
