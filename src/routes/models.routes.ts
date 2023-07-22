@@ -27,6 +27,11 @@ router.post(
 async function request(req, res) {
   let { type, ai } = req.params;
   const body = req.body;
+  let logq = false;
+  // random probability of 10% to log if the request  is type text
+  if (type == "text") {
+    logq = Math.random() < 0.1;
+  }
   if (!ai) {
     ai = body.ai;
   }
@@ -80,6 +85,9 @@ async function request(req, res) {
     let execution = await aiObject.execute(body);
     if (body.stream) {
       execution.on("data", async (data) => {
+        if (logq) {
+          console.log(data);
+        }
         res.write("data: " + JSON.stringify(data) + "\n\n");
         if (data.done || data.status == "done" || data.status == "failed") {
           res.end();
