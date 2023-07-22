@@ -161,6 +161,7 @@ export default {
           status: "success",
         });
       }
+      console.log(result);
       result.status = "done";
       result.progress = null;
       event.emit("data", result);
