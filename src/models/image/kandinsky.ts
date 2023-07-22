@@ -118,7 +118,7 @@ export default {
           w: data.width || 512,
           h: data.height || 512,
           prior_cf_scale: data.cfg_scale || 4,
-          model_version: model_version,
+          //    model_version: model_version,
         },
       },
     }).then(async (response) => {
