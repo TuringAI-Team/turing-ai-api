@@ -12,6 +12,7 @@ const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
 });
 const openai = new OpenAIApi(configuration);
+import axios from "axios";
 
 export default {
   data: {
@@ -47,3 +48,22 @@ export default {
   },
   execute: async (data) => {},
 };
+
+async function chatgpt(
+  message,
+  max_tokens,
+  temperature,
+  model,
+  functions,
+  event
+) {
+  let data = {};
+  axios({
+    method: "post",
+    url: "https://api.openai.com/v1/chat/completions",
+    headers: {
+      Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+    },
+    data: {},
+  }).then((response) => {});
+}

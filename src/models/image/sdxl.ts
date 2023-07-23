@@ -169,15 +169,12 @@ export default {
       id: randomUUID(),
       error: null,
     };
-    if (stream) {
-      event = new EventEmitter();
+    event.emit("data", result);
+    //  after 5s change progress to 0.46
+    setTimeout(() => {
+      result.progress = 0.46;
       event.emit("data", result);
-      //  after 5s change progress to 0.46
-      setTimeout(() => {
-        result.progress = 0.46;
-        event.emit("data", result);
-      }, 5000);
-    }
+    }, 5000);
     let originalBalance = await getBalance();
     if (action === "generate") {
       generate(
