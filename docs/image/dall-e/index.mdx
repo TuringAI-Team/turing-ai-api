@@ -43,6 +43,7 @@ POST *https://api.turing.sh/image/dall-e*
       headers: {
         "Content-Type": "application/json",
         Authorization: "Bearer YOUR_API_KEY",
+        "x-captcha-token": "Captcha key"
       },
       data: {
   "number": 1,
@@ -59,6 +60,7 @@ POST *https://api.turing.sh/image/dall-e*
     headers={
       "Content-Type": "application/json",
       "Authorization": "Bearer YOUR_API_KEY",
+      "x-captcha-token": "Captcha key"
     },
     data=json.dumps({
   "number": 1,

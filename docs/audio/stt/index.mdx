@@ -46,6 +46,7 @@ POST *https://api.turing.sh/audio/stt*
       headers: {
         "Content-Type": "application/json",
         Authorization: "Bearer YOUR_API_KEY",
+        "x-captcha-token": "Captcha key"
       },
       data: {
   "model": "fast-whisper",
@@ -63,6 +64,7 @@ POST *https://api.turing.sh/audio/stt*
     headers={
       "Content-Type": "application/json",
       "Authorization": "Bearer YOUR_API_KEY",
+      "x-captcha-token": "Captcha key"
     },
     data=json.dumps({
   "model": "fast-whisper",

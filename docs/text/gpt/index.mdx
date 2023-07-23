@@ -36,7 +36,6 @@ POST *https://api.turing.sh/text/gpt*
 - **stream**
   - Type: boolean
   - Required: false
-  - Default: true
 
 ## Examples
 
@@ -50,14 +49,14 @@ POST *https://api.turing.sh/text/gpt*
       headers: {
         "Content-Type": "application/json",
         Authorization: "Bearer YOUR_API_KEY",
+        "x-captcha-token": "Captcha key"
       },
       data: {
   "messages": "array",
   "model": "gpt-3.5-turbo",
   "max_tokens": 512,
   "temperature": 0.9,
-  "plugins": [],
-  "stream": true
+  "plugins": []
 },
     })
   })();
@@ -70,14 +69,14 @@ POST *https://api.turing.sh/text/gpt*
     headers={
       "Content-Type": "application/json",
       "Authorization": "Bearer YOUR_API_KEY",
+      "x-captcha-token": "Captcha key"
     },
     data=json.dumps({
   "messages": "array",
   "model": "gpt-3.5-turbo",
   "max_tokens": 512,
   "temperature": 0.9,
-  "plugins": [],
-  "stream": true
+  "plugins": []
 }),
   )
   ```

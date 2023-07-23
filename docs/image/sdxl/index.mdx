@@ -92,6 +92,7 @@ POST *https://api.turing.sh/image/sdxl*
       headers: {
         "Content-Type": "application/json",
         Authorization: "Bearer YOUR_API_KEY",
+        "x-captcha-token": "Captcha key"
       },
       data: {
   "prompt": "string",
@@ -117,6 +118,7 @@ POST *https://api.turing.sh/image/sdxl*
     headers={
       "Content-Type": "application/json",
       "Authorization": "Bearer YOUR_API_KEY",
+      "x-captcha-token": "Captcha key"
     },
     data=json.dumps({
   "prompt": "string",

@@ -18,6 +18,10 @@ POST *https://api.turing.sh/text/filter*
   - Description: Filters you want to apply
   - Options: nsfw, cp, toxicity
 
+- **stream**
+  - Type: boolean
+  - Required: false
+
 ## Examples
 
 <CodeGroup title="Text Filter example">
@@ -30,6 +34,7 @@ POST *https://api.turing.sh/text/filter*
       headers: {
         "Content-Type": "application/json",
         Authorization: "Bearer YOUR_API_KEY",
+        "x-captcha-token": "Captcha key"
       },
       data: {
   "text": "string",
@@ -46,6 +51,7 @@ POST *https://api.turing.sh/text/filter*
     headers={
       "Content-Type": "application/json",
       "Authorization": "Bearer YOUR_API_KEY",
+      "x-captcha-token": "Captcha key"
     },
     data=json.dumps({
   "text": "string",

@@ -31,6 +31,7 @@ POST *https://api.turing.sh/image/vision*
       headers: {
         "Content-Type": "application/json",
         Authorization: "Bearer YOUR_API_KEY",
+        "x-captcha-token": "Captcha key"
       },
       data: {
   "model": [
@@ -49,6 +50,7 @@ POST *https://api.turing.sh/image/vision*
     headers={
       "Content-Type": "application/json",
       "Authorization": "Bearer YOUR_API_KEY",
+      "x-captcha-token": "Captcha key"
     },
     data=json.dumps({
   "model": [

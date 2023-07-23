@@ -40,6 +40,7 @@ POST *https://api.turing.sh/text/huggingface*
       headers: {
         "Content-Type": "application/json",
         Authorization: "Bearer YOUR_API_KEY",
+        "x-captcha-token": "Captcha key"
       },
       data: {
   "model": "OpenAssistant/oasst-sft-4-pythia-12b-epoch-3.5"
@@ -55,6 +56,7 @@ POST *https://api.turing.sh/text/huggingface*
     headers={
       "Content-Type": "application/json",
       "Authorization": "Bearer YOUR_API_KEY",
+      "x-captcha-token": "Captcha key"
     },
     data=json.dumps({
   "model": "OpenAssistant/oasst-sft-4-pythia-12b-epoch-3.5"

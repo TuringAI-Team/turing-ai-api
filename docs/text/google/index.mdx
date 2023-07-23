@@ -39,6 +39,7 @@ POST *https://api.turing.sh/text/google*
       headers: {
         "Content-Type": "application/json",
         Authorization: "Bearer YOUR_API_KEY",
+        "x-captcha-token": "Captcha key"
       },
       data: {
   "messages": "array",
@@ -57,6 +58,7 @@ POST *https://api.turing.sh/text/google*
     headers={
       "Content-Type": "application/json",
       "Authorization": "Bearer YOUR_API_KEY",
+      "x-captcha-token": "Captcha key"
     },
     data=json.dumps({
   "messages": "array",

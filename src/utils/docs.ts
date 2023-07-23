@@ -97,6 +97,7 @@ function generateExamples(model, section) {
       headers: {
         "Content-Type": "application/json",
         Authorization: "Bearer YOUR_API_KEY",
+        "x-captcha-token": "Captcha key"
       },
       data: ${JSON.stringify(data, null, 2)},
     })
@@ -110,6 +111,7 @@ function generateExamples(model, section) {
     headers={
       "Content-Type": "application/json",
       "Authorization": "Bearer YOUR_API_KEY",
+      "x-captcha-token": "Captcha key"
     },
     data=json.dumps(${JSON.stringify(data, null, 2)}),
   )
