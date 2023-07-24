@@ -31,6 +31,20 @@ export default {
         default: 0.9,
       },
     },
+    response: {
+      cost: {
+        type: "number",
+        description: "Cost of the request in USD",
+      },
+      result: {
+        type: "string",
+        description: "Result of the request",
+      },
+      done: {
+        type: "boolean",
+        description: "Whether the request is done or not",
+      },
+    },
   },
   execute: async (data) => {
     let { messages, model, max_tokens, temperature } = data;

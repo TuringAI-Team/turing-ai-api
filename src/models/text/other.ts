@@ -32,6 +32,25 @@ export default {
         default: false,
       },
     },
+    response: {
+      cost: {
+        type: "number",
+        description: "Cost of the request in USD",
+      },
+      result: {
+        type: "string",
+        description: "Result of the request",
+      },
+      status: {
+        type: "string",
+        description: "Status of the request",
+        options: ["queued", "generating", "done"],
+      },
+      done: {
+        type: "boolean",
+        description: "Whether the request is done or not",
+      },
+    },
   },
   execute: async (data) => {
     const event = new EventEmitter();

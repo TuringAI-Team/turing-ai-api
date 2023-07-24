@@ -127,6 +127,33 @@ export default {
         default: true,
       },
     },
+    response: {
+      cost: {
+        type: "number",
+        description: "Cost of the request in USD",
+      },
+      results: {
+        type: "array",
+        description: "Results of the request",
+      },
+      status: {
+        type: "string",
+        description: "Status of the request",
+        options: ["queued", "generating", "done", "failed"],
+      },
+      progress: {
+        type: "number",
+        description: "Progress of the request",
+      },
+      id: {
+        type: "string",
+        description: "ID of the request",
+      },
+      error: {
+        type: "string",
+        description: "Error of the request",
+      },
+    },
   },
   execute: async (data) => {
     let {

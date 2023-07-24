@@ -122,6 +122,33 @@ export default {
         default: true,
       },
     },
+    response: {
+      cost: {
+        type: "number",
+        description: "Cost of the request in USD",
+      },
+      id: {
+        type: "string",
+        description: "ID of the request",
+      },
+      status: {
+        type: "string",
+        description: "Status of the request",
+        options: ["generating", "queued", "done", "failed"],
+      },
+      progress: {
+        type: "number",
+        description: "Progress of the request",
+      },
+      queue_position: {
+        type: "number",
+        description: "Queue position of the request",
+      },
+      results: {
+        type: "array",
+        description: "Results of the request",
+      },
+    },
   },
   execute: async (data) => {
     let res = await generateAsync(data);

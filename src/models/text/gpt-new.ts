@@ -50,20 +50,44 @@ export default {
 };
 
 async function chatgpt(
-  message,
+  messages,
   max_tokens,
-  temperature,
   model,
-  functions,
-  event
+  event,
+  temperature?,
+  functions?
 ) {
-  let data = {};
-  axios({
+  let data: any = {
+    messages: messages,
+    stream: true,
+    max_tokens: max_tokens,
+    model: model,
+  };
+  if (temperature) {
+    data["temperature"] = temperature;
+  }
+  if (functions) {
+    data["functions"] = functions;
+  }
+  let response = await axios({
     method: "post",
     url: "https://api.openai.com/v1/chat/completions",
     headers: {
+      "Content-Type": "application/json",
       Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+      //   stream response
+      Accept: "text/event-stream",
     },
-    data: {},
-  }).then((response) => {});
+    responseType: "stream",
+    data: data,
+  });
+  let stream = response.data;
+
+  stream.on("data", (data) => {
+    console.log(data);
+  });
+
+  stream.on("end", () => {
+    console.log("stream done");
+  });
 }

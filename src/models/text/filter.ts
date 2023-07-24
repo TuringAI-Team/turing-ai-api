@@ -30,6 +30,28 @@ export default {
         default: false,
       },
     },
+    response: {
+      nsfw: {
+        type: "boolean",
+        description: "Whether the text is nsfw or not",
+      },
+      youth: {
+        type: "boolean",
+        description: "Whether the text is youth or not",
+      },
+      cp: {
+        type: "boolean",
+        description: "Whether the text is cp or not",
+      },
+      toxic: {
+        type: "boolean",
+        description: "Whether the text is toxic or not",
+      },
+      done: {
+        type: "boolean",
+        description: "Whether the request is done or not",
+      },
+    },
   },
   execute: async (data) => {
     let { text, filters }: { text: string; filters: string[] } = data;

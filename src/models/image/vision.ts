@@ -21,6 +21,24 @@ export default {
         description: "Image URL for the model to process",
       },
     },
+    response: {
+      cost: {
+        type: "number",
+        description: "Cost of the request in USD",
+      },
+      description: {
+        type: "string",
+        description: "Description of the image",
+      },
+      text: {
+        type: "string",
+        description: "Text extracted from the image",
+      },
+      done: {
+        type: "boolean",
+        description: "Whether the request is done or not",
+      },
+    },
   },
   execute: async (data) => {
     let result = {

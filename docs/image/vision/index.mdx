@@ -19,6 +19,25 @@ POST *https://api.turing.sh/image/vision*
   - Required: true
   - Description: Image URL for the model to process
 
+## Response
+
+
+- **cost**
+  - Type: number
+  - Description: Cost of the request in USD
+
+- **description**
+  - Type: string
+  - Description: Description of the image
+
+- **text**
+  - Type: string
+  - Description: Text extracted from the image
+
+- **done**
+  - Type: boolean
+  - Description: Whether the request is done or not
+
 ## Examples
 
 <CodeGroup title="Image vision example">
