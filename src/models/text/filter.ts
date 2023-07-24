@@ -51,8 +51,8 @@ export default {
       res = await openai.createModeration({
         input: text,
       });
-    } catch (e) {
-      console.log(e);
+    } catch (e: any) {
+      console.log(e.response.data);
       res = {};
     }
     if (filters.find((f) => f === "nsfw")) {
