@@ -1,6 +1,7 @@
 import ChartJsImage from "chartjs-to-image";
 import supabase from "../db/supabase.js";
 import ms from "ms";
+import fs from "fs";
 
 const availableCharts = [
   "chat",
@@ -19,7 +20,6 @@ export async function getChartImage(chart, filter, period: any, type) {
   if (!availableCharts.includes(chart)) throw new Error("Invalid chart");
   if (!availableTypes.includes(type)) throw new Error("Invalid type of chart");
   let chartImage = new ChartJsImage();
-  console.log(period);
   let periodMs: any = ms(period);
 
   let timeStart: any = Date.now() - periodMs;
@@ -79,19 +79,44 @@ export async function getChartImage(chart, filter, period: any, type) {
   let metricData = data.map((d: any) => d.data);
   if (metricData.length === 0) throw new Error("No data found");
 
-  let data1 = metricData[0];
-  console.log(data1);
-  let keys = Object.keys(data1);
+  let keys = [];
+  let types = [];
+  let keyData = data.sort((a: any, b: any) => {
+    let dateA = new Date(a.time);
+    let dateB = new Date(b.time);
+    // sort by date recent first
+    return dateB.getTime() - dateA.getTime();
+  });
+  for (let data3 of keyData) {
+    let nke = Object.keys(data3);
+    //  filter keys
+    nke = nke.filter((key) => {
+      // are not in keys
+      return !keys.includes(key);
+    });
+    keys.push(...nke);
+    for (let key of nke) {
+      let type = {
+        key: key,
+        type: typeof data3[key],
+        content: data3[key],
+      };
+      types.push(type);
+    }
+  }
+  console.log(keys);
+
   let newKeys = [];
   let keysToRemove = [];
   for (let i = 0; i < keys.length; i++) {
-    if (typeof data1[keys[i]] == "object") {
+    let type = types.find((x) => x.key == keys[i]);
+    if (type.type == "object") {
       // get all the keys of the object
-      let subKeys = Object.keys(data1[keys[i]]);
+      let subKeys = Object.keys(type.content);
       for (let j = 0; j < subKeys.length; j++) {
         // check subkeys for objects
-        if (typeof data1[keys[i]][subKeys[j]] == "object") {
-          let subSubKeys = Object.keys(data1[keys[i]][subKeys[j]]);
+        if (typeof type.content[subKeys[j]] == "object") {
+          let subSubKeys = Object.keys(type.content[subKeys[j]]);
           // change subkeys to be parentKey-subKey-subSubKey
           subSubKeys = subSubKeys.map(
             (subSubKey) => `${keys[i]}.${subKeys[j]}.${subSubKey}`
@@ -240,6 +265,9 @@ export async function getChartImage(chart, filter, period: any, type) {
   });
   chartImage.setWidth(width);
   let base64 = await chartImage.toDataUrl();
+  //  save file in disk
+  let buffer = Buffer.from(base64.split(",")[1], "base64");
+  fs.writeFileSync(`./chart.png`, buffer);
 
   return { image: base64 };
 }

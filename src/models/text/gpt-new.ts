@@ -46,13 +46,62 @@ export default {
       },
     },
   },
-  execute: async (data) => {},
+  execute: async (data) => {
+    let event = new EventEmitter();
+    let { messages, model, max_tokens, temperature, plugins } = data;
+
+    let result: any = {
+      result: "",
+      done: false,
+      cost: 0,
+      tool: null,
+      toolInput: null,
+      finishReason: null,
+    };
+    result = await chatgpt(
+      messages,
+      max_tokens,
+      model,
+      result,
+      event,
+      temperature,
+      plugins
+    );
+
+    if (result.tool) {
+      // execute tool
+
+      let pluginInfo = pluginList.find((p) => p.name === result.tool);
+      let args = JSON.parse(result.toolInput);
+      if (
+        !pluginInfo.parameters.required ||
+        (args[pluginInfo.parameters.required[0]] &&
+          pluginInfo.parameters.required.length > 0) ||
+        pluginInfo.parameters.required.length == 0
+      ) {
+        console.log(`args ${JSON.stringify(args)}`);
+        result.toolInput = args;
+        let pluginResponse;
+        try {
+          pluginResponse = await pluginInfo.function(args);
+        } catch (e) {
+          console.error(e);
+          pluginResponse = `Error: ${e}`;
+        }
+        result.toolResult = pluginResponse;
+        console.log(`pluginResponse ${JSON.stringify(pluginResponse)}`);
+      }
+    }
+
+    return result;
+  },
 };
 
 async function chatgpt(
   messages,
   max_tokens,
   model,
+  result,
   event,
   temperature?,
   functions?
@@ -87,7 +136,11 @@ async function chatgpt(
     console.log(data);
   });
 
-  stream.on("end", () => {
-    console.log("stream done");
+  // when the stream emits end you return the result, wait for the stream to end
+  await new Promise((resolve) => {
+    stream.on("end", () => {
+      resolve(result);
+    });
   });
+  return result;
 }
