@@ -54,8 +54,11 @@ export default {
       result: "",
       done: false,
       cost: 0,
-      tool: null,
-      toolInput: null,
+      tool: {
+        name: null,
+        input: null,
+        result: null,
+      },
       finishReason: null,
     };
     result = await chatgpt(
@@ -71,8 +74,8 @@ export default {
     if (result.tool) {
       // execute tool
 
-      let pluginInfo = pluginList.find((p) => p.name === result.tool);
-      let args = JSON.parse(result.toolInput);
+      let pluginInfo = pluginList.find((p) => p.name === result.tool.name);
+      let args = JSON.parse(result.tool.input);
       if (
         !pluginInfo.parameters.required ||
         (args[pluginInfo.parameters.required[0]] &&
@@ -80,16 +83,16 @@ export default {
         pluginInfo.parameters.required.length == 0
       ) {
         console.log(`args ${JSON.stringify(args)}`);
-        result.toolInput = args;
+        result.tool.input = args;
         let pluginResponse;
         try {
           pluginResponse = await pluginInfo.function(args);
         } catch (e) {
           console.error(e);
-          pluginResponse = `Error: ${e}`;
+          result.tool.result = `Error: ${e}`;
         }
-        result.toolResult = pluginResponse;
-        console.log(`pluginResponse ${JSON.stringify(pluginResponse)}`);
+        result.tool.result = pluginResponse;
+        console.log(`pluginResponse ${JSON.stringify(result.tool.result)}`);
       }
     }
 
