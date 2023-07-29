@@ -133,7 +133,6 @@ export default {
               result.done = true;
               console.log("stop");
             }
-            result.done = true;
           } else {
             result.done = true;
           }
@@ -186,7 +185,6 @@ async function chatgpt(
   stream.on("data", (data) => {
     data = data.toString();
     data = data.split("data: ")[1];
-    console.log(data);
     if (data != "[DONE]") {
       data = JSON.parse(data);
       if (data.choices[0].delta.function_call) {
