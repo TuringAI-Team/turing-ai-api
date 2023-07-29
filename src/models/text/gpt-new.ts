@@ -183,6 +183,7 @@ async function chatgpt(
       result.result = data.choices[0].delta.content;
       result.finishReason = data.choices[0].finish_reason;
     }
+    console.log(result);
   });
 
   // when the stream emits end you return the result, wait for the stream to end
@@ -191,5 +192,7 @@ async function chatgpt(
       resolve(result);
     });
   });
+  console.log(result);
+
   return result;
 }
