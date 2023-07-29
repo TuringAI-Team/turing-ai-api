@@ -177,7 +177,12 @@ async function chatgpt(
 
   stream.on("data", (data) => {
     data = data.toString();
-    console.log(data);
+    data = data.split("data: ")[1];
+    if (data != "[DONE]") {
+      data = JSON.parse(data);
+      result.result = data.choices[0].delta.content;
+      result.finishReason = data.choices[0].finish_reason;
+    }
   });
 
   // when the stream emits end you return the result, wait for the stream to end
