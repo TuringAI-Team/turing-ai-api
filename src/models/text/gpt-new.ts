@@ -176,6 +176,7 @@ async function chatgpt(
   let stream = response.data;
 
   stream.on("data", (data) => {
+    data = data.toString();
     console.log(data);
   });
 
