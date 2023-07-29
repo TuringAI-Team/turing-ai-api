@@ -124,7 +124,8 @@ export default {
       })
       .catch((err) => {
         console.log(err.response.data.error);
-        throw err;
+        res.done = true;
+        res.error = err.response.data.error;
       });
 
     return event;
