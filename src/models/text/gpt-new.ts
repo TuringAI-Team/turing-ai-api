@@ -58,6 +58,7 @@ export default {
         name: null,
         input: null,
         result: null,
+        error: null,
       },
       finishReason: null,
     };
@@ -108,6 +109,7 @@ export default {
             } catch (e) {
               console.error(e);
               result.tool.result = `Error: ${e}`;
+              result.tool.error = e;
             }
             console.log(`pluginResponse ${JSON.stringify(result.tool.result)}`);
             messages = [
