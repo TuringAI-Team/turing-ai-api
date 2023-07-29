@@ -183,7 +183,7 @@ async function chatgpt(
     console.log(data);
     if (data != "[DONE]") {
       data = JSON.parse(data);
-      result.result += data.choices[0].delta.content;
+      result.result += data.choices[0].delta?.content || "";
       result.finishReason = data.choices[0].finish_reason;
       event.emit("data", result);
     }
