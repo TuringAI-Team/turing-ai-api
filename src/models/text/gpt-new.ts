@@ -129,6 +129,9 @@ export default {
               temperature,
               []
             );
+            result.done = true;
+          } else {
+            result.done = true;
           }
           event.emit("data", result);
         } else {
