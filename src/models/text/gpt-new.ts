@@ -93,7 +93,7 @@ export default {
           // execute tool
 
           let pluginInfo = pluginList.find((p) => p.name === result.tool.name);
-          console.log(`args ${JSON.stringify(result.tool.input)}`);
+          console.log(`args ${result.tool.input}`);
 
           if (
             !pluginInfo.parameters.required ||
@@ -101,6 +101,7 @@ export default {
               pluginInfo.parameters.required.length > 0) ||
             pluginInfo.parameters.required.length == 0
           ) {
+            console.log(`execute ${result.tool.name}`);
             let pluginResponse;
             try {
               pluginResponse = await pluginInfo.function(result.tool.input);
