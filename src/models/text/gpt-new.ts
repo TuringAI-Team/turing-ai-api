@@ -93,18 +93,16 @@ export default {
           // execute tool
 
           let pluginInfo = pluginList.find((p) => p.name === result.tool.name);
-          let args = JSON.parse(result.tool.input);
           if (
             !pluginInfo.parameters.required ||
-            (args[pluginInfo.parameters.required[0]] &&
+            (result.tool.input[pluginInfo.parameters.required[0]] &&
               pluginInfo.parameters.required.length > 0) ||
             pluginInfo.parameters.required.length == 0
           ) {
-            console.log(`args ${JSON.stringify(args)}`);
-            result.tool.input = args;
+            console.log(`args ${JSON.stringify(result.tool.input)}`);
             let pluginResponse;
             try {
-              pluginResponse = await pluginInfo.function(args);
+              pluginResponse = await pluginInfo.function(result.tool.input);
               result.tool.result = pluginResponse;
             } catch (e) {
               console.error(e);
