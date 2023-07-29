@@ -93,7 +93,12 @@ export default {
           // execute tool
 
           let pluginInfo = pluginList.find((p) => p.name === result.tool.name);
-          console.log(`args ${result.tool.input}`);
+          if (typeof result.tool.input == "string") {
+            result.tool.input = JSON.parse(result.tool.input);
+            console.log(
+              `result.tool.input ${JSON.stringify(result.tool.input)}`
+            );
+          }
 
           if (
             !pluginInfo.parameters.required ||
