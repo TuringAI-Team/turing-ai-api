@@ -194,13 +194,13 @@ async function chatgpt(
         }
         if (!result.tool.input) result.tool.input = "{";
         result.tool.input += data.choices[0].delta.function_call?.arguments;
+        if (result.finishReason) {
+          result.tool.input = JSON.parse(result.tool.input);
+        }
       } else {
         result.result += data.choices[0].delta?.content || "";
       }
       result.finishReason = data.choices[0].finish_reason;
-      if (result.finishReason) {
-        result.tool.input = JSON.parse(result.tool.input);
-      }
     } else {
       if (result.tool.name) {
         result.tool.input = JSON.parse(result.tool.input);
