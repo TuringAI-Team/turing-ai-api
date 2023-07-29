@@ -64,7 +64,7 @@ export default {
     if (!model) model = "gpt-3.5-turbo";
     if (!max_tokens) max_tokens = 512;
     if (!temperature) temperature = 0.9;
-    if (!plugins) plugins = [];
+    if (!plugins) plugins = null;
 
     let functions = [];
 
@@ -158,7 +158,7 @@ async function chatgpt(
   if (temperature) {
     data["temperature"] = temperature;
   }
-  if (functions) {
+  if (functions && functions.length > 0) {
     data["functions"] = functions;
   }
   let response = await axios({
