@@ -104,11 +104,11 @@ export default {
             let pluginResponse;
             try {
               pluginResponse = await pluginInfo.function(args);
+              result.tool.result = pluginResponse;
             } catch (e) {
               console.error(e);
               result.tool.result = `Error: ${e}`;
             }
-            result.tool.result = pluginResponse;
             console.log(`pluginResponse ${JSON.stringify(result.tool.result)}`);
             messages = [
               ...messages,
