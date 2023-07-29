@@ -187,7 +187,8 @@ async function chatgpt(
         if (data.choices[0].delta.function_call.name) {
           result.tool.name = data.choices[0].delta.function_call.name;
         }
-        result.tool.input += data.choices[0].delta.function_call.arguments;
+        if (!result.tool.input) result.tool.input = "{";
+        result.tool.input += data.choices[0].delta.function_call?.arguments;
       } else {
         result.result += data.choices[0].delta?.content || "";
       }
