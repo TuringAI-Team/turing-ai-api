@@ -183,10 +183,21 @@ async function chatgpt(
     console.log(data);
     if (data != "[DONE]") {
       data = JSON.parse(data);
-      result.result += data.choices[0].delta?.content || "";
+      if (data.choices[0].delta.function_call) {
+        if (data.choices[0].delta.function_call.name) {
+          result.tool.name = data.choices[0].delta.function_call.name;
+        }
+        result.tool.input += data.choices[0].delta.function_call.arguments;
+      } else {
+        result.result += data.choices[0].delta?.content || "";
+      }
       result.finishReason = data.choices[0].finish_reason;
-      event.emit("data", result);
+    } else {
+      if (result.tool.name) {
+        result.tool.input = JSON.parse(result.tool.input);
+      }
     }
+    event.emit("data", result);
   });
 
   // when the stream emits end you return the result, wait for the stream to end
