@@ -91,6 +91,7 @@ export default {
         j++;
         if (result.tool.name) {
           // execute tool
+          result.tool.input = JSON.parse(result.tool.input);
 
           let pluginInfo = pluginList.find((p) => p.name === result.tool.name);
           if (
@@ -205,7 +206,6 @@ async function chatgpt(
       resolve(result);
     });
   });
-  console.log(result);
 
   return result;
 }
