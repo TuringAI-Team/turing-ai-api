@@ -45,7 +45,8 @@ export default {
       description: null,
       text: null,
       cost: 0,
-      done: true,
+      done: false,
+      record: null,
     };
     let { model, image } = data;
     let cost = 0;
@@ -105,6 +106,12 @@ export default {
       });
     }
     result.done = true;
+    result.record = {
+      description: result.description,
+      text: result.text,
+      model: model,
+      image: image,
+    };
     event.emit("data", result);
     return event;
   },

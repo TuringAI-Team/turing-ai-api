@@ -7,6 +7,7 @@ import log from "../utils/log.js";
 import redisClient from "../db/redis.js";
 import { update } from "../utils/db.js";
 import delay from "delay";
+import { dataset } from "src/utils/datasets.js";
 
 const router = express.Router();
 
@@ -85,12 +86,19 @@ async function request(req, res) {
     let execution = await aiObject.execute(body);
     if (body.stream) {
       execution.on("data", async (data) => {
-        res.write("data: " + JSON.stringify(data) + "\n\n");
         if (data.done || data.status == "done" || data.status == "failed") {
+          /* if (data.record) {
+            await dataset(type, ai, data.record, data.id);
+            delete data.record;
+          }*/
+
+          res.write("data: " + JSON.stringify(data) + "\n\n");
           res.end();
           if (data.cost) {
             applyCost(data.cost, ai, type, req.user);
           }
+        } else {
+          res.write("data: " + JSON.stringify(data) + "\n\n");
         }
       });
     } else {
@@ -98,8 +106,13 @@ async function request(req, res) {
         applyCost(execution.cost, ai, type, req.user);
       }
       new Promise((resolve) => {
-        execution.on("data", (data) => {
+        execution.on("data", async (data) => {
           if (data.done || data.status == "done" || data.status == "failed") {
+            /*         if (data.record ) {
+              await dataset(type, ai, data.record, data.id);
+              delete data.record;
+            }
+*/
             resolve(data);
           }
         });
