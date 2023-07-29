@@ -103,24 +103,29 @@ export default {
           topK: 40,
         },
       },
-    }).then((response) => {
-      let cost = 0;
-      let promptLength = getPromptLength(
-        messages.map((message) => message.content).join(" ")
-      );
-      let result = response.data.predictions[0].candidates[0].content;
-      res.result = result;
-      let resultLength = getPromptLength(result);
-      let pricePerK = 0.0003;
-      cost = (promptLength + resultLength) * pricePerK;
-      res.cost = cost;
-      res.done = true;
-      res = {
-        ...res,
-        ...response.data,
-      };
-      event.emit("data", res);
-    });
+    })
+      .then((response) => {
+        let cost = 0;
+        let promptLength = getPromptLength(
+          messages.map((message) => message.content).join(" ")
+        );
+        let result = response.data.predictions[0].candidates[0].content;
+        res.result = result;
+        let resultLength = getPromptLength(result);
+        let pricePerK = 0.0003;
+        cost = (promptLength + resultLength) * pricePerK;
+        res.cost = cost;
+        res.done = true;
+        res = {
+          ...res,
+          ...response.data,
+        };
+        event.emit("data", res);
+      })
+      .catch((err) => {
+        console.log(err.response.data.error);
+        throw err;
+      });
 
     return event;
   },
