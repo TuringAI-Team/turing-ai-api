@@ -129,6 +129,10 @@ export default {
               temperature,
               []
             );
+            if (result.finishReason == "stop") {
+              result.done = true;
+              console.log("stop");
+            }
             result.done = true;
           } else {
             result.done = true;
