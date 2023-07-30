@@ -210,8 +210,10 @@ async function chatgpt(
       } else {
         if (result.tool.name) {
           // removpe null world
-          result.tool.input = result.tool.input.replace("null", "");
-          console.log(`result.tool.input ${result.tool.input}`);
+          if (typeof result.tool.input == "string") {
+            result.tool.input = result.tool.input.replace("null", "");
+            console.log(`result.tool.input ${result.tool.input}`);
+          }
 
           result.tool.input = JSON.parse(result.tool.input);
         }
