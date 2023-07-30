@@ -196,7 +196,6 @@ async function chatgpt(
       data = data.replace("data: ", "").trim();
 
       if (data != "[DONE]") {
-        console.log(`data ${data}`);
         data = JSON.parse(data);
 
         if (data.choices[0].delta.function_call) {
