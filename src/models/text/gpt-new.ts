@@ -191,10 +191,9 @@ async function chatgpt(
   stream.on("data", (d) => {
     d = d.toString();
     let dataArr = d.split("\n");
-    console.log(dataArr);
+    dataArr = dataArr.filter((x) => x != "");
     for (var data of dataArr) {
       data = data.split("data: ")[1];
-      console.log(data, typeof data);
       data = JSON.parse(data);
 
       if (data != "[DONE]") {
