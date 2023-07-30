@@ -190,7 +190,7 @@ async function chatgpt(
 
   stream.on("data", (data) => {
     data = data.toString();
-    data = data.replace("data: ", "").trim();
+    data = data.replace("data:", "").trim();
     console.log(data);
     if (data != "[DONE]") {
       data = JSON.parse(data);
