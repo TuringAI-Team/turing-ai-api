@@ -214,6 +214,7 @@ async function chatgpt(
         if (result.tool.name) {
           // removpe null world
           result.tool.input = result.tool.input.replace("null", "");
+          console.log(`result.tool.input ${result.tool.input}`);
 
           result.tool.input = JSON.parse(result.tool.input);
         }
