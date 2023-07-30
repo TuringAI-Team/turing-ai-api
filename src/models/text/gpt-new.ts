@@ -194,7 +194,6 @@ async function chatgpt(
     dataArr = dataArr.filter((x) => x != "");
     for (var data of dataArr) {
       data = data.replace("data: ", "").trim();
-      console.log(data);
       if (data != "[DONE]") {
         data = JSON.parse(data);
 
@@ -213,9 +212,6 @@ async function chatgpt(
         result.finishReason = data.choices[0].finish_reason;
       } else {
         if (result.tool.name) {
-          console.log(
-            `result.tool.input ${result.tool.input} ${typeof result.tool.input}`
-          );
           // removpe null world
           result.tool.input = result.tool.input.replace("null", "");
 

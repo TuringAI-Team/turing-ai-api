@@ -523,8 +523,9 @@ const pluginList = [
       let language = params.language;
       let code = params.code;
       if (language == "javascript") language = "nodejs-16.14.0";
+
       let result: any = {};
-      let compiler = compilers.find((c) => c === language);
+      let compiler = compilers.find((c) => c.includes(language));
       if (compiler) {
         try {
           let response = await fromString({
