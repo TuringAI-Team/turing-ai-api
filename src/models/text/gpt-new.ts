@@ -192,7 +192,7 @@ async function chatgpt(
     d = d.toString();
     let dataArr = d.split("\n");
     for (data of dataArr) {
-      data = data.replace("data: ", "").trim();
+      data = data.split("data: ")[1];
 
       if (data != "[DONE]") {
         console.log(data);
