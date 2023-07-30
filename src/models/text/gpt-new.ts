@@ -191,12 +191,12 @@ async function chatgpt(
   stream.on("data", (d) => {
     d = d.toString();
     let dataArr = d.split("\n");
-    for (data of dataArr) {
+    for (var data of dataArr) {
       data = data.split("data: ")[1];
       console.log(data, typeof data);
+      data = JSON.parse(data);
 
       if (data != "[DONE]") {
-        data = JSON.parse(data);
         if (data.choices[0].delta.function_call) {
           if (data.choices[0].delta.function_call.name) {
             result.tool.name = data.choices[0].delta.function_call.name;
