@@ -203,9 +203,6 @@ async function chatgpt(
           }
           result.tool.input +=
             data.choices[0].delta.function_call?.arguments || "";
-          if (result.finishReason) {
-            result.tool.input = JSON.parse(result.tool.input);
-          }
         } else {
           result.result += data.choices[0].delta?.content || "";
         }
