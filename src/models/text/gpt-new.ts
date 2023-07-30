@@ -202,7 +202,8 @@ async function chatgpt(
           if (data.choices[0].delta.function_call.name) {
             result.tool.name = data.choices[0].delta.function_call.name;
           }
-          result.tool.input += data.choices[0].delta.function_call?.arguments;
+          result.tool.input +=
+            data.choices[0].delta.function_call?.arguments || "";
           if (result.finishReason) {
             result.tool.input = JSON.parse(result.tool.input);
           }
@@ -213,6 +214,7 @@ async function chatgpt(
       } else {
         if (result.tool.name) {
           console.log(`result.tool.input ${result.tool.input}`);
+
           result.tool.input = JSON.parse(result.tool.input);
         }
       }
