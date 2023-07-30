@@ -214,6 +214,7 @@ async function chatgpt(
         result.finishReason = data.choices[0].finish_reason;
       } else {
         if (result.tool.name) {
+          console.log(`result.tool.input ${result.tool.input}`);
           result.tool.input = JSON.parse(result.tool.input);
         }
       }
