@@ -188,30 +188,34 @@ async function chatgpt(
   });
   let stream = response.data;
 
-  stream.on("data", (data) => {
-    data = data.toString();
-    data = data.replace("data:", "").trim();
-    console.log(data);
-    if (data != "[DONE]") {
-      data = JSON.parse(data);
-      if (data.choices[0].delta.function_call) {
-        if (data.choices[0].delta.function_call.name) {
-          result.tool.name = data.choices[0].delta.function_call.name;
+  stream.on("data", (d) => {
+    d = d.toString();
+    let dataArr = d.split("\n");
+    for (let i = 0; i < dataArr.length; i++) {
+      let data = dataArr[i];
+      data = data.replace("data: ", "").trim();
+      if (data != "[DONE]") {
+        data = JSON.parse(data);
+        if (data.choices[0].delta.function_call) {
+          if (data.choices[0].delta.function_call.name) {
+            result.tool.name = data.choices[0].delta.function_call.name;
+          }
+          if (!result.tool.input) result.tool.input = "{";
+          result.tool.input += data.choices[0].delta.function_call?.arguments;
+          if (result.finishReason) {
+            result.tool.input = JSON.parse(result.tool.input);
+          }
+        } else {
+          result.result += data.choices[0].delta?.content || "";
         }
-        if (!result.tool.input) result.tool.input = "{";
-        result.tool.input += data.choices[0].delta.function_call?.arguments;
-        if (result.finishReason) {
+        result.finishReason = data.choices[0].finish_reason;
+      } else {
+        if (result.tool.name) {
           result.tool.input = JSON.parse(result.tool.input);
         }
-      } else {
-        result.result += data.choices[0].delta?.content || "";
-      }
-      result.finishReason = data.choices[0].finish_reason;
-    } else {
-      if (result.tool.name) {
-        result.tool.input = JSON.parse(result.tool.input);
       }
     }
+
     event.emit("data", result);
   });
 
