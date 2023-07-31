@@ -140,7 +140,7 @@ export default {
               result.tool.error = e;
             }
             result.cost +=
-              (getPromptLength(result.tool.result) / 1000) *
+              (getPromptLength(JSON.stringify(result.tool.result)) / 1000) *
               prices[model].input;
 
             console.log(`pluginResponse ${JSON.stringify(result.tool.result)}`);

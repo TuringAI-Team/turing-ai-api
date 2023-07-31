@@ -1,6 +1,7 @@
 import delay from "delay";
 import { translateModels, request } from "../../utils/runpod.js";
 import EventEmitter from "events";
+import axios from "axios";
 
 export default {
   data: {
@@ -51,6 +52,19 @@ export default {
   execute: async (data) => {
     const event = new EventEmitter();
     let { image, upscaler } = data;
+    let res = {
+      id: "upscale",
+      kudos: 0,
+      queue_position: 0,
+    };
+    let result: any = {
+      id: res.id,
+      cost: res.kudos / 1000,
+      status: "generating",
+      queue_position: res.queue_position,
+      result: {},
+    };
+
     return event;
   },
 };
