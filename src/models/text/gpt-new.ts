@@ -69,12 +69,13 @@ export default {
 
     let functions = [];
 
-    for (let i = 0; i < data.plugins.length; i++) {
+    for (let i = 0; i < data.plugins?.length; i++) {
       let plugin = pluginList.find((p) => p.name === data.plugins[i]);
       if (plugin) {
         functions.push(plugin);
       }
     }
+    console.log(`functions ${JSON.stringify(functions)}`);
 
     chatgpt(
       messages,
