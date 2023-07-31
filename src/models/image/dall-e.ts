@@ -20,6 +20,8 @@ export default {
         type: "number",
         required: true,
         options: [1, 2, 3, 4],
+        default: 1,
+        description: "Number of images to generate",
       },
       size: {
         type: "string",

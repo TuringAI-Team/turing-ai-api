@@ -19,6 +19,7 @@ export default {
       number: {
         type: "number",
         required: false,
+        description: "Number of images to generate",
         default: 1,
       },
       negative_prompt: {

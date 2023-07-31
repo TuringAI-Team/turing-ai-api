@@ -38,6 +38,7 @@ export default {
       number: {
         type: "number",
         required: false,
+        description: "Number of images to generate",
         default: 1,
       },
       strength: {
@@ -109,7 +110,7 @@ export default {
           "OpenJourney Diffusion",
           "SDXL_beta::stability.ai#6901",
         ],
-        default: "stable_diffusion",
+        default: "SDXL_beta::stability.ai#6901",
       },
       nsfw: {
         type: "boolean",
@@ -252,6 +253,8 @@ async function generateAsync(data) {
   }
   if (data.model) {
     formatData.models = [data.model];
+  } else {
+    formatData.models = ["SDXL_beta::stability.ai#6901"];
   }
   if (data.nsfw) {
     formatData.nsfw = true;
