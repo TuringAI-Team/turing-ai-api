@@ -75,7 +75,6 @@ export default {
         functions.push(plugin);
       }
     }
-    console.log(`functions ${JSON.stringify(functions)}`);
 
     chatgpt(
       messages,
@@ -86,7 +85,6 @@ export default {
       temperature,
       functions
     ).then(async (x) => {
-      console.log("done");
       result = x;
       event.emit("data", result);
       let j = 0;
@@ -224,7 +222,6 @@ async function chatgpt(
         }
       }
     }
-    console.log(`result ${JSON.stringify(result)}`);
 
     event.emit("data", result);
   });
