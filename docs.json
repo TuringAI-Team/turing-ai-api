@@ -92,6 +92,10 @@
           "/image/sh"
         ],
         [
+          "Upscale models",
+          "/image/upscale"
+        ],
+        [
           "Image vision",
           "/image/vision"
         ]

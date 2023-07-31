@@ -207,6 +207,9 @@ async function chatgpt(
           result.result += data.choices[0].delta?.content || "";
         }
         result.finishReason = data.choices[0].finish_reason;
+        if (result.finishReason == "stop") {
+          result.done = true;
+        }
       } else {
         if (result.tool.name) {
           // removpe null world
