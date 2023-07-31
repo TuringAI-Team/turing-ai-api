@@ -232,5 +232,7 @@ async function chatgpt(
     });
   });
 
+  console.log(result);
+
   return result;
 }
