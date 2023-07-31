@@ -221,6 +221,7 @@ async function chatgpt(
         }
       }
     }
+    console.log(result);
 
     event.emit("data", result);
   });
@@ -231,8 +232,6 @@ async function chatgpt(
       resolve(result);
     });
   });
-
-  console.log(result);
 
   return result;
 }
