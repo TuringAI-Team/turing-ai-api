@@ -75,6 +75,7 @@ export default {
         functions.push(plugin);
       }
     }
+
     chatgpt(
       messages,
       max_tokens,
@@ -84,6 +85,7 @@ export default {
       temperature,
       functions
     ).then(async (x) => {
+      console.log("done");
       result = x;
       event.emit("data", result);
       let j = 0;
@@ -221,7 +223,7 @@ async function chatgpt(
         }
       }
     }
-    console.log(result);
+    console.log(`result ${JSON.stringify(result)}`);
 
     event.emit("data", result);
   });
