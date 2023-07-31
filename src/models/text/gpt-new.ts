@@ -13,6 +13,22 @@ const configuration = new Configuration({
 });
 const openai = new OpenAIApi(configuration);
 import axios from "axios";
+import { get } from "http";
+
+let prices = {
+  "gpt-3.5-turbo": {
+    input: 0.0015,
+    output: 0.002,
+  },
+  "gpt-4": {
+    input: 0.03,
+    output: 0.06,
+  },
+  "gpt-3.5-turbo-16k": {
+    input: 0.003,
+    output: 0.004,
+  },
+};
 
 export default {
   data: {
@@ -76,6 +92,8 @@ export default {
       }
     }
 
+    result.cost +=
+      (getChatMessageLength(messages) / 1000) * prices[model].input;
     chatgpt(
       messages,
       max_tokens,
@@ -87,6 +105,10 @@ export default {
     ).then(async (x) => {
       result = x;
       event.emit("data", result);
+      if (result.result) {
+        result.cost +=
+          (getPromptLength(result.result) / 1000) * prices[model].output;
+      }
       let j = 0;
       while (!result.done) {
         j++;
@@ -117,6 +139,10 @@ export default {
               result.tool.result = `Error: ${e}`;
               result.tool.error = e;
             }
+            result.cost +=
+              (getPromptLength(result.tool.result) / 1000) *
+              prices[model].input;
+
             console.log(`pluginResponse ${JSON.stringify(result.tool.result)}`);
             messages = [
               ...messages,
@@ -136,6 +162,10 @@ export default {
               temperature,
               []
             );
+            if (result.result) {
+              result.cost +=
+                (getPromptLength(result.result) / 1000) * prices[model].output;
+            }
             if (result.finishReason == "stop") {
               result.done = true;
               console.log("stop");
