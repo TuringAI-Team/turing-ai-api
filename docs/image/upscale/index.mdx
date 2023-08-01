@@ -12,7 +12,7 @@ POST *https://api.turing.sh/image/upscale*
   - Required: false
   - Description: Upscaler to use, by selecting this you won't generate any image but you will upscale the image you provide
   - Options: GFPGAN, RealESRGAN_x4plus, RealESRGAN_x2plus, RealESRGAN_x4plus_anime_6B, NMKD_Siax, 4x_AnimeSharp
-  - Default: RealESRGAN_x4plus
+  - Default: RealESRGAN_x2plus
 
 - **image**
   - Type: string
@@ -53,7 +53,7 @@ POST *https://api.turing.sh/image/upscale*
         "x-captcha-token": "Captcha key"
       },
       data: {
-  "upscaler": "RealESRGAN_x4plus",
+  "upscaler": "RealESRGAN_x2plus",
   "image": "string"
 },
     })
@@ -70,7 +70,7 @@ POST *https://api.turing.sh/image/upscale*
       "x-captcha-token": "Captcha key"
     },
     data=json.dumps({
-  "upscaler": "RealESRGAN_x4plus",
+  "upscaler": "RealESRGAN_x2plus",
   "image": "string"
 }),
   )

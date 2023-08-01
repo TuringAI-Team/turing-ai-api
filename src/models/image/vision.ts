@@ -1,6 +1,7 @@
 import axios from "axios";
 import { request, translateModels } from "../../utils/runpod.js";
 import { EventEmitter } from "events";
+import upscale from "./upscale.js";
 
 export default {
   data: {
@@ -51,23 +52,25 @@ export default {
     let { model, image } = data;
     let cost = 0;
     let event = new EventEmitter();
+    event.emit("data", result);
 
     if (model.includes("blip2")) {
-      let url = await translateModels("blip2");
-      request(url, `runsync`, {
-        input: {
-          data_url: image,
-        },
-      }).then((res) => {
-        if (res.output) {
-          result.description = res.output.captions[0].caption;
-        }
-        let executionTime = res.executionTime;
-        cost = (executionTime / 1000) * 0.0004;
-        result.cost += cost;
+      upscale.execute({
+        upscaler: "caption",
+        image: image,
+      }).then((ev) => {
+        result.description = ""
+        ev.on("data", (data) => {
+          event.emit("data", result);
+          if (data.status == "done") {
+            result.description = data.result
+            result.cost += data.cost;
+            if (model.length == 1) result.done = true;
+            event.emit("data", result);
+          }
+        });
+      })
 
-        event.emit("data", result);
-      });
     }
     if (model.includes("ocr")) {
       // OCR_KEY
@@ -102,10 +105,10 @@ export default {
 
         result.text = text;
         result.cost += 0.00004;
+        result.done = true;
         event.emit("data", result);
       });
     }
-    result.done = true;
     result.record = {
       description: result.description,
       text: result.text,
