@@ -84,7 +84,7 @@ export default {
         },
       }).then((res) => {
         let body = res.data;
-        const lines = body.ParsedResults[0].TextOverlay.Lines.map((l) => ({
+        const lines = body.ParsedResults[0].TextOverlay.lines.map((l) => ({
           text: l.LineText,
 
           words: l.Words.map((w) => ({
