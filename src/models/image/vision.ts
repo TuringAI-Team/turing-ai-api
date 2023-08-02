@@ -77,14 +77,18 @@ export default {
     if (model.includes("ocr")) {
       // OCR_KEY
       axios({
-        url: `https://api.ocr.space/parse/ImageUrl?url=${image}&OCREngine=1&scale=true`,
+        url: `https://api.ocr.space/parse/ImageUrl`,
         method: "GET",
         headers: {
           apikey: process.env.OCR_KEY,
         },
+        params: {
+          url: image,
+          apikey: process.env.OCR_KEY,
+        },
       }).then((res) => {
         let body = res.data;
-        const lines = body.ParsedResults[0].TextOverlay.lines.map((l) => ({
+        const lines = body.ParsedResults[0]?.TextOverlay?.Lines?.map((l) => ({
           text: l.LineText,
 
           words: l.Words.map((w) => ({
