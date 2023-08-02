@@ -47,6 +47,7 @@ export default {
       text: null,
       cost: 0,
       done: false,
+      lines: null,
       record: null,
     };
     let { model, image } = data;
@@ -55,22 +56,23 @@ export default {
     event.emit("data", result);
 
     if (model.includes("blip2")) {
-      upscale.execute({
-        upscaler: "caption",
-        image: image,
-      }).then((ev) => {
-        result.description = ""
-        ev.on("data", (data) => {
-          event.emit("data", result);
-          if (data.status == "done") {
-            result.description = data.result
-            result.cost += data.cost;
-            if (model.length == 1) result.done = true;
+      upscale
+        .execute({
+          upscaler: "caption",
+          image: image,
+        })
+        .then((ev) => {
+          result.description = "";
+          ev.on("data", (data) => {
             event.emit("data", result);
-          }
+            if (data.status == "done") {
+              result.description = data.result;
+              result.cost += data.cost;
+              if (model.length == 1) result.done = true;
+              event.emit("data", result);
+            }
+          });
         });
-      })
-
     }
     if (model.includes("ocr")) {
       // OCR_KEY
@@ -105,6 +107,7 @@ export default {
 
         result.text = text;
         result.cost += 0.00004;
+        result.lines = lines;
         result.done = true;
         event.emit("data", result);
       });
