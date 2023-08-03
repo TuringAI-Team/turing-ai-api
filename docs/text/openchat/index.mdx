@@ -1,9 +1,9 @@
 ---
-title: OpenAI models
+title: OpenChat models
 ---
 
-# OpenAI models
-POST *https://api.turing.sh/text/gpt-new*
+# OpenChat models
+POST *https://api.turing.sh/text/openchat*
 
 ## Parameters
 
@@ -14,8 +14,9 @@ POST *https://api.turing.sh/text/gpt-new*
 
 - **model**
   - Type: string
-  - Required: true
-  - Options: gpt-3.5-turbo, gpt-4, gpt-3.5-turbo-16k
+  - Required: false
+  - Options: openchat_v3.2
+  - Default: openchat_v3.2
 
 - **max_tokens**
   - Type: number
@@ -27,12 +28,6 @@ POST *https://api.turing.sh/text/gpt-new*
   - Required: false
   - Default: 0.9
 
-- **plugins**
-  - Type: array
-  - Required: false
-  - Options: google, youtube-search, weather, wikipedia, tenor, alphavantage-stocks, alphavantage-crypto, alphavantage-forex, free-games, tasty, world-news, calculator, github, code-interpreter, diagrams, render-diagrams
-  - Default: 
-
 ## Response
 
 <Error>Response not defined yet</Error>
@@ -40,13 +35,13 @@ POST *https://api.turing.sh/text/gpt-new*
 
 ## Examples
 
-<CodeGroup title="OpenAI models example">
+<CodeGroup title="OpenChat models example">
   ```typescript
   import axios from "axios";
   (async () => {
     let response = await axios({
       method: "post",
-      url: 'https://api.turing.sh/text/gpt-new',
+      url: 'https://api.turing.sh/text/openchat',
       headers: {
         "Content-Type": "application/json",
         Authorization: "Bearer YOUR_API_KEY",
@@ -54,10 +49,9 @@ POST *https://api.turing.sh/text/gpt-new*
       },
       data: {
   "messages": "array",
-  "model": "gpt-3.5-turbo",
+  "model": "openchat_v3.2",
   "max_tokens": 512,
-  "temperature": 0.9,
-  "plugins": []
+  "temperature": 0.9
 },
     })
   })();
@@ -66,7 +60,7 @@ POST *https://api.turing.sh/text/gpt-new*
   import requests
   import json
   response = requests.post(
-    "https://api.turing.sh/text/gpt-new",
+    "https://api.turing.sh/text/openchat",
     headers={
       "Content-Type": "application/json",
       "Authorization": "Bearer YOUR_API_KEY",
@@ -74,10 +68,9 @@ POST *https://api.turing.sh/text/gpt-new*
     },
     data=json.dumps({
   "messages": "array",
-  "model": "gpt-3.5-turbo",
+  "model": "openchat_v3.2",
   "max_tokens": 512,
-  "temperature": 0.9,
-  "plugins": []
+  "temperature": 0.9
 }),
   )
   ```

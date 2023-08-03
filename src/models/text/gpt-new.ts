@@ -129,7 +129,6 @@ export default {
               pluginInfo.parameters.required.length > 0) ||
             pluginInfo.parameters.required.length == 0
           ) {
-            console.log(`execute ${result.tool.name}`);
             let pluginResponse;
             try {
               pluginResponse = await pluginInfo.function(result.tool.input);

@@ -48,14 +48,17 @@ export default {
         description: "Whether the request is done or not",
       },
     },
+    pricing: {
+      average: 0.01,
+    },
   },
   execute: async (data) => {
-    if (!data.upscaler) data.upscaler = "RealESRGAN_x2plus"
+    if (!data.upscaler) data.upscaler = "RealESRGAN_x2plus";
     let res = await generateAsync(data);
     console.log(res);
     let result: any = {
       id: res.id,
-      cost: 1 / 1000,
+      cost: 10 / 1000,
       status: "generating",
       progress: 0,
     };
@@ -71,7 +74,7 @@ export default {
           result.status = "done";
           result.progress = null;
           if (data.upscaler != "caption") {
-            let url = check.forms[0].result[data.upscaler]
+            let url = check.forms[0].result[data.upscaler];
             let base64;
             let buffer = await axios.get(url, { responseType: "arraybuffer" });
             base64 = Buffer.from(buffer.data, "binary").toString("base64");
@@ -80,7 +83,7 @@ export default {
               base64: base64,
             };
           } else {
-            result.result = check.forms[0].result.caption
+            result.result = check.forms[0].result.caption;
           }
           stream.emit("data", result);
           return;
@@ -98,16 +101,18 @@ export default {
             result.status = "done";
             result.progress = null;
             if (data.upscaler != "caption") {
-              let url = check.forms[0].result[data.upscaler]
+              let url = check.forms[0].result[data.upscaler];
               let base64;
-              let buffer = await axios.get(url, { responseType: "arraybuffer" });
+              let buffer = await axios.get(url, {
+                responseType: "arraybuffer",
+              });
               base64 = Buffer.from(buffer.data, "binary").toString("base64");
               result.result = {
                 url: url,
                 base64: base64,
               };
             } else {
-              result.result = check.forms[0].result.caption
+              result.result = check.forms[0].result.caption;
             }
             stream.emit("data", result);
             return;
@@ -135,8 +140,8 @@ async function generateAsync(data) {
     forms: [
       {
         name: data.upscaler,
-      }
-    ]
+      },
+    ],
   };
 
   let res = await axios({
@@ -166,4 +171,3 @@ async function checkRequest(id: string) {
   });
   return res.data;
 }
-

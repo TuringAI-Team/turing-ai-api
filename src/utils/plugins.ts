@@ -604,7 +604,15 @@ const pluginList = [
         },
       },
     },
-    function: async (params) => {},
+    function: async (params) => {
+      const { markdown, type } = params;
+      console.log(type);
+
+      let image = await renderDiagram(markdown);
+      return {
+        image: image.toString("base64"),
+      };
+    },
   },
 ];
 
