@@ -151,6 +151,27 @@ export default {
                 content: JSON.stringify(result.tool.result),
               },
             ];
+
+            let fns = [];
+            if (pluginInfo.secPlugin) {
+              let plugin = pluginList.find(
+                (p) => p.name === pluginInfo.secPlugin
+              );
+              if (plugin) {
+                fns.push(plugin);
+              }
+            }
+
+            if (result.tool.name == "diagrams") {
+              messages = [
+                ...messages,
+                {
+                  role: "system",
+                  content:
+                    "Do not include the markdown code block (```) in your message just include the url of the rendered diagram.",
+                },
+              ];
+            }
             // execute func
             result = await chatgpt(
               messages,
@@ -159,7 +180,7 @@ export default {
               result,
               event,
               temperature,
-              []
+              fns
             );
             if (result.result) {
               result.cost +=
@@ -217,7 +238,7 @@ async function chatgpt(
     data: data,
   });
   let stream = response.data;
-
+  result.tool.input = "";
   stream.on("data", (d) => {
     d = d.toString();
     let dataArr = d.split("\n");
@@ -241,7 +262,7 @@ async function chatgpt(
           result.done = true;
         }
       } else {
-        if (result.tool.name) {
+        if (result.tool.name && result.tool.input != "") {
           // removpe null world
           if (typeof result.tool.input == "string") {
             result.tool.input = result.tool.input.replace("null", "");

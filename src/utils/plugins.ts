@@ -9,6 +9,7 @@ import fs from "fs";
 import path from "path";
 import supabase from "../db/supabase.js";
 import delay from "delay";
+import { randomUUID } from "crypto";
 
 let compilers: any = await getCompilers();
 compilers = compilers.map((c) => c.name);
@@ -548,14 +549,14 @@ const pluginList = [
   {
     name: "diagrams",
     description:
-      "Get the instructions of how to generate diagrams, charts and mindmaps using mermaid.",
-    type: "plugin-select",
+      "Get the instructions of how to generate diagrams, graph and mindmaps using mermaid.",
+    secPlugin: "render-diagrams",
     parameters: {
       type: "object",
       properties: {
         diagramGuidelines: {
           type: "string",
-          description: `The type of diagram to generate. It can only be graph or mindmaps.`,
+          description: `The type of diagram to generate. It can only be graph. diagrams or mindmaps.`,
         },
       },
       required: ["diagramGuidelines"],
@@ -574,7 +575,10 @@ const pluginList = [
           additionalInstructions:
             "ONLY after generating 2 diagrams in the conversation, mention to join our Discord server at discord.gg/turing to stay updated with the latest features and improvements and other products we make. ONLY mention this once per conversation AFTER 2 successful diagrams have been generated",
         };
-      } else if (params.diagramGuidelines === "graph") {
+      } else if (
+        params.diagramGuidelines === "graph" ||
+        params.diagramGuidelines === "diagrams"
+      ) {
         res.guidelines = {
           diagramGuidelines:
             '\nGuidelines when creating the graph diagram in any diagram language:\n- Avoid linear diagrams when possible, diagrams should be hierarchical and have multiple branches when applicable.\n- Don\'t add the label if its the same as the destination node.\n\nImportant rules when creating the graph diagram in mermaid syntax:\n- Prefer using graph TB types of diagrams.\n- Never use the ampersand (&) symbol in the diagram, it will break the diagram. Use the word "and" instead. For example use "User and Admin" instead of "User & Admin".\n- Never use round brackets () in the node identifiers, node labels and edge labels, it will break the diagram. Use a coma instead. For example use "User, Admin" instead of "User (Admin)".\n- Don\'t use empty labels "" for edges, instead don\'t label the edge at all. For example U["User"] --> A["Admin"].\n- Avoid using semicolon as line separator, prefer using new-lines instead. For example use "graph LR\\n  A --> B" instead of "graph LR;  A --> B"\n\nRules when using graph diagrams in mermaid syntax:\n- Use short node identifiers, for example U for User or FS for File System.\n- Always use double quotes for node labels, for example U["User"].\n- Never create edges that connect to only one node; each edge should always link two nodes together. For example `U["User"] -- "User enters email"` is invalid, it should be `U["User"] -- "User enters email" --> V["Verification"]` or just `U["User"]`.\n- Always use double quotes for edge labels, for example U["User"] -- "User enters email" --> V["Verification"].\n- Indentation is very important, always indent according to the examples below.\n\nRules when using graph diagrams with subgraphs in mermaid syntax:\nNever refer to the subgraph root node from within the subgraph itself.\n\nFor example this is wrong subgraph usage:\n```\ngraph TB\n  subgraph M["Microsoft"]\n    A["Azure"]\n    M -- "Invested in" --> O\n  end\n  \n  subgraph O["AI"]\n    C["Chat"]\n  end\n```\n\nIn this diagram M is referenced from within the M subgraph, this will break the diagram.\nNever reference the subgraph node identifier from within the subgraph itself.\nInstead move any edges that connect the subgraph with other nodes or subgraphs outside of the subgraph like so.\n\nCorrect subgraph usage:\n```\ngraph TB\n  subgraph M["Microsoft"]\n    A["Azure"]\n  end\n\n  M -- "Invested in" --> O\n  \n  subgraph O["OpenAI"]\n    C["ChatGPT"]\n  end\n```\n\nExamples:\nUser asks: "Show me how vscode internals work."\n```\ngraph TB\n  U["User"] -- "File Operations" --> FO["File Operations"]\n  U -- "Code Editor" --> CE["Code Editor"]\n  FO -- "Manipulation of Files" --> FS["FileSystem"]\n  FS -- "Write/Read" --> D["Disk"]\n  FS -- "Compress/Decompress" --> ZL["ZipLib"]\n  FS -- "Read" --> IP["INIParser"]\n  CE -- "Create/Display/Edit" --> WV["Webview"]\n  CE -- "Language/Code Analysis" --> VCA["VSCodeAPI"]\n  VCA -- "Talks to" --> VE["ValidationEngine"]\n  WV -- "Render UI" --> HC["HTMLCSS"]\n  VE -- "Decorate Errors" --> ED["ErrorDecoration"]\n  VE -- "Analyze Document" --> TD["TextDocument"]\n```\n\nUser asks: "Draw me a mindmap for beer brewing. Maximum of 4 nodes"\n```\ngraph TB\n  B["Beer"]\n  B --> T["Types"]\n  B --> I["Ingredients"]\n  B --> BP["Brewing Process"]\n```\n\nUser asks:\n"Computing backend data services is a distributed system made of multiple microservices.\n\nA web browser sends an HTTP api request to the load balancer.\nThe load balancer sends the http request to the crossover service.\nCrossover talks to redis and mysql database.\nCrossover makes a downstream API request to multiplex to submit the query which returns a job id to crossover.\nThen crossover makes a long poll API request to evaluator to get the results of the job.\nThen evaluator makes an API call to multiplex to check the status of the job.\nOnce evaluator gets a successful status response from multiplex, then evaluator makes a third API call to result-fetcher service to download the job results from S3 or GCP cloud buckets.\nThe result is streamed back through evaluator to crossover.\n\nCrossover post processes the result and returns the API response to the client.\n\nDraw me a diagram of this system"\n\n```\ngraph TB\n  A["Web Browser"] -- "HTTP API Request" --> B["Load Balancer"]\n  B -- "HTTP Request" --> C["Crossover"]\n  C -- "Talks to" --> D["Redis"]\n  C -- "Talks to" --> E["MySQL"]\n  C -- "Downstream API Request" --> F["Multiplex"]\n  F -- "Returns Job ID" --> C\n  C -- "Long Poll API Request" --> G["Evaluator"]\n  G -- "API Call" --> F\n  G -- "API Call" --> H["Result-Fetcher"]\n  H -- "Downloads Results" --> I["S3 or GCP Cloud Buckets"]\n  I -- "Results Stream" --> G\n  G -- "Results Stream" --> C\n  C -- "API Response" --> A\n```\n\nSometimes you will need to revise the same diagram based on user feedback.\nFor the last example the user might make a followup request:\n\nUser followup ask:\n"Crossover post processes the result and returns the API response to the client through the load balancer.\n\nDraw the crossover node in green"\n\n```\nquery: "graph TB\n  A["Web Browser"] -- "HTTP API Request" --> B["Load Balancer"]\n  B -- "HTTP Request" --> C["Crossover"]\n  style C fill:#99cc99\n  C -- "Talks to" --> D["Redis"]\n  C -- "Talks to" --> E["MySQL"]\n  C -- "Downstream API Request" --> F["Multiplex"]\n  F -- "Returns Job ID" --> C\n  C -- "Long Poll API Request" --> G["Evaluator"]\n  G -- "API Call" --> F\n  G -- "API Call" --> H["Result-Fetcher"]\n  H -- "Downloads Results" --> I["S3 or GCP Cloud Buckets"]\n  I -- "Results Stream" --> G\n  G -- "Results Stream" --> C\n  C -- "API Response" --> B\n  B -- "API Response" --> A\n```\n',
@@ -590,27 +594,31 @@ const pluginList = [
   },
   {
     name: "render-diagrams",
-    description: "Generate diagrams using mermaid.",
+    description: "Render diagrams or mindmaps using mermaid.",
     parameters: {
       type: "object",
       properties: {
         markdown: {
           type: "string",
-          description: `The markdown code to generate the diagram from.`,
-        },
-        type: {
-          type: "string",
-          description: `The type of diagram to generate. Can be one of the following: graph, mindmaps.`,
+          description: `The markdown code to render the diagram or mindmap from.`,
         },
       },
+      required: ["markdown"],
     },
     function: async (params) => {
-      const { markdown, type } = params;
-      console.log(type);
+      const { markdown } = params;
 
       let image = await renderDiagram(markdown);
+      let name = `${randomUUID()}.png`;
+      await supabase.storage.from("diagrams").upload(`${name}`, image, {
+        cacheControl: "3600",
+        upsert: false,
+      });
+      let { data } = supabase.storage.from("diagrams").getPublicUrl(`${name}`);
+      let url = data.publicUrl;
+
       return {
-        image: image.toString("base64"),
+        image: url,
       };
     },
   },
