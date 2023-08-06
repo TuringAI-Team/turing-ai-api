@@ -663,7 +663,10 @@ const pluginList = [
       },
       required: ["gender", "fitness_level", "body_weight", "parts", "location"],
     },
-    function: async (params) => {},
+    function: async (params) => {
+      let res = await planfit(params);
+      return res;
+    },
   },
 ];
 
