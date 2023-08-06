@@ -10,6 +10,7 @@ import path from "path";
 import supabase from "../db/supabase.js";
 import delay from "delay";
 import { randomUUID } from "crypto";
+import { run } from "@mermaid-js/mermaid-cli";
 
 let compilers: any = await getCompilers();
 compilers = compilers.map((c) => c.name);
@@ -622,6 +623,48 @@ const pluginList = [
       };
     },
   },
+  {
+    name: "planfit",
+    description:
+      "Plugin for recommending workout routines. It also provides instructions for each exercise, videos included.",
+    parameters: {
+      type: "object",
+      properties: {
+        gender: {
+          type: "string",
+          description:
+            "User's Gender. M or F or O. M is Male, F is Female, O is Other.",
+        },
+        fitness_level: {
+          type: "string",
+          description:
+            "User's level of fitness. 1 to 5, 1 is Intoductory, 2 is Beginner, 3 is Intermediate, 4 is Advanced, 5 is Expert.",
+        },
+        body_weight: {
+          type: "number",
+          description:
+            "User's Body weight. If user don't want to tell, it has to be null. If user enter it as pound, it should be converted to kg.",
+        },
+        parts: {
+          type: "array",
+          description:
+            "Muscle parts that are trained today. They should be in the list. (leg, back, chest, shoulder, core, biceps, triceps, forearm, cardio)",
+        },
+        location: {
+          type: "string",
+          description:
+            "The location where user work out, gym or home. If home is selected, the workout routine will be body weight exercise.",
+        },
+        language: {
+          type: "string",
+          description:
+            "User's language code that should be reconized from user's prompts.",
+        },
+      },
+      required: ["gender", "fitness_level", "body_weight", "parts", "location"],
+    },
+    function: async (params) => {},
+  },
 ];
 
 // Render the diagram as an image
@@ -657,6 +700,29 @@ async function renderDiagram(diagramCode) {
   await browser.close();
 
   return ss;
+}
+
+async function planfit(data: {
+  gender: string;
+  fitness_level: string;
+  body_weight: number;
+  parts: string[];
+  location: string;
+  language: string;
+}) {
+  let res = await axios({
+    method: "post",
+    url: "https://chatgptplugin.planfit.ai/get-workout-routine",
+    data: {
+      gender: data.gender,
+      fitness_level: data.fitness_level,
+      body_weight: data.body_weight,
+      parts: data.parts,
+      location: data.location,
+      user_language_code: data.language,
+    },
+  });
+  return res.data;
 }
 
 export default pluginList;

@@ -25,6 +25,7 @@
     "@google-ai/generativelanguage": "^0.2.0",
     "@google-cloud/aiplatform": "^2.16.0",
     "@huggingface/inference": "^2.5.2",
+    "@mermaid-js/mermaid-cli": "^10.3.0",
     "@octokit/rest": "^19.0.13",
     "@sellix/node-sdk": "^1.0.9",
     "@supabase/supabase-js": "^2.26.0",
