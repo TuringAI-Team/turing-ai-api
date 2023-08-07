@@ -249,7 +249,7 @@ async function chatgpt(
         try {
           data = JSON.parse(data);
         } catch (e) {
-          console.log(data);
+          console.log(d);
           console.log(e);
         }
         if (data.choices) {
