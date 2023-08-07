@@ -241,7 +241,7 @@ async function chatgpt(
   result.tool.input = "";
   stream.on("data", (d) => {
     d = d.toString();
-    let dataArr = d.split("\n");
+    let dataArr = d.split("\n\n");
     dataArr = dataArr.filter((x) => x != "");
     for (var data of dataArr) {
       data = data.replace("data: ", "").trim();
