@@ -13,7 +13,6 @@ import { getToday } from "../../utils/ms.js";
 //MODELS
 import kandinsky from "../image/kandinsky.js";
 import dall_e from "../image/dall-e.js";
-import sdxl from "../image/sdxl.js";
 import music from "../audio/music.js";
 import controlnet from "../image/controlnet.js";
 
