@@ -94,112 +94,113 @@ export default {
 
     result.cost +=
       (getChatMessageLength(messages) / 1000) * prices[model].input;
-    chatgpt(
-      messages,
-      max_tokens,
-      model,
-      result,
-      event,
-      temperature,
-      functions
-    ).then(async (x) => {
-      result = x;
-      event.emit("data", result);
-      if (result.result) {
-        result.cost +=
-          (getPromptLength(result.result) / 1000) * prices[model].output;
-      }
-      let j = 0;
-      while (!result.done) {
-        j++;
-        if (result.tool.name) {
-          // execute tool
+    chatgpt(messages, max_tokens, model, result, event, temperature, functions)
+      .then(async (x) => {
+        result = x;
+        event.emit("data", result);
+        if (result.result) {
+          result.cost +=
+            (getPromptLength(result.result) / 1000) * prices[model].output;
+        }
+        let j = 0;
+        while (!result.done) {
+          j++;
+          if (result.tool.name) {
+            // execute tool
 
-          let pluginInfo = pluginList.find((p) => p.name === result.tool.name);
-          if (typeof result.tool.input == "string") {
-            result.tool.input = JSON.parse(result.tool.input);
-            console.log(
-              `result.tool.input ${JSON.stringify(result.tool.input)}`
+            let pluginInfo = pluginList.find(
+              (p) => p.name === result.tool.name
             );
-          }
-
-          if (
-            !pluginInfo.parameters.required ||
-            (result.tool.input[pluginInfo.parameters.required[0]] &&
-              pluginInfo.parameters.required.length > 0) ||
-            pluginInfo.parameters.required.length == 0
-          ) {
-            let pluginResponse;
-            try {
-              pluginResponse = await pluginInfo.function(result.tool.input);
-              result.tool.result = pluginResponse;
-            } catch (e) {
-              console.error(e);
-              result.tool.result = `Error: ${e}`;
-              result.tool.error = e;
-            }
-            result.cost +=
-              (getPromptLength(JSON.stringify(result.tool.result)) / 1000) *
-              prices[model].input;
-
-            console.log(`pluginResponse ${JSON.stringify(result.tool.result)}`);
-            messages = [
-              ...messages,
-              {
-                role: "function",
-                name: result.tool.name,
-                content: JSON.stringify(result.tool.result),
-              },
-            ];
-
-            let fns = [];
-            if (pluginInfo.secPlugin) {
-              let plugin = pluginList.find(
-                (p) => p.name === pluginInfo.secPlugin
+            if (typeof result.tool.input == "string") {
+              result.tool.input = JSON.parse(result.tool.input);
+              console.log(
+                `result.tool.input ${JSON.stringify(result.tool.input)}`
               );
-              if (plugin) {
-                fns.push(plugin);
-              }
             }
 
-            if (result.tool.name == "diagrams") {
+            if (
+              !pluginInfo.parameters.required ||
+              (result.tool.input[pluginInfo.parameters.required[0]] &&
+                pluginInfo.parameters.required.length > 0) ||
+              pluginInfo.parameters.required.length == 0
+            ) {
+              let pluginResponse;
+              try {
+                pluginResponse = await pluginInfo.function(result.tool.input);
+                result.tool.result = pluginResponse;
+              } catch (e) {
+                console.error(e);
+                result.tool.result = `Error: ${e}`;
+                result.tool.error = e;
+              }
+              result.cost +=
+                (getPromptLength(JSON.stringify(result.tool.result)) / 1000) *
+                prices[model].input;
+
+              console.log(
+                `pluginResponse ${JSON.stringify(result.tool.result)}`
+              );
               messages = [
                 ...messages,
                 {
-                  role: "system",
-                  content:
-                    "Do not include the markdown code block (```) in your message just include the url of the rendered diagram.",
+                  role: "function",
+                  name: result.tool.name,
+                  content: JSON.stringify(result.tool.result),
                 },
               ];
-            }
-            // execute func
-            result = await chatgpt(
-              messages,
-              max_tokens,
-              model,
-              result,
-              event,
-              temperature,
-              fns
-            );
-            if (result.result) {
-              result.cost +=
-                (getPromptLength(result.result) / 1000) * prices[model].output;
-            }
-            if (result.finishReason == "stop") {
+
+              let fns = [];
+              if (pluginInfo.secPlugin) {
+                let plugin = pluginList.find(
+                  (p) => p.name === pluginInfo.secPlugin
+                );
+                if (plugin) {
+                  fns.push(plugin);
+                }
+              }
+
+              if (result.tool.name == "diagrams") {
+                messages = [
+                  ...messages,
+                  {
+                    role: "system",
+                    content:
+                      "Do not include the markdown code block (```) in your message just include the url of the rendered diagram.",
+                  },
+                ];
+              }
+              // execute func
+              result = await chatgpt(
+                messages,
+                max_tokens,
+                model,
+                result,
+                event,
+                temperature,
+                fns
+              );
+              if (result.result) {
+                result.cost +=
+                  (getPromptLength(result.result) / 1000) *
+                  prices[model].output;
+              }
+              if (result.finishReason == "stop") {
+                result.done = true;
+                console.log("stop");
+              }
+            } else {
               result.done = true;
-              console.log("stop");
             }
+            event.emit("data", result);
           } else {
             result.done = true;
+            event.emit("data", result);
           }
-          event.emit("data", result);
-        } else {
-          result.done = true;
-          event.emit("data", result);
         }
-      }
-    });
+      })
+      .catch((e) => {
+        console.log(e);
+      });
     return event;
   },
 };
