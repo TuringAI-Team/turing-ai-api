@@ -273,7 +273,11 @@ async function chatgpt(
           if (typeof result.tool.input == "string") {
             result.tool.input = result.tool.input.replace("null", "");
             console.log(`result.tool.input ${result.tool.input}`);
-            result.tool.input = JSON.parse(result.tool.input);
+            try {
+              result.tool.input = JSON.parse(result.tool.input);
+            } catch (e) {
+              console.log(e);
+            }
           }
         }
       }
