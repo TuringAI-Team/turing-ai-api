@@ -89,6 +89,7 @@ export default {
       }).then((res) => {
         let body = res.data;
         if (body.ParsedResults.length == 0) {
+          console.log(body);
           if (model.length == 1 || result.description) {
             result.done = true;
           }
