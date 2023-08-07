@@ -252,19 +252,20 @@ async function chatgpt(
           console.log(data);
           console.log(e);
         }
-
-        if (data.choices[0].delta.function_call) {
-          if (data.choices[0].delta.function_call.name) {
-            result.tool.name = data.choices[0].delta.function_call.name;
+        if (data.choices) {
+          if (data.choices[0].delta.function_call) {
+            if (data.choices[0].delta.function_call.name) {
+              result.tool.name = data.choices[0].delta.function_call.name;
+            }
+            result.tool.input +=
+              data.choices[0].delta.function_call?.arguments || "";
+          } else {
+            result.result += data.choices[0].delta?.content || "";
           }
-          result.tool.input +=
-            data.choices[0].delta.function_call?.arguments || "";
-        } else {
-          result.result += data.choices[0].delta?.content || "";
-        }
-        result.finishReason = data.choices[0].finish_reason;
-        if (result.finishReason == "stop") {
-          result.done = true;
+          result.finishReason = data.choices[0].finish_reason;
+          if (result.finishReason == "stop") {
+            result.done = true;
+          }
         }
       } else {
         if (result.tool.name && result.tool.input != "") {
