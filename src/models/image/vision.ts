@@ -88,6 +88,13 @@ export default {
         },
       }).then((res) => {
         let body = res.data;
+        if (body.ParsedResults.length == 0) {
+          if (model.length == 1 || result.description) {
+            result.done = true;
+          }
+          event.emit("data", result);
+          return;
+        }
         const lines = body.ParsedResults[0]?.TextOverlay?.Lines?.map((l) => ({
           text: l.LineText,
 
