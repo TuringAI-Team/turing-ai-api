@@ -68,7 +68,7 @@ export default {
             if (data.status == "done") {
               result.description = data.result;
               result.cost += data.cost;
-              if (model.length == 1) result.done = true;
+              if (model.length == 1 || result.text) result.done = true;
               event.emit("data", result);
             }
           });
@@ -112,7 +112,9 @@ export default {
         result.text = text;
         result.cost += 0.00004;
         result.lines = lines;
-        result.done = true;
+        if (model.length == 1 || result.description) {
+          result.done = true;
+        }
         event.emit("data", result);
       });
     }
