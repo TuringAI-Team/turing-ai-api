@@ -72,6 +72,9 @@ export default {
               event.emit("data", result);
             }
           });
+        })
+        .catch((e) => {
+          console.log(e);
         });
     }
     if (model.includes("ocr")) {
