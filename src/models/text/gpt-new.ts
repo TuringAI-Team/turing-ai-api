@@ -226,73 +226,67 @@ async function chatgpt(
   if (functions && functions.length > 0) {
     data["functions"] = functions;
   }
-  let response = await axios({
+  result.tool.input = "";
+  await fetchEventSource("https://api.openai.com/v1/chat/completions", {
     method: "post",
-    url: "https://api.openai.com/v1/chat/completions",
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
-      //   stream response
-      Accept: "text/event-stream",
     },
-    responseType: "stream",
-    data: data,
-  });
-  let stream = response.data;
-  result.tool.input = "";
-  stream.on("data", (d) => {
-    d = d.toString();
-    let dataArr = d.split("\n\n");
-    dataArr = dataArr.filter((x) => x != "");
-    for (var data of dataArr) {
-      data = data.replace("data: ", "").trim();
-      if (data != "[DONE]") {
-        try {
-          data = JSON.parse(data);
-        } catch (e) {
-          console.log(d);
-          console.log(e);
-        }
-        if (data.choices) {
-          if (data.choices[0].delta.function_call) {
-            if (data.choices[0].delta.function_call.name) {
-              result.tool.name = data.choices[0].delta.function_call.name;
-            }
-            result.tool.input +=
-              data.choices[0].delta.function_call?.arguments || "";
-          } else {
-            result.result += data.choices[0].delta?.content || "";
+    body: JSON.stringify(data),
+    onmessage: (msg) => {
+      let d: any = msg.data;
+      d = d.toString();
+      let dataArr = d.split("\n\n");
+      dataArr = dataArr.filter((x) => x != "");
+      for (var data of dataArr) {
+        data = data.replace("data: ", "").trim();
+        if (data != "[DONE]") {
+          try {
+            data = JSON.parse(data);
+          } catch (e) {
+            console.log(d);
+            console.log(e);
           }
-          result.finishReason = data.choices[0].finish_reason;
+          if (data.choices) {
+            if (data.choices[0].delta.function_call) {
+              if (data.choices[0].delta.function_call.name) {
+                result.tool.name = data.choices[0].delta.function_call.name;
+              }
+              result.tool.input +=
+                data.choices[0].delta.function_call?.arguments || "";
+            } else {
+              result.result += data.choices[0].delta?.content || "";
+            }
+            result.finishReason = data.choices[0].finish_reason;
+          }
+        } else {
+          if (result.tool.name && result.tool.input != "") {
+            // removpe null world
+            if (typeof result.tool.input == "string") {
+              result.tool.input = result.tool.input.replace("null", "");
+              console.log(`result.tool.input ${result.tool.input}`);
+              try {
+                result.tool.input = JSON.parse(result.tool.input);
+              } catch (e) {
+                console.log(e);
+              }
+            }
+          }
           if (result.finishReason == "stop") {
             result.done = true;
           }
         }
-      } else {
-        if (result.tool.name && result.tool.input != "") {
-          // removpe null world
-          if (typeof result.tool.input == "string") {
-            result.tool.input = result.tool.input.replace("null", "");
-            console.log(`result.tool.input ${result.tool.input}`);
-            try {
-              result.tool.input = JSON.parse(result.tool.input);
-            } catch (e) {
-              console.log(e);
-            }
-          }
-        }
       }
-    }
 
-    event.emit("data", result);
+      event.emit("data", result);
+    },
   });
 
   // when the stream emits end you return the result, wait for the stream to end
-  await new Promise((resolve) => {
+  /*await new Promise((resolve) => {
     stream.on("end", () => {
       resolve(result);
     });
-  });
-
-  return result;
+  })*/ return result;
 }
