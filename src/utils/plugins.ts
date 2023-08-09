@@ -767,6 +767,10 @@ const pluginList = [
       }
     },
   },
+  {
+    name: "music",
+    description: "Plugin for generating music using prompts.",
+  },
 ];
 
 // Render the diagram as an image

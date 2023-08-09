@@ -19,10 +19,9 @@ export default {
         type: "string",
         required: false,
         options: [
-          "claude-1",
           "claude-instant-1",
-          "claude-1-100k",
-          "claude-instant-1-100k",
+          "claude-instant-1.2",
+          "claude-1",
           "claude-2",
         ],
         default: "claude-instant-1",
