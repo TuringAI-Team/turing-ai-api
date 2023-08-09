@@ -1,6 +1,5 @@
 import axios from "axios";
 import { GoogleAuth } from "google-auth-library";
-import { DiscussServiceClient } from "@google-ai/generativelanguage";
 import { getPromptLength } from "../../utils/tokenizer.js";
 import { EventEmitter } from "events";
 

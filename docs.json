@@ -47,20 +47,12 @@
           "/text/gpt-new"
         ],
         [
-          "OpenAI Models",
-          "/text/gpt"
-        ],
-        [
           "Huggingface based models",
           "/text/huggingface"
         ],
         [
           "OpenChat models",
           "/text/openchat"
-        ],
-        [
-          "Other models",
-          "/text/other"
         ],
         [
           "Translate text",
@@ -86,10 +78,6 @@
         [
           "Kandinsky 2.1",
           "/image/kandinsky"
-        ],
-        [
-          "Stable Diffusion XL",
-          "/image/sdxl"
         ],
         [
           "Stablehorde",
