@@ -11,6 +11,8 @@ import supabase from "../db/supabase.js";
 import delay from "delay";
 import { randomUUID } from "crypto";
 import { run } from "@mermaid-js/mermaid-cli";
+import sh from "../models/image/sh.js";
+import kandinsky from "../models/image/kandinsky.js";
 
 let compilers: any = await getCompilers();
 compilers = compilers.map((c) => c.name);
@@ -714,6 +716,54 @@ const pluginList = [
         });
         console.log(res.data);
         return res.data;
+      }
+    },
+  },
+  {
+    name: "image",
+    description:
+      "Plugin for generating images using prompts. This uses different AI models to generate images.",
+    parameters: {
+      type: "object",
+      properties: {
+        prompt: {
+          type: "string",
+          description:
+            "Image generation prompt with fitting & descriptive keywords. Keep the description below 70 characters",
+        },
+      },
+      required: ["prompt"],
+    },
+    function: async (parameters) => {
+      let { prompt, model } = parameters;
+      if (!model || model == "sdxl") {
+        let event = await sh.execute({
+          prompt: prompt,
+          model: "SDXL_beta::stability.ai#6901",
+          number: 2,
+          nsfw: false,
+        });
+        let r: any = {};
+        // await until event sent done
+        await new Promise((resolve, reject) => {
+          event.on("data", (d) => {
+            if (d.done) {
+              r = d;
+              resolve(d);
+            }
+          });
+        });
+        let result = r.result[0];
+        let base64 = result.base64;
+        // convert base64 to url
+        let buffer = Buffer.from(base64, "base64");
+        await supabase.storage
+          .from("images")
+          .upload(`${result.id}.png`, buffer);
+        let { data } = await supabase.storage
+          .from("images")
+          .getPublicUrl(`${result.id}.png`);
+        return data.publicUrl;
       }
     },
   },
