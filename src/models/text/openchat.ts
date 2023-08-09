@@ -35,6 +35,24 @@ export default {
         default: 0.9,
       },
     },
+    response: {
+      result: {
+        type: "string",
+        required: true,
+      },
+      done: {
+        type: "boolean",
+        required: true,
+      },
+      cost: {
+        type: "number",
+        required: true,
+      },
+      finishReason: {
+        type: "string",
+        required: true,
+      },
+    },
   },
   execute: async (data) => {
     let event = new EventEmitter();

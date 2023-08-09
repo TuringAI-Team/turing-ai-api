@@ -60,6 +60,28 @@ export default {
         default: true,
       },
     },
+    response: {
+      cost: {
+        type: "number",
+        required: true,
+      },
+      results: {
+        type: "array",
+        required: true,
+      },
+      status: {
+        type: "string",
+        required: true,
+      },
+      progress: {
+        type: "number",
+        required: false,
+      },
+      id: {
+        type: "string",
+        required: true,
+      },
+    },
   },
   execute: async (data) => {
     let {

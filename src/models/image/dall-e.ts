@@ -40,6 +40,32 @@ export default {
         default: false,
       },
     },
+    response: {
+      cost: {
+        type: "number",
+        required: true,
+      },
+      results: {
+        type: "array",
+        required: true,
+      },
+      status: {
+        type: "string",
+        required: true,
+      },
+      progress: {
+        type: "number",
+        required: false,
+      },
+      id: {
+        type: "string",
+        required: true,
+      },
+      done: {
+        type: "boolean",
+        required: true,
+      },
+    },
   },
   execute: async (data) => {
     let {
