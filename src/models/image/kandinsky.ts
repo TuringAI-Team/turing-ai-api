@@ -146,10 +146,17 @@ export default {
       let spentInSec = (Date.now() - start) / 1000;
       let cost = (response.data.executionTime / 1000) * 0.00025;
       result.cost = cost;
+      if (
+        !response.data.output ||
+        (!response.data.output.images && !response.data.output.image_url)
+      ) {
+        console.log(response.data);
+        throw new Error("No images");
+      }
       if (data.number && data.number > 1) {
         try {
           result.results = await Promise.all(
-            response.data.output.images.map(async (x) => {
+            response.data.output?.images.map(async (x) => {
               let res = await axios.get(x, {
                 responseType: "arraybuffer",
                 // change time out to 2 min
