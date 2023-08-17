@@ -7,7 +7,7 @@ import log from "../utils/log.js";
 import redisClient from "../db/redis.js";
 import { update } from "../utils/db.js";
 import delay from "delay";
-import { dataset } from "src/utils/datasets.js";
+import { dataset } from "../utils/datasets.js";
 
 const router = express.Router();
 
@@ -87,7 +87,7 @@ async function request(req, res) {
     if (body.stream) {
       execution.on("data", async (data) => {
         if (data.done || data.status == "done" || data.status == "failed") {
-          /* if (data.record) {
+          /*  if (data.record) {
             await dataset(type, ai, data.record, data.id);
             delete data.record;
           }*/
@@ -108,11 +108,12 @@ async function request(req, res) {
       new Promise((resolve) => {
         execution.on("data", async (data) => {
           if (data.done || data.status == "done" || data.status == "failed") {
-            /*         if (data.record ) {
+            /*
+            if (data.record) {
               await dataset(type, ai, data.record, data.id);
               delete data.record;
-            }
-*/
+            }*/
+
             resolve(data);
           }
         });

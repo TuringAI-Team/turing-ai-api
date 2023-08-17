@@ -2,6 +2,7 @@ import axios from "axios";
 import { GoogleAuth } from "google-auth-library";
 import { getPromptLength } from "../../utils/tokenizer.js";
 import { EventEmitter } from "events";
+import { randomUUID } from "crypto";
 
 export default {
   data: {
@@ -29,6 +30,12 @@ export default {
         required: false,
         default: 0.9,
       },
+      id: {
+        type: "string",
+        required: false,
+        default: randomUUID(),
+        description: "ID of the conversation (used for data saving)",
+      },
     },
     response: {
       cost: {
@@ -46,7 +53,7 @@ export default {
     },
   },
   execute: async (data) => {
-    let { messages, model, max_tokens, temperature } = data;
+    let { messages, model, max_tokens, temperature, id } = data;
     if (!model) {
       model = "chat-bison";
     }
@@ -55,6 +62,8 @@ export default {
       cost: 0,
       done: false,
       result: "",
+      record: null,
+      id: id || randomUUID(),
     };
     // get message that is message.role == "system"
     let message = messages.find((message) => message.role == "system");
@@ -76,6 +85,25 @@ export default {
     const client = await auth.getClient();
     let token: any = await client.getAccessToken();
     token = token.token;
+    res.record = {
+      input: {
+        instances: [
+          {
+            context: message
+              ? message.content
+              : "You are PaLM 2 a AI chatbot created by Google.",
+            messages: messages,
+            examples: [],
+          },
+        ],
+        parameters: {
+          temperature: temperature || 0.2,
+          maxOutputTokens: max_tokens || 250,
+          topP: 0.8,
+          topK: 40,
+        },
+      },
+    };
     axios({
       method: "post",
       url: `https://us-central1-aiplatform.googleapis.com/v1/projects/turingai-4354f/locations/us-central1/publishers/google/models/${
@@ -108,6 +136,10 @@ export default {
         let promptLength = getPromptLength(
           messages.map((message) => message.content).join(" ")
         );
+        res.record = {
+          ...res.record,
+          output: response.data,
+        };
         let result = response.data.predictions[0].candidates[0].content;
         res.result = result;
         let resultLength = getPromptLength(result);

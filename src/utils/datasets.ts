@@ -28,8 +28,9 @@ export async function datasetSave(
 
   // first check if the data with id exists
   let { data, error } = await supabase
-    .from(datasetName)
+    .from("datasets_new")
     .select("*")
+    .eq("dataset", datasetName)
     .eq("id", id)
     .single();
   if (error) {
@@ -39,17 +40,18 @@ export async function datasetSave(
   if (data) {
     // update
     let { data: d, error } = await supabase
-      .from(datasetName)
+      .from("datasets_new")
       .update({
         record: [...(data.record || []), record],
       })
+      .eq("dataset", datasetName)
       .eq("id", id);
     if (error) {
       console.log(error);
       throw error;
     }
   } else {
-    await supabase.from(datasetName).insert([
+    await supabase.from("datasets_new").insert([
       {
         id: id,
         record: record,

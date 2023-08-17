@@ -14,12 +14,8 @@ POST *https://api.turing.sh/text/alan*
   - Type: string
   - Required: true
 
-- **conversationId**
-  - Type: string
-  - Required: true
-
-- **message**
-  - Type: string
+- **messages**
+  - Type: array
   - Required: true
 
 - **searchEngine**
@@ -27,38 +23,37 @@ POST *https://api.turing.sh/text/alan*
   - Required: false
   - Options: google, none
 
-- **photo**
+- **image**
   - Type: string
   - Required: false
 
-- **photoDescription**
+- **imageDescription**
   - Type: string
   - Required: false
 
 - **imageGenerator**
   - Type: string
   - Required: false
-  - Options: sdxl, kandinsky, dall-e, none
+  - Options: sdxl, kandinsky, none
 
-- **nsfwFilter**
+- **nsfw**
   - Type: boolean
-  - Required: false
-
-- **videoGenerator**
-  - Type: string
   - Required: false
 
 - **audioGenerator**
   - Type: string
   - Required: false
+  - Options: musicgen
 
 - **imageModificator**
   - Type: string
   - Required: false
+  - Options: controlnet, none
 
 - **max_tokens**
   - Type: number
   - Required: false
+  - Default: 250
 
 ## Response
 
@@ -81,10 +76,12 @@ POST *https://api.turing.sh/text/alan*
       },
       data: {
   "userName": "string",
-  "conversationId": "string",
-  "message": "string",
+  "messages": "array",
   "searchEngine": "google",
-  "imageGenerator": "sdxl"
+  "imageGenerator": "sdxl",
+  "audioGenerator": "musicgen",
+  "imageModificator": "controlnet",
+  "max_tokens": 250
 },
     })
   })();
@@ -101,10 +98,12 @@ POST *https://api.turing.sh/text/alan*
     },
     data=json.dumps({
   "userName": "string",
-  "conversationId": "string",
-  "message": "string",
+  "messages": "array",
   "searchEngine": "google",
-  "imageGenerator": "sdxl"
+  "imageGenerator": "sdxl",
+  "audioGenerator": "musicgen",
+  "imageModificator": "controlnet",
+  "max_tokens": 250
 }),
   )
   ```

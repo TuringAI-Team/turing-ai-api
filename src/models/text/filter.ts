@@ -2,6 +2,7 @@ import axios from "axios";
 import { Configuration, OpenAIApi } from "openai";
 import { nsfwWords, underagedCebs, youngWords } from "../../utils/keywords.js";
 import { EventEmitter } from "events";
+import { randomUUID } from "crypto";
 
 const availableFilters = ["nsfw", "cp", "toxicity"];
 const configuration = new Configuration({
@@ -66,6 +67,8 @@ export default {
       cp: false,
       toxic: false,
       done: false,
+      record: null,
+      id: randomUUID(),
     };
     event.emit("data", result);
     var res;
@@ -128,6 +131,18 @@ export default {
       }
       result.toxic = isToxic;
     }
+
+    result.record = {
+      input: text,
+      openai: res,
+      filters: filters,
+      flags: {
+        nsfw: result.nsfw,
+        youth: result.youth,
+        cp: result.cp,
+        toxic: result.toxic,
+      },
+    };
     result.done = true;
     setTimeout(() => {
       event.emit("data", result);

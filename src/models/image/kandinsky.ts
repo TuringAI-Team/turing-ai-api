@@ -1,6 +1,8 @@
 import axios from "axios";
 import { randomUUID } from "crypto";
 import { EventEmitter } from "events";
+import { predict } from "replicate-api";
+
 export default {
   data: {
     name: "kandinsky",
@@ -121,6 +123,7 @@ export default {
 
     let start = Date.now();
 
+    /*
     axios({
       url: "https://api.runpod.ai/v2/kandinsky-v2/runsync",
       method: "POST",
@@ -188,6 +191,40 @@ export default {
           status: "success",
         });
       }
+      result.status = "done";
+      result.progress = null;
+      event.emit("data", result);
+    });*/
+
+    predict({
+      model: `ai-forever/kandinsky-2.2`, // The model name
+      input: {
+        prompt: prompt,
+        num_inference_steps: steps || 50,
+        negative_prompt: negative_prompt,
+        num_outputs: data.number || 1,
+        width: data.width || 512,
+        height: data.height || 512,
+      }, // The model specific input
+      token: process.env.REPLICATE_API_KEY, // You need a token from replicate.com
+      poll: true, // Wait for the model to finish
+    }).then(async (prediction: any) => {
+      if (prediction.error) throw new Error(prediction.error);
+      let output = prediction.output;
+
+      let cost = prediction.metrics.predictTime * 0.0115;
+      result.cost = cost;
+      let res = await axios.get(output[0], {
+        responseType: "arraybuffer",
+        timeout: 120000,
+      });
+      let base64 = Buffer.from(res.data, "binary").toString("base64");
+      result.results.push({
+        base64: base64,
+        id: randomUUID(),
+        seed: Math.floor(Math.random() * 100000000),
+        status: "success",
+      });
       result.status = "done";
       result.progress = null;
       event.emit("data", result);
