@@ -87,10 +87,10 @@ async function request(req, res) {
     if (body.stream) {
       execution.on("data", async (data) => {
         if (data.done || data.status == "done" || data.status == "failed") {
-          /*  if (data.record) {
-            await dataset(type, ai, data.record, data.id);
+          if (data.record) {
+            //  await dataset(type, ai, data.record, data.id);
             delete data.record;
-          }*/
+          }
 
           res.write("data: " + JSON.stringify(data) + "\n\n");
           res.end();
@@ -108,17 +108,15 @@ async function request(req, res) {
       new Promise((resolve) => {
         execution.on("data", async (data) => {
           if (data.done || data.status == "done" || data.status == "failed") {
-            /*
             if (data.record) {
-              await dataset(type, ai, data.record, data.id);
+              //  await dataset(type, ai, data.record, data.id);
               delete data.record;
-            }*/
+            }
 
             resolve(data);
           }
         });
       }).then((d: any) => {
-        console.log(d);
         res.json({ success: true, ...d });
       });
     }
