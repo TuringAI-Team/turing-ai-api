@@ -14,19 +14,24 @@ export async function translateModels(model) {
 
 export async function request(url, action, body) {
   let URL = `https://api.runpod.ai/${url}/${action}`;
-  let res = await axios({
-    method: "POST",
-    url: URL,
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${process.env.RUNPOD_KEY}`,
-    },
-    data: {
-      input: {
-        ...body.input,
+  try {
+    let res = await axios({
+      method: "POST",
+      url: URL,
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${process.env.RUNPOD_KEY}`,
       },
-    },
-  });
-  let result = res.data;
-  return result;
+      data: {
+        input: {
+          ...body.input,
+        },
+      },
+    });
+    let result = res.data;
+    return result;
+  } catch (error: any) {
+    console.log(error.response.data);
+    throw error;
+  }
 }
