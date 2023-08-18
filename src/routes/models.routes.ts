@@ -118,6 +118,7 @@ async function request(req, res) {
           }
         });
       }).then((d: any) => {
+        console.log(d);
         res.json({ success: true, ...d });
       });
     }
