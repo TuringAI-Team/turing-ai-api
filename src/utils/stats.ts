@@ -19,7 +19,6 @@ export async function getUpdatedStats() {
     'div[class="text-sm-normal-AEQz4v"]',
     (el) => el.textContent
   );
-  console.log(guilds);
   let guildsNumber = guilds.split(" ")[2];
   await pushStats(parseInt(guildsNumber));
   await browser.close();
