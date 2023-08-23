@@ -14,15 +14,13 @@ export async function getUpdatedStats() {
     "https://discord.com/oauth2/authorize?client_id=1053015370115588147&scope=bot"
   );
   await delay(5000);
-  // log content of the page
-  console.log(await page.content());
-  await page.waitForSelector(
-    'div[class="text-xs-medium-311pdh entryInner-1tOOER"]'
-  );
-  let guilds = await page.$eval(
-    'div[class="text-xs-medium-311pdh entryInner-1tOOER"]',
-    (el) => el.textContent
-  ); // text is Used in X servers
+
+  let guilds;
+  // get the element with the text Used by X servers
+  // save screenshot
+  await page.screenshot({ path: "screenshot.png" });
+
+  return 0;
   console.log(guilds);
   let guildsNumber = guilds.split(" ")[2];
   await pushStats(parseInt(guildsNumber));
