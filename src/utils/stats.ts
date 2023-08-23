@@ -19,9 +19,7 @@ export async function getUpdatedStats() {
     'div[class="text-sm-normal-AEQz4v"]',
     (el) => el.textContent
   );
-  console.log(guilds);
-  let guildsNumber = guilds.split(" ")[1].split("k")[0] + "000";
-
+  let guildsNumber = guilds.split(" ")[1].split("K")[0] + "000";
   try {
     await pushStats(parseInt(guildsNumber));
   } catch (error) {
