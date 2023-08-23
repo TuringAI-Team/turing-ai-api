@@ -11,7 +11,7 @@ export async function getUpdatedStats() {
   });
   const page = await browser.newPage();
   await page.goto(
-    "https://discord.com/oauth2/authorize?client_id=1053015370115588147&scope=bot"
+    "https://discord.com/application-directory/1053015370115588147"
   );
   await delay(5000);
 
