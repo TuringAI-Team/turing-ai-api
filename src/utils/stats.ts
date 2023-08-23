@@ -20,7 +20,11 @@ export async function getUpdatedStats() {
     (el) => el.textContent
   );
   let guildsNumber = guilds.split(" ")[2];
-  await pushStats(parseInt(guildsNumber));
+  try {
+    await pushStats(parseInt(guildsNumber));
+  } catch (error) {
+    console.log(error);
+  }
   await browser.close();
   return parseInt(guildsNumber);
 }
