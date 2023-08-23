@@ -49,6 +49,7 @@
     "mathjs": "^11.8.2",
     "openai": "^3.3.0",
     "puppeteer": "^19.11.1",
+    "puppeteer-core": "^21.1.0",
     "rabbitmq-client": "^4.1.0",
     "redis": "^4.6.7",
     "replicate-api": "^0.4.4",

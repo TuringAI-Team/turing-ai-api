@@ -256,6 +256,7 @@ async function chatgpt(
       Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
     },
     body: JSON.stringify(data),
+    onopen: async (response) => {},
     onmessage: (msg) => {
       let d: any = msg.data;
       d = d.toString();

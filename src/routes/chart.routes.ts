@@ -21,4 +21,5 @@ router.post("/:chart", key, turnstile, async (req: Request, res: Response) => {
     res.json({ error: error, success: false }).status(400);
   }
 });
+
 export default router;

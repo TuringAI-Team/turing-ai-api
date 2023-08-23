@@ -6,9 +6,17 @@ import ffmpeg from "fluent-ffmpeg";
 import * as fs from "fs";
 import { generateKey } from "../utils/key.js";
 import { pub } from "../db/mq.js";
+import { getStats } from "../utils/stats.js";
 
 const router = express.Router();
-
+async function secret(req, res, next) {
+  let { secret } = req.headers;
+  if (secret == process.env.SUPER_KEY) {
+    next();
+  } else {
+    res.json({ success: false, error: "no permissions" });
+  }
+}
 async function topgg(req, res, next) {
   if (req.headers.authorization == process.env.TOPGG_AUTH) {
     next();
@@ -69,6 +77,18 @@ async function convertToVideo(audio, image, duration, callback) {
     })
     .run();
 }
+
+router.post(
+  "/bot",
+  secret,
+  key,
+  turnstile,
+  async (req: Request, res: Response) => {
+    let guilds = await getStats();
+    res.json({ success: true, guilds });
+  }
+);
+
 router.post("/top-vote", topgg, async (req: Request, res: Response) => {
   let body = req.body;
   let botId = "1053015370115588147";

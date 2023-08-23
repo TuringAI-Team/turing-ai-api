@@ -91,7 +91,6 @@ async function request(req, res) {
             //  await dataset(type, ai, data.record, data.id);
             delete data.record;
           }
-
           res.write("data: " + JSON.stringify(data) + "\n\n");
           res.end();
           if (data.cost) {
@@ -155,7 +154,6 @@ async function applyCost(cost, ai, type, user) {
     let updatedUser: any = await redisClient.get(`users:${user.id}`);
     updatedUser = JSON.parse(updatedUser);
     let plan = updatedUser.plan;
-    console.log(plan.used);
     plan.used += totalCost;
     plan.expenses.push({
       data: {
@@ -174,7 +172,6 @@ async function applyCost(cost, ai, type, user) {
     });
     await delay(3000);
     let up = JSON.parse(await redisClient.get(`users:${user.id}`)).plan;
-    console.log(up.used);
   }
 }
 
