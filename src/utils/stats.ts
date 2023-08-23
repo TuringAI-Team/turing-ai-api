@@ -1,6 +1,7 @@
 import fs from "fs";
 import axios from "axios";
 import puppeteer from "puppeteer";
+import delay from "delay";
 
 export async function getUpdatedStats() {
   // using puppeter open the link https://discord.com/oauth2/authorize?client_id=1053015370115588147&scope=bot and get the number of guilds
@@ -12,6 +13,9 @@ export async function getUpdatedStats() {
   await page.goto(
     "https://discord.com/oauth2/authorize?client_id=1053015370115588147&scope=bot"
   );
+  await delay(5000);
+  // log content of the page
+  console.log(await page.content());
   await page.waitForSelector(
     'div[class="text-xs-medium-311pdh entryInner-1tOOER"]'
   );
