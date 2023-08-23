@@ -19,6 +19,7 @@ export async function getUpdatedStats() {
     'div[class="text-xs-medium-311pdh entryInner-1tOOER"]',
     (el) => el.textContent
   ); // text is Used in X servers
+  console.log(guilds);
   let guildsNumber = guilds.split(" ")[2];
   await pushStats(parseInt(guildsNumber));
   await browser.close();
