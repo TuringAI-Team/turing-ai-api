@@ -14,13 +14,11 @@ export async function getUpdatedStats() {
     "https://discord.com/application-directory/1053015370115588147"
   );
   await delay(5000);
-
-  let guilds;
-  // get the element with the text Used by X servers
-  // save screenshot
-  await page.screenshot({ path: "screenshot.png" });
-
-  return 0;
+  await page.waitForSelector('div[class="text-sm-normal-AEQz4v"]');
+  let guilds = await page.$eval(
+    'div[class="text-sm-normal-AEQz4v"]',
+    (el) => el.textContent
+  );
   console.log(guilds);
   let guildsNumber = guilds.split(" ")[2];
   await pushStats(parseInt(guildsNumber));
