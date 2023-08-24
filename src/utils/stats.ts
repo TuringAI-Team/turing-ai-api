@@ -4,28 +4,39 @@ import puppeteer from "puppeteer";
 import delay from "delay";
 
 export async function getUpdatedStats() {
-  // using puppeter open the link https://discord.com/oauth2/authorize?client_id=1053015370115588147&scope=bot and get the number of guilds
-  const browser = await puppeteer.launch({
-    args: ["--no-sandbox"],
-    headless: "new",
-  });
-  const page = await browser.newPage();
-  await page.goto(
-    "https://discord.com/application-directory/1053015370115588147"
+  let res = await fetch(
+    "https://discord.com/api/v9/applications/1053015370115588147",
+    {
+      headers: {
+        accept: "*/*",
+        "accept-language": "es-ES,es;q=0.9,en;q=0.8",
+        authorization: process.env.STATS_AUTH,
+        "sec-ch-ua":
+          '"Chromium";v="116", "Not)A;Brand";v="24", "Brave";v="116"',
+        "sec-ch-ua-mobile": "?0",
+        "sec-ch-ua-platform": '"Windows"',
+        "sec-fetch-dest": "empty",
+        "sec-fetch-mode": "cors",
+        "sec-fetch-site": "same-origin",
+        "sec-gpc": "1",
+      },
+      referrer:
+        "https://discord.com/developers/applications/1053015370115588147/information",
+      referrerPolicy: "strict-origin-when-cross-origin",
+      body: null,
+      method: "GET",
+      mode: "cors",
+      credentials: "include",
+    }
   );
-  await delay(5000);
-  await page.waitForSelector('div[class="text-sm-normal-AEQz4v"]');
-  let guilds = await page.$eval(
-    'div[class="text-sm-normal-AEQz4v"]',
-    (el) => el.textContent
-  );
-  let guildsNumber = guilds.split(" ")[1].split("K")[0] + "000";
+  let answer = await res.json();
+  let guildsNumber = answer.approximate_guild_count;
   try {
-    await pushStats(parseInt(guildsNumber));
+    await pushStats(guildsNumber);
   } catch (error) {}
-  await browser.close();
-  return parseInt(guildsNumber);
+  return guildsNumber;
 }
+
 export async function getStats() {
   if (fs.existsSync("./guilds.txt")) {
     let guilds = fs.readFileSync("./guilds.txt", "utf-8");
