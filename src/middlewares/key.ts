@@ -72,12 +72,12 @@ export default async (req: Request, res: Response, next) => {
       if (isvalid) {
         next();
       } else {
-        res.status(401).send({ error: "Unauthorized" });
+        res.status(401).send({ error: "Unauthorized, no valid token" });
       }
     } else {
-      res.status(401).send({ error: "Unauthorized" });
+      res.status(401).send({ error: "Unauthorized, no token provided(1)" });
     }
   } else {
-    res.status(401).send({ error: "Unauthorized" });
+    res.status(401).send({ error: "Unauthorized, no token provided" });
   }
 };

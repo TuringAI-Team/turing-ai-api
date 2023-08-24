@@ -3,6 +3,15 @@ import supabase from "../db/supabase.js";
 import { v4 as uuidv4 } from "uuid";
 import redisClient from "../db/redis.js";
 
+export async function pushKeysToCache() {
+  let { data, error } = await supabase.from("api_keys").select("*");
+  if (data) {
+    data.map((d) => {
+      redisClient.set(`api:${d["api-token"]}`, JSON.stringify(d));
+    });
+  }
+}
+
 export async function generateKey(
   userId: string,
   name: string,
