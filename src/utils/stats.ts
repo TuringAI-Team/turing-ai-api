@@ -22,9 +22,7 @@ export async function getUpdatedStats() {
   let guildsNumber = guilds.split(" ")[1].split("K")[0] + "000";
   try {
     await pushStats(parseInt(guildsNumber));
-  } catch (error) {
-    console.log(error);
-  }
+  } catch (error) {}
   await browser.close();
   return parseInt(guildsNumber);
 }
@@ -43,28 +41,32 @@ async function pushStats(guilds: number) {
   fs.writeFileSync("./guilds.txt", guilds.toString());
   let shards = Math.round(guilds / 1000);
   // round shards to the nearest integer
-  await axios({
-    method: "post",
-    url: "https://top.gg/api/bots/1053015370115588147/stats",
-    headers: {
-      Authorization: process.env.TOPGG_TOKEN,
-      "Content-Type": "application/json",
-    },
-    data: {
-      server_count: guilds,
-      shard_count: shards,
-    },
-  });
-  await axios({
-    method: "post",
-    url: "https://discord.bots.gg/api/v1/bots/1053015370115588147/stats",
-    headers: {
-      Authorization: process.env.DISCORD_BOTS_GG,
-      "Content-Type": "application/json",
-    },
-    data: {
-      guildCount: guilds,
-      shardCount: shards,
-    },
-  });
+  try {
+    await axios({
+      method: "post",
+      url: "https://top.gg/api/bots/1053015370115588147/stats",
+      headers: {
+        Authorization: process.env.TOPGG_TOKEN,
+        "Content-Type": "application/json",
+      },
+      data: {
+        server_count: guilds,
+        shard_count: shards,
+      },
+    });
+  } catch (error) {}
+  try {
+    await axios({
+      method: "post",
+      url: "https://discord.bots.gg/api/v1/bots/1053015370115588147/stats",
+      headers: {
+        Authorization: process.env.DISCORD_BOTS_GG,
+        "Content-Type": "application/json",
+      },
+      data: {
+        guildCount: guilds,
+        shardCount: shards,
+      },
+    });
+  } catch (error) {}
 }
