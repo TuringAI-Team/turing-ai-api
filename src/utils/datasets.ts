@@ -25,24 +25,41 @@ export async function datasetSave(
 ) {
   let datasetName = `turing-${ai}-${type}`;
   if (!id) id = randomUUID();
+  if (record.base64) {
+    // upload to supabase storage
+    let { error } = await supabase.storage
+      .from("datasets_new")
+      .upload(`${datasetName}/${id}.png`, record.base64, {
+        cacheControl: "3600",
+        upsert: false,
+      });
+    if (error) {
+      console.log(error);
+      throw error;
+    }
+    let { data } = await supabase.storage
+      .from("datasets_new")
+      .getPublicUrl(`${datasetName}/${id}.png`);
+    record.url = data.publicUrl;
+    delete record.base64;
+  }
 
   // first check if the data with id exists
   let { data, error } = await supabase
     .from("datasets_new")
     .select("*")
     .eq("dataset", datasetName)
-    .eq("id", id)
-    .single();
+    .eq("id", id);
   if (error) {
     console.log(error);
     throw error;
   }
-  if (data) {
+  if (data && data.length > 0) {
     // update
     let { data: d, error } = await supabase
       .from("datasets_new")
       .update({
-        record: [...(data.record || []), record],
+        record: [...(data[0].record || []), record],
       })
       .eq("dataset", datasetName)
       .eq("id", id);
@@ -51,15 +68,22 @@ export async function datasetSave(
       throw error;
     }
   } else {
-    await supabase.from("datasets_new").insert([
+    let { error } = await supabase.from("datasets_new").insert([
       {
         id: id,
         record: record,
         dataset: datasetName,
-        ai: ai,
+        model: ai,
+        rates: {
+          "1": 0,
+        },
         type: type,
       },
     ]);
+    if (error) {
+      console.log(error);
+      throw error;
+    }
   }
 
   return {

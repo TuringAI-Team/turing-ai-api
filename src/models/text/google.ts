@@ -62,7 +62,7 @@ export default {
       cost: 0,
       done: false,
       result: "",
-      record: null,
+      //  record: null,
       id: id || randomUUID(),
     };
     // get message that is message.role == "system"
@@ -85,7 +85,7 @@ export default {
     const client = await auth.getClient();
     let token: any = await client.getAccessToken();
     token = token.token;
-    res.record = {
+    /*  res.record = {
       input: {
         instances: [
           {
@@ -103,7 +103,7 @@ export default {
           topK: 40,
         },
       },
-    };
+    };*/
     axios({
       method: "post",
       url: `https://us-central1-aiplatform.googleapis.com/v1/projects/turingai-4354f/locations/us-central1/publishers/google/models/${
@@ -136,10 +136,10 @@ export default {
         let promptLength = getPromptLength(
           messages.map((message) => message.content).join(" ")
         );
-        res.record = {
+        /*    res.record = {
           ...res.record,
           output: response.data,
-        };
+        };*/
         let result = response.data.predictions[0].candidates[0].content;
         res.result = result;
         let resultLength = getPromptLength(result);

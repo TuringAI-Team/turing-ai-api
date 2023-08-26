@@ -160,6 +160,7 @@ export default {
       progress: 0,
       queue_position: res.queue_position,
       results: [],
+      record: null,
     };
     let maxTime = 45;
     if (res.id) {
@@ -182,6 +183,22 @@ export default {
               id: x.id,
               base64: x.img,
               status: x.censored ? "filtered" : "success",
+            };
+          });
+          result.record = result.results.map((x) => {
+            return {
+              ...x,
+              prompt: data.prompt,
+              model: data.model,
+              sampler: data.sampler,
+              cfg_scale: data.cfg_scale,
+              nsfw: data.nsfw,
+              width: data.width,
+              height: data.height,
+              steps: data.steps,
+              number: data.number,
+              strength: data.strength,
+              negative_prompt: data.negative_prompt,
             };
           });
           stream.emit("data", result);
@@ -209,6 +226,22 @@ export default {
                 id: x.id,
                 base64: x.img,
                 status: x.censored ? "filtered" : "success",
+              };
+            });
+            result.record = result.results.map((x) => {
+              return {
+                ...x,
+                prompt: data.prompt,
+                model: data.model,
+                sampler: data.sampler,
+                cfg_scale: data.cfg_scale,
+                nsfw: data.nsfw,
+                width: data.width,
+                height: data.height,
+                steps: data.steps,
+                number: data.number,
+                strength: data.strength,
+                negative_prompt: data.negative_prompt,
               };
             });
             clearInterval(interval);

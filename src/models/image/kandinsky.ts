@@ -110,6 +110,7 @@ export default {
       status: "generating",
       progress: 0,
       id: randomUUID(),
+      record: null,
     };
     event = new EventEmitter();
     event.emit("data", result);
@@ -224,6 +225,20 @@ export default {
         id: randomUUID(),
         seed: Math.floor(Math.random() * 100000000),
         status: "success",
+      });
+      result.record = result.results.map((x) => {
+        return {
+          ...x,
+          prompt: prompt,
+          negative_prompt: negative_prompt,
+          guidance_scale: guidance_scale,
+          steps: steps,
+          width: data.width || 512,
+          height: data.height || 512,
+          cfg_scale: data.cfg_scale || 4,
+          model_version: model_version,
+          cost: cost,
+        };
       });
       result.status = "done";
       result.progress = null;

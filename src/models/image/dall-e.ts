@@ -87,6 +87,7 @@ export default {
       progress: 0,
       id: randomUUID(),
       done: false,
+      record: null,
     };
     event.emit("data", result);
     if (size == "512x512") result.cost = 0.018;
@@ -112,6 +113,14 @@ export default {
           result.status = "done";
           result.progress = null;
           result.done = true;
+          result.record = result.results.map((r) => {
+            return {
+              ...r,
+              prompt,
+              number,
+              size,
+            };
+          });
           event.emit("data", result);
         });
 

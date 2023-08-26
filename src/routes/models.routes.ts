@@ -88,7 +88,7 @@ async function request(req, res) {
       execution.on("data", async (data) => {
         if (data.done || data.status == "done" || data.status == "failed") {
           if (data.record) {
-            //  await dataset(type, ai, data.record, data.id);
+            await dataset(type, ai, data.record, data.id);
             delete data.record;
           }
           res.write("data: " + JSON.stringify(data) + "\n\n");
@@ -108,7 +108,7 @@ async function request(req, res) {
         execution.on("data", async (data) => {
           if (data.done || data.status == "done" || data.status == "failed") {
             if (data.record) {
-              //  await dataset(type, ai, data.record, data.id);
+              await dataset(type, ai, data.record, data.id);
               delete data.record;
             }
 
