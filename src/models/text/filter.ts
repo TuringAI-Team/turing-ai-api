@@ -134,7 +134,7 @@ export default {
 
     result.record = {
       input: text,
-      openai: res,
+      openai: res?.data?.results,
       filters: filters,
       flags: {
         nsfw: result.nsfw,
