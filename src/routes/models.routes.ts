@@ -97,6 +97,7 @@ async function request(req, res) {
               data.id = re.id;
             }
           }
+          console.log("lg, ", data);
           res.write("data: " + JSON.stringify(data) + "\n\n");
           res.end();
           if (data.cost) {
