@@ -68,18 +68,20 @@ export default {
     if (!max_tokens) max_tokens = 512;
     if (!temperature) temperature = 0.9;
     result.cost += (getChatMessageLength(messages) / 1000) * 0.0001;
-    chatgpt(messages, max_tokens, model, result, event, temperature).then(
-      async (x) => {
+    openchat(messages, max_tokens, model, result, event, temperature)
+      .then(async (x) => {
         result = x;
         result.cost += (getPromptLength(result.result) / 1000) * 0.0001;
         event.emit("data", result);
-      }
-    );
+      })
+      .catch((e) => {
+        console.log(e);
+      });
     return event;
   },
 };
 
-async function chatgpt(
+async function openchat(
   messages,
   max_tokens,
   model,
@@ -96,6 +98,7 @@ async function chatgpt(
   if (temperature) {
     data["temperature"] = temperature;
   }
+
   let response = await axios({
     method: "post",
     url: "https://api.openchat.team/v1/chat/completions",
