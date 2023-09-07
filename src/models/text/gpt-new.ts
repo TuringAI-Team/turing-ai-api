@@ -119,7 +119,6 @@ export default {
     if (!temperature) temperature = 0.9;
     if (!plugins) plugins = null;
     if (!id) id = randomUUID();
-    console.log(`id ${id}`);
     let functions = [];
 
     for (let i = 0; i < data.plugins?.length; i++) {
@@ -136,7 +135,6 @@ export default {
         result = x;
         if (result.done) {
           result.id = id;
-          console.log("done");
         }
         event.emit("data", result);
         if (result.result) {
@@ -240,7 +238,6 @@ export default {
           } else {
             result.done = true;
             result.id = id;
-            console.log("done3");
             event.emit("data", result);
           }
         }
