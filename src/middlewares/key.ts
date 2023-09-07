@@ -10,6 +10,11 @@ export async function verifyToken(token: string, req) {
     if (!decoded) {
       // decode supabase access token
       const { data, error } = await supabase.auth.getUser(token);
+      console.log({
+        file: 'src/middlewares/key.ts',
+        data: data,
+        error: error
+      })
       if (error) {
         console.log(error);
         return false;
@@ -45,6 +50,11 @@ export async function verifyToken(token: string, req) {
     }
   } catch (err) {
     const { data, error } = await supabase.auth.getUser(token);
+    console.log({
+      file: 'src/middlewares/key.ts',
+      data: data,
+      error: error
+    })
     if (error) {
       console.log(error);
       return false;
