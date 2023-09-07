@@ -28,6 +28,13 @@ router.delete("/", key, secret, async (req: Request, res: Response) => {
     .select("*")
     .eq("id", keyId)
     .eq("userId", user);
+
+  console.log({
+    file: 'src/routes/key.routes.ts',
+    data: user,
+    error: err
+  })
+
   if (err) {
     res.json({ success: false, error: err });
     return;
@@ -37,6 +44,13 @@ router.delete("/", key, secret, async (req: Request, res: Response) => {
     .delete()
     .eq("id", keyId)
     .eq("userId", user);
+
+  console.log({
+    file: 'src/routes/key.routes.ts',
+    data: user,
+    error: err
+  })
+
   if (error) {
     res.json({ success: false, error });
     return;
@@ -52,6 +66,13 @@ router.get("/u/:user", key, secret, async (req: Request, res: Response) => {
     .select("*")
     .eq("userId", user)
     .order("created_at", { ascending: false });
+
+  console.log({
+    file: 'src/routes/key.routes.ts',
+    data: user,
+    error: error
+  })
+
   if (error) {
     res.json({ success: false, error });
     return;

@@ -33,6 +33,11 @@ export async function datasetSave(
         cacheControl: "3600",
         upsert: false,
       });
+
+    console.log({
+      file: 'src/utils/datasets.ts',
+      error: error
+    })
     if (error) {
       console.log(error);
       throw error;
@@ -40,6 +45,13 @@ export async function datasetSave(
     let { data } = await supabase.storage
       .from("datasets_new")
       .getPublicUrl(`${datasetName}/${id}.png`);
+
+    console.log({
+      file: 'src/utils/datasets.ts',
+      data: data,
+      error: error
+    })
+
     record.url = data.publicUrl;
     delete record.base64;
   }
@@ -50,6 +62,13 @@ export async function datasetSave(
     .select("*")
     .eq("dataset", datasetName)
     .eq("id", id);
+
+  console.log({
+    file: 'src/utils/datasets.ts',
+    data: data,
+    error: error
+  })
+
   if (error) {
     console.log(error);
     throw error;
@@ -63,6 +82,13 @@ export async function datasetSave(
       })
       .eq("dataset", datasetName)
       .eq("id", id);
+
+    console.log({
+      file: 'src/utils/datasets.ts',
+      data: data,
+      error: error
+    })
+
     if (error) {
       console.log(error);
       throw error;
@@ -80,6 +106,13 @@ export async function datasetSave(
         type: type,
       },
     ]);
+
+    console.log({
+      file: 'src/utils/datasets.ts',
+      data: data,
+      error: error
+    })
+  
     if (error) {
       console.log(error);
       throw error;

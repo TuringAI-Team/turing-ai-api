@@ -5,6 +5,13 @@ import redisClient from "../db/redis.js";
 
 export async function pushKeysToCache() {
   let { data, error } = await supabase.from("api_keys").select("*");
+
+  console.log({
+    file: 'src/utils/key.ts',
+    data: data,
+    error: error
+  })
+
   if (data) {
     data.map((d) => {
       redisClient.set(`api:${d["api-token"]}`, JSON.stringify(d));
@@ -43,6 +50,13 @@ export async function generateKey(
       .from("users_new")
       .select("*")
       .eq("id", userId);
+
+    console.log({
+      file: 'src/utils/key.ts',
+      data: data,
+      error: error
+    })
+
     if (error) {
       console.log(error);
       return false;
@@ -58,6 +72,13 @@ export async function generateKey(
     },
   ]);
   redisClient.set(`api:${apiToken}`, JSON.stringify(d));
+
+  console.log({
+    file: 'src/utils/key.ts',
+    data: data,
+    error: error
+  })
+
   if (error) {
     console.log(error);
     return false;
@@ -109,6 +130,13 @@ export async function checkCaptchaToken(token: string, req) {
               .from("users_new")
               .select("*")
               .eq("id", data.userId);
+
+            console.log({
+              file: 'src/utils/key.ts',
+              data: data,
+              error: error
+            })
+
             if (error) {
               console.log(error);
               return false;
