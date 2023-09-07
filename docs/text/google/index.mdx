@@ -32,7 +32,7 @@ POST *https://api.turing.sh/text/google*
   - Type: string
   - Required: false
   - Description: ID of the conversation (used for data saving)
-  - Default: cdb89598-da12-4c81-8152-26adb0ec4b2e
+  - Default: 38a92213-d283-4a43-becd-f489e543f085
 
 ## Response
 
@@ -48,6 +48,10 @@ POST *https://api.turing.sh/text/google*
 - **done**
   - Type: boolean
   - Description: Whether the request is done or not
+
+- **id**
+  - Type: string
+  - Description: ID of the conversation (used for data saving)
 
 ## Examples
 
@@ -68,7 +72,7 @@ POST *https://api.turing.sh/text/google*
   "model": "chat-bison",
   "max_tokens": 512,
   "temperature": 0.9,
-  "id": "cdb89598-da12-4c81-8152-26adb0ec4b2e"
+  "id": "38a92213-d283-4a43-becd-f489e543f085"
 },
     })
   })();
@@ -88,7 +92,7 @@ POST *https://api.turing.sh/text/google*
   "model": "chat-bison",
   "max_tokens": 512,
   "temperature": 0.9,
-  "id": "cdb89598-da12-4c81-8152-26adb0ec4b2e"
+  "id": "38a92213-d283-4a43-becd-f489e543f085"
 }),
   )
   ```

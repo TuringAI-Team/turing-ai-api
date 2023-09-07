@@ -85,11 +85,17 @@ async function request(req, res) {
     }*/
     let execution = await aiObject.execute(body);
     if (body.stream) {
+      let saved = false;
       execution.on("data", async (data) => {
         if (data.done || data.status == "done" || data.status == "failed") {
-          if (data.record) {
-            await dataset(type, ai, data.record, data.id);
+          if (data.record && !saved && type == "image") {
+            saved = true;
+            let record = data.record;
             delete data.record;
+            let re = await dataset(type, ai, record, data.id);
+            if (re && re?.id) {
+              data.id = re.id;
+            }
           }
           res.write("data: " + JSON.stringify(data) + "\n\n");
           res.end();
@@ -104,12 +110,18 @@ async function request(req, res) {
       if (execution?.cost) {
         applyCost(execution.cost, ai, type, req.user);
       }
+      let saved = false;
       new Promise((resolve) => {
         execution.on("data", async (data) => {
           if (data.done || data.status == "done" || data.status == "failed") {
-            if (data.record) {
-              await dataset(type, ai, data.record, data.id);
+            if (data.record && !saved && type == "image") {
+              saved = true;
+              let record = data.record;
               delete data.record;
+              let re = await dataset(type, ai, record, data.id);
+              if (re && re?.id) {
+                data.id = re.id;
+              }
             }
 
             resolve(data);

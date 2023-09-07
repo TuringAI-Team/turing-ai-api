@@ -14,6 +14,7 @@ const configuration = new Configuration({
 const openai = new OpenAIApi(configuration);
 import axios from "axios";
 import { get } from "http";
+import { randomUUID } from "crypto";
 
 let prices = {
   "gpt-3.5-turbo": {
@@ -60,6 +61,12 @@ export default {
         default: [],
         options: pluginList.map((p) => p.name),
       },
+      id: {
+        type: "string",
+        required: false,
+        default: randomUUID(),
+        description: "ID of the conversation (used for data saving)",
+      },
     },
     response: {
       result: {
@@ -82,16 +89,22 @@ export default {
         type: "string",
         required: true,
       },
+      id: {
+        type: "string",
+        required: true,
+        description: "ID of the conversation (used for data saving)",
+      },
     },
   },
   execute: async (data) => {
     let event = new EventEmitter();
-    let { messages, model, max_tokens, temperature, plugins } = data;
+    let { messages, model, max_tokens, temperature, plugins, id } = data;
 
     let result: any = {
       result: "",
       done: false,
       cost: 0,
+      id: null,
       tool: {
         name: null,
         input: null,
@@ -99,12 +112,14 @@ export default {
         error: null,
       },
       finishReason: null,
+      record: [],
     };
     if (!model) model = "gpt-3.5-turbo";
     if (!max_tokens) max_tokens = 512;
     if (!temperature) temperature = 0.9;
     if (!plugins) plugins = null;
-
+    if (!id) id = randomUUID();
+    console.log(`id ${id}`);
     let functions = [];
 
     for (let i = 0; i < data.plugins?.length; i++) {
@@ -119,6 +134,10 @@ export default {
     chatgpt(messages, max_tokens, model, result, event, temperature, functions)
       .then(async (x) => {
         result = x;
+        if (result.done) {
+          result.id = id;
+          console.log("done");
+        }
         event.emit("data", result);
         if (result.result) {
           result.cost +=
@@ -208,14 +227,20 @@ export default {
               }
               if (result.finishReason == "stop") {
                 result.done = true;
-                console.log("stop");
+                result.id = id;
+                console.log("done1");
               }
             } else {
               result.done = true;
+              result.id = id;
+              console.log("done2");
             }
+
             event.emit("data", result);
           } else {
             result.done = true;
+            result.id = id;
+            console.log("done3");
             event.emit("data", result);
           }
         }
@@ -249,6 +274,14 @@ async function chatgpt(
     data["functions"] = functions;
   }
   result.tool.input = "";
+  result.record = [
+    ...result.record,
+    {
+      type: "gpt_input",
+      data: data,
+    },
+  ];
+  let lastOutput;
   await fetchEventSource("https://api.openai.com/v1/chat/completions", {
     method: "post",
     headers: {
@@ -272,6 +305,7 @@ async function chatgpt(
             console.log(e);
           }
           if (data.choices) {
+            lastOutput = data;
             if (data.choices[0].delta.function_call) {
               if (data.choices[0].delta.function_call.name) {
                 result.tool.name = data.choices[0].delta.function_call.name;
@@ -284,6 +318,22 @@ async function chatgpt(
             result.finishReason = data.choices[0].finish_reason;
           }
         } else {
+          if (lastOutput.choices[0].delta?.content) {
+            lastOutput.choices[0].delta.content = result.result;
+          }
+          if (lastOutput.choices[0].delta.function_call?.arguments) {
+            lastOutput.choices[0].delta.function_call.arguments =
+              result.tool.input;
+          }
+          result.record = [
+            ...result.record,
+            {
+              type: "gpt_output",
+              data: {
+                ...lastOutput,
+              },
+            },
+          ];
           if (result.tool.name && result.tool.input != "") {
             // removpe null world
             if (typeof result.tool.input == "string") {
@@ -311,5 +361,7 @@ async function chatgpt(
     stream.on("end", () => {
       resolve(result);
     });
-  })*/ return result;
+  })*/
+
+  return result;
 }

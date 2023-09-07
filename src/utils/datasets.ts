@@ -12,8 +12,10 @@ export async function dataset(
     record.forEach(async (r: any) => {
       await datasetSave(type, ai, r, r.id);
     });
+    return;
   } else {
-    await datasetSave(type, ai, record, id);
+    console.log("saving dataset", id);
+    return await datasetSave(type, ai, record, id);
   }
 }
 
@@ -26,10 +28,11 @@ export async function datasetSave(
   let datasetName = `turing-${ai}-${type}`;
   if (!id) id = randomUUID();
   if (record.base64) {
+    let buffer = Buffer.from(record.base64, "base64");
     // upload to supabase storage
     let { error } = await supabase.storage
       .from("datasets_new")
-      .upload(`${datasetName}/${id}.png`, record.base64, {
+      .upload(`${datasetName}/${id}.png`, buffer, {
         cacheControl: "3600",
         upsert: false,
       });
@@ -56,16 +59,39 @@ export async function datasetSave(
   }
   if (data && data.length > 0) {
     // update
-    let { data: d, error } = await supabase
-      .from("datasets_new")
-      .update({
-        record: [...(data[0].record || []), record],
-      })
-      .eq("dataset", datasetName)
-      .eq("id", id);
-    if (error) {
-      console.log(error);
-      throw error;
+    // check if last update was more than 72 hours ago
+    if (data[0].last_update < Date.now() - 72 * 60 * 60 * 1000) {
+      id = randomUUID();
+      let { error } = await supabase.from("datasets_new").insert([
+        {
+          id: id,
+          record: record,
+          dataset: datasetName,
+          model: ai,
+          rates: {
+            "1": 0,
+          },
+          type: type,
+          last_update: Date.now(),
+        },
+      ]);
+      if (error) {
+        console.log(error);
+        throw error;
+      }
+    } else {
+      let { data: d, error } = await supabase
+        .from("datasets_new")
+        .update({
+          record: [...(data[0].record || []), record],
+          last_update: Date.now(),
+        })
+        .eq("dataset", datasetName)
+        .eq("id", id);
+      if (error) {
+        console.log(error);
+        throw error;
+      }
     }
   } else {
     let { error } = await supabase.from("datasets_new").insert([
@@ -78,6 +104,7 @@ export async function datasetSave(
           "1": 0,
         },
         type: type,
+        last_update: Date.now(),
       },
     ]);
     if (error) {
@@ -85,7 +112,6 @@ export async function datasetSave(
       throw error;
     }
   }
-
   return {
     id,
   };

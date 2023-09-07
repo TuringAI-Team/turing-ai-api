@@ -33,6 +33,12 @@ POST *https://api.turing.sh/text/gpt-new*
   - Options: google, youtube-search, weather, wikipedia, tenor, alphavantage-stocks, alphavantage-crypto, alphavantage-forex, free-games, tasty, world-news, calculator, github, code-interpreter, diagrams, render-diagrams, planfit, wolfram, image, music
   - Default: 
 
+- **id**
+  - Type: string
+  - Required: false
+  - Description: ID of the conversation (used for data saving)
+  - Default: 448dfdb2-46ec-4a54-baa1-882e406996ad
+
 ## Response
 
 
@@ -50,6 +56,10 @@ POST *https://api.turing.sh/text/gpt-new*
 
 - **finishReason**
   - Type: string
+
+- **id**
+  - Type: string
+  - Description: ID of the conversation (used for data saving)
 
 ## Examples
 
@@ -70,7 +80,8 @@ POST *https://api.turing.sh/text/gpt-new*
   "model": "gpt-3.5-turbo",
   "max_tokens": 512,
   "temperature": 0.9,
-  "plugins": []
+  "plugins": [],
+  "id": "448dfdb2-46ec-4a54-baa1-882e406996ad"
 },
     })
   })();
@@ -90,7 +101,8 @@ POST *https://api.turing.sh/text/gpt-new*
   "model": "gpt-3.5-turbo",
   "max_tokens": 512,
   "temperature": 0.9,
-  "plugins": []
+  "plugins": [],
+  "id": "448dfdb2-46ec-4a54-baa1-882e406996ad"
 }),
   )
   ```
