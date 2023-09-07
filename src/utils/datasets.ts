@@ -37,10 +37,6 @@ export async function datasetSave(
         upsert: false,
       });
 
-    console.log({
-      file: "src/utils/datasets.ts",
-      error: error,
-    });
     if (error) {
       console.log(error);
       throw error;
@@ -48,12 +44,6 @@ export async function datasetSave(
     let { data } = await supabase.storage
       .from("datasets_new")
       .getPublicUrl(`${datasetName}/${id}.png`);
-
-    console.log({
-      file: "src/utils/datasets.ts",
-      data: data,
-      error: error,
-    });
 
     record.url = data.publicUrl;
     delete record.base64;
@@ -66,18 +56,13 @@ export async function datasetSave(
     .eq("dataset", datasetName)
     .eq("id", id);
 
-  console.log({
-    file: "src/utils/datasets.ts",
-    data: data,
-    error: error,
-  });
-
   if (error) {
     console.log(error);
     throw error;
   }
   if (data && data.length > 0) {
     // update
+
     // check if last update was more than 72 hours ago
     if (data[0].last_update < Date.now() - 72 * 60 * 60 * 1000) {
       id = randomUUID();
@@ -126,12 +111,6 @@ export async function datasetSave(
         last_update: Date.now(),
       },
     ]);
-
-    console.log({
-      file: "src/utils/datasets.ts",
-      data: data,
-      error: error,
-    });
 
     if (error) {
       console.log(error);
