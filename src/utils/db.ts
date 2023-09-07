@@ -2,9 +2,12 @@ import { pub } from "../db/mq.js";
 
 export async function update(action: "update" | "vote", data: any) {
   let d = {};
+
+  let collection;
+  let id;
   if (action === "update") {
-    let collection = data.collection;
-    let id = data.id;
+    collection = data.collection;
+    id = data.id;
     delete data.collection;
     delete data.id;
     d = {
@@ -13,27 +16,19 @@ export async function update(action: "update" | "vote", data: any) {
       updates: data,
     };
   } else {
-    d = data.userId;
+    d = {
+      userId: data.userId,
+    };
   }
   try {
     await pub.send(
       {
-        exchange: "messages",
-        routingKey: "message",
+        exchange: "db",
+        routingKey: "db",
       },
       JSON.stringify({
-        id: action,
-        data: d,
-      })
-    );
-    await pub.send(
-      {
-        exchange: "messages:dev",
-        routingKey: "message",
-      },
-      JSON.stringify({
-        id: action,
-        data: d,
+        type: action,
+        ...d,
       })
     );
   } catch (e) {
