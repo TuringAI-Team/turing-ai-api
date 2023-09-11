@@ -97,8 +97,8 @@ router.post("/top-vote", topgg, async (req: Request, res: Response) => {
     console.log(`User ${userId} just voted!`);
     await pub.send(
       {
-        exchange: "messages",
-        routingKey: "message",
+        exchange: "db",
+        routingKey: "db",
       },
       JSON.stringify({
         id: "vote",
