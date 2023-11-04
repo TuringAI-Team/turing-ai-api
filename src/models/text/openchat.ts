@@ -101,8 +101,9 @@ export default {
         },
         ...messages
       ]
+      console.log(newMessages)
     } else {
-
+      newMessages = messages;
     }
     openchat(messages, max_tokens, model, result, event, temperature)
       .then(async (x) => {
