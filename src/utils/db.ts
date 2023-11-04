@@ -13,7 +13,7 @@ export async function update(action: "update" | "vote", data: any) {
     d = {
       collection,
       id,
-      updates: data,
+      data: data,
     };
   } else {
     d = {
