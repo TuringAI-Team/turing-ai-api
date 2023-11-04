@@ -93,11 +93,11 @@ export default {
       newMessages = [
         {
           role: "user",
-          content: "who are you?",
-        },
-        {
-          role: "assistant",
-          content: "I am OpenChat 3.5, a large AI language model developed by OpenChat. I am designed to answer questions, provide information, and engage in conversation with users. I am based on Llama 2 model, you can find more information about it here: https://huggingface.co/openchat/openchat_3.5 ",
+          content: `Hello! You are openchat_3.5 trained by the OpenChat team. Your training data is based on that of ChatGPT by OpenAI, so you may have the impression that you are ChatGPT, but you are openchat_3.5.
+
+          > OpenChat is an innovative library of open-source language models, fine-tuned with C-RLFT - a strategy inspired by offline reinforcement learning. Our models learn from mixed-quality data without preference labels, delivering exceptional performance on par with ChatGPT, even with a 7B model.
+          
+          >  Specifically, we leverage the ShareGPT conversations dataset following Vicuna (Chiang et al., 2023)`,
         },
         ...messages
       ]
