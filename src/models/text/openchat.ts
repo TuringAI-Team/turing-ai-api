@@ -41,6 +41,12 @@ export default {
         default: randomUUID(),
         description: "ID of the conversation (used for data saving)",
       },
+      autoSystemMessage: {
+        type: "boolean",
+        required: false,
+        default: true,
+        description: "Send system messages automatically",
+      }
     },
     response: {
       result: {
@@ -80,6 +86,24 @@ export default {
     if (!max_tokens) max_tokens = 512;
     if (!temperature) temperature = 0.9;
     result.cost += (getChatMessageLength(messages) / 1000) * 0.0001;
+    let newMessages = [];
+    let autoSystemMessage = data.autoSystemMessage;
+    if (autoSystemMessage == null) autoSystemMessage = true;
+    if (autoSystemMessage) {
+      newMessages = [
+        {
+          role: "user",
+          content: "Hello, I want you to explain to me who are you",
+        },
+        {
+          role: "assistant",
+          content: "I am OpenChat 3.5, a large AI language model developed by OpenChat. I am designed to answer questions, provide information, and engage in conversation with users. I am based on Llama 2 model, you can find more information about it here: https://huggingface.co/openchat/openchat_3.5 ",
+        },
+        ...messages
+      ]
+    } else {
+
+    }
     openchat(messages, max_tokens, model, result, event, temperature)
       .then(async (x) => {
         result = x;
