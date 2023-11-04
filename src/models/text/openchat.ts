@@ -22,8 +22,8 @@ export default {
       model: {
         type: "string",
         required: false,
-        default: "openchat_3.5",
-        options: ["openchat_3.5"],
+        default: "openchat_v3.2_mistral",
+        options: ["openchat_v3.2_mistral"],
       },
       max_tokens: {
         type: "number",
@@ -76,7 +76,7 @@ export default {
       cost: 0,
       finishReason: null,
     };
-    if (!model) model = "openchat_3.5";
+    if (!model) model = "openchat_v3.2_mistral";
     if (!max_tokens) max_tokens = 512;
     if (!temperature) temperature = 0.9;
     result.cost += (getChatMessageLength(messages) / 1000) * 0.0001;
