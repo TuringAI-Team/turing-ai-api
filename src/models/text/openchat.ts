@@ -93,7 +93,7 @@ export default {
       newMessages = [
         {
           role: "user",
-          content: "Hello, I want you to explain to me who are you",
+          content: "who are you?",
         },
         {
           role: "assistant",
@@ -101,7 +101,6 @@ export default {
         },
         ...messages
       ]
-      console.log(newMessages)
     } else {
       newMessages = messages;
     }
