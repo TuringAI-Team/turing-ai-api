@@ -8,6 +8,7 @@ import {
 
 import axios from "axios";
 import { get } from "http";
+import { randomUUID } from "crypto";
 
 export default {
   data: {
@@ -21,8 +22,8 @@ export default {
       model: {
         type: "string",
         required: false,
-        default: "openchat_v3.2",
-        options: ["openchat_v3.2"],
+        default: "openchat_3.5",
+        options: ["openchat_3.5"],
       },
       max_tokens: {
         type: "number",
@@ -33,6 +34,12 @@ export default {
         type: "number",
         required: false,
         default: 0.9,
+      },
+      id: {
+        type: "string",
+        required: false,
+        default: randomUUID(),
+        description: "ID of the conversation (used for data saving)",
       },
     },
     response: {
@@ -52,6 +59,11 @@ export default {
         type: "string",
         required: true,
       },
+      id: {
+        type: "string",
+        required: true,
+        description: "ID of the conversation (used for data saving)",
+      },
     },
   },
   execute: async (data) => {
@@ -64,7 +76,7 @@ export default {
       cost: 0,
       finishReason: null,
     };
-    if (!model) model = "openchat_v3.2";
+    if (!model) model = "openchat_3.5";
     if (!max_tokens) max_tokens = 512;
     if (!temperature) temperature = 0.9;
     result.cost += (getChatMessageLength(messages) / 1000) * 0.0001;
