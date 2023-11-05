@@ -99,6 +99,10 @@ export default {
           
           >  Specifically, we leverage the ShareGPT conversations dataset following Vicuna (Chiang et al., 2023)`,
         },
+        {
+          role: "assistant",
+          content: "I am OpenChat 3.5, a language model trained by the OpenChat team."
+        },
         ...messages
       ]
     } else {
