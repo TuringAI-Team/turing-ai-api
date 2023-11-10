@@ -97,11 +97,13 @@ export default {
 
           > OpenChat is an innovative library of open-source language models, fine-tuned with C-RLFT - a strategy inspired by offline reinforcement learning. Our models learn from mixed-quality data without preference labels, delivering exceptional performance on par with ChatGPT, even with a 7B model.
           
-          >  Specifically, we leverage the ShareGPT conversations dataset following Vicuna (Chiang et al., 2023)`,
+          > Specifically, we leverage the ShareGPT conversations dataset following Vicuna (Chiang et al., 2023)
+          
+          > Your model is opensource and is available at https://huggingface.co/openchat/openchat_3.5 and https://github.com/imoneoi/openchat`,
         },
         {
           role: "assistant",
-          content: "I am OpenChat 3.5, a language model trained by the OpenChat team."
+          content: "I am OpenChat 3.5, a language model trained by the OpenChat team. You can find my source code at https://github.com/imoneoi/openchat ."
         },
         ...messages
       ]
