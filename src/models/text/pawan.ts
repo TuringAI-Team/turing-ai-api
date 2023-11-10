@@ -12,8 +12,8 @@ import { randomUUID } from "crypto";
 
 export default {
   data: {
-    name: "openchat",
-    fullName: "OpenChat models",
+    name: "pawan",
+    fullName: "Pawan.krd models",
     parameters: {
       messages: {
         type: "array",
@@ -22,8 +22,8 @@ export default {
       model: {
         type: "string",
         required: false,
-        default: "openchat_v3.2_mistral",
-        options: ["openchat_v3.2_mistral"],
+        default: "zephyr-7b-beta",
+        options: ["zephyr-7b-beta", "pai-001-light-beta"],
       },
       max_tokens: {
         type: "number",
@@ -82,33 +82,11 @@ export default {
       cost: 0,
       finishReason: null,
     };
-    if (!model) model = "openchat_v3.2_mistral";
+    if (!model) model = "zephyr-7b-beta";
     if (!max_tokens) max_tokens = 512;
     if (!temperature) temperature = 0.9;
     result.cost += (getChatMessageLength(messages) / 1000) * 0.0001;
-    let newMessages = [];
-    let autoSystemMessage = data.autoSystemMessage;
-    if (autoSystemMessage == null) autoSystemMessage = true;
-    if (autoSystemMessage) {
-      newMessages = [
-        {
-          role: "user",
-          content: `Hello! You are openchat_3.5 trained by the OpenChat team. Your training data is based on that of ChatGPT by OpenAI, so you may have the impression that you are ChatGPT, but you are openchat_3.5.
-
-          > OpenChat is an innovative library of open-source language models, fine-tuned with C-RLFT - a strategy inspired by offline reinforcement learning. Our models learn from mixed-quality data without preference labels, delivering exceptional performance on par with ChatGPT, even with a 7B model.
-          
-          >  Specifically, we leverage the ShareGPT conversations dataset following Vicuna (Chiang et al., 2023)`,
-        },
-        {
-          role: "assistant",
-          content: "I am OpenChat 3.5, a language model trained by the OpenChat team."
-        },
-        ...messages
-      ]
-    } else {
-      newMessages = messages;
-    }
-    openchat(newMessages, max_tokens, model, result, event, temperature)
+    pawan(messages, max_tokens, model, result, event, temperature)
       .then(async (x) => {
         result = x;
         result.cost += (getPromptLength(result.result) / 1000) * 0.0001;
@@ -121,7 +99,7 @@ export default {
   },
 };
 
-async function openchat(
+async function pawan(
   messages,
   max_tokens,
   model,
@@ -133,7 +111,7 @@ async function openchat(
     messages: messages,
     stream: true,
     max_tokens: max_tokens,
-    model: model,
+    //model: model,
   };
   if (temperature) {
     data["temperature"] = temperature;
@@ -141,10 +119,10 @@ async function openchat(
 
   let response = await axios({
     method: "post",
-    url: "https://api.openchat.team/v1/chat/completions",
+    url: `https://api.pawan.krd${model == "pai-001-light-beta" ? "/pai-001-light-beta" : ""}/v1/chat/completions`,
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${process.env.OPENCHAT_API_KEY}`,
+      Authorization: `Bearer ${process.env.PAWAN_API_KEY}`,
       //   stream response
       Accept: "text/event-stream",
     },
