@@ -136,11 +136,6 @@ async function pawan(messages, max_tokens, model, result, event, temperature?) {
     async function* streamCompletion(data) {
       yield* linesToMessages(chunksToLines(data));
     }
-
-    /////////////////////////////////////
-    ////// your axios request here //////
-    /////////////////////////////////////
-
     let response = await axios({
       method: "post",
       url: `https://api.pawan.krd${
@@ -177,7 +172,7 @@ async function pawan(messages, max_tokens, model, result, event, temperature?) {
     }
     return result;
   } catch (e: any) {
-    console.log(`error: ${e.response.data}`);
+    console.log(`error: ${JSON.stringify(e.response.data)}`);
     return result;
   }
 }
