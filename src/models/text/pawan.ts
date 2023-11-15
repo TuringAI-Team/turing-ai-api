@@ -112,67 +112,63 @@ async function pawan(messages, max_tokens, model, result, event, temperature?) {
   if (model == "zephyr-7b-beta") {
     data["model"] = "pai-001-light-beta";
   }
-  try {
-    async function* chunksToLines(chunksAsync) {
-      let previous = "";
-      for await (const chunk of chunksAsync) {
-        const bufferChunk = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
-        previous += bufferChunk;
-        let eolIndex;
-        while ((eolIndex = previous.indexOf("\n")) >= 0) {
-          const line = previous.slice(0, eolIndex + 1).trimEnd();
-          if (line === "data: [DONE]") break;
-          if (line.startsWith("data: ")) yield line;
-          previous = previous.slice(eolIndex + 1);
-        }
+  async function* chunksToLines(chunksAsync) {
+    let previous = "";
+    for await (const chunk of chunksAsync) {
+      const bufferChunk = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
+      previous += bufferChunk;
+      let eolIndex;
+      while ((eolIndex = previous.indexOf("\n")) >= 0) {
+        const line = previous.slice(0, eolIndex + 1).trimEnd();
+        if (line === "data: [DONE]") break;
+        if (line.startsWith("data: ")) yield line;
+        previous = previous.slice(eolIndex + 1);
       }
     }
-    async function* linesToMessages(linesAsync) {
-      for await (const line of linesAsync) {
-        const message = line.substring("data :".length);
-        yield message;
-      }
-    }
-    async function* streamCompletion(data) {
-      yield* linesToMessages(chunksToLines(data));
-    }
-    let response = await axios({
-      method: "post",
-      url: `https://api.pawan.krd${
-        model == "pai-001-light-beta" ? "/pai-001-light-beta" : ""
-      }/v1/chat/completions`,
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${process.env.PAWAN_API_KEY}`,
-        //   stream response
-        Accept: "text/event-stream",
-      },
-      responseType: "stream",
-      data: data,
-    });
-    for await (const message of streamCompletion(response.data)) {
-      try {
-        const parsed = JSON.parse(message);
-        result += parsed.choices[0].delta?.content || "";
-
-        event.emit("data", result);
-        if (parsed.choices[0].finish_reason == "stop") {
-          result.done = true;
-          result.finishReason = "stop";
-          break;
-        }
-        if (parsed.choices[0].finish_reason == "max_tokens") {
-          result.done = true;
-          result.finishReason = "max_tokens";
-          break;
-        }
-      } catch (error) {
-        console.error("Could not JSON parse stream message", message, error);
-      }
-    }
-    return result;
-  } catch (e: any) {
-    console.log(`error: ${JSON.stringify(e.response)}`);
-    return result;
   }
+  async function* linesToMessages(linesAsync) {
+    for await (const line of linesAsync) {
+      const message = line.substring("data :".length);
+      yield message;
+    }
+  }
+  async function* streamCompletion(data) {
+    yield* linesToMessages(chunksToLines(data));
+  }
+  let response = await axios({
+    method: "post",
+    url: `https://api.pawan.krd${
+      model == "pai-001-light-beta" ? "/pai-001-light-beta" : ""
+    }/v1/chat/completions`,
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${process.env.PAWAN_API_KEY}`,
+      //   stream response
+      Accept: "text/event-stream",
+    },
+    responseType: "stream",
+    data: data,
+  });
+
+  for await (const message of streamCompletion(response.data)) {
+    try {
+      const parsed = JSON.parse(message);
+      result += parsed.choices[0].delta?.content || "";
+
+      event.emit("data", result);
+      if (parsed.choices[0].finish_reason == "stop") {
+        result.done = true;
+        result.finishReason = "stop";
+        break;
+      }
+      if (parsed.choices[0].finish_reason == "max_tokens") {
+        result.done = true;
+        result.finishReason = "max_tokens";
+        break;
+      }
+    } catch (error) {
+      console.error("Could not JSON parse stream message", message, error);
+    }
+  }
+  return result;
 }
