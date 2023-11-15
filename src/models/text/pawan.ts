@@ -86,7 +86,15 @@ export default {
     if (!max_tokens) max_tokens = 512;
     if (!temperature) temperature = 0.9;
     result.cost += (getChatMessageLength(messages) / 1000) * 0.0001;
-    pawan(messages, max_tokens, model, result, event, temperature)
+
+    const newMessages = [
+      {
+        role: "system",
+        text: "You are an a helpful assistant called Zephyr, your task is answering user questions. You are being exceuted inside a discord bot and your model have been created by HuggingFace.",
+      },
+      ...messages,
+    ];
+    pawan(newMessages, max_tokens, model, result, event, temperature)
       .then(async (x) => {
         result = x;
         result.cost += (getPromptLength(result.result) / 1000) * 0.0001;
