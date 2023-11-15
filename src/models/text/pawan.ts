@@ -46,7 +46,7 @@ export default {
         required: false,
         default: true,
         description: "Send system messages automatically",
-      }
+      },
     },
     response: {
       result: {
@@ -99,14 +99,7 @@ export default {
   },
 };
 
-async function pawan(
-  messages,
-  max_tokens,
-  model,
-  result,
-  event,
-  temperature?
-) {
+async function pawan(messages, max_tokens, model, result, event, temperature?) {
   let data: any = {
     messages: messages,
     stream: true,
@@ -116,10 +109,15 @@ async function pawan(
   if (temperature) {
     data["temperature"] = temperature;
   }
+  if (model == "zephyr-7b-beta") {
+    data["model"] = "zephyr-7b-beta";
+  }
 
   let response = await axios({
     method: "post",
-    url: `https://api.pawan.krd${model == "pai-001-light-beta" ? "/pai-001-light-beta" : ""}/v1/chat/completions`,
+    url: `https://api.pawan.krd${
+      model == "pai-001-light-beta" ? "/pai-001-light-beta" : ""
+    }/v1/chat/completions`,
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${process.env.PAWAN_API_KEY}`,
