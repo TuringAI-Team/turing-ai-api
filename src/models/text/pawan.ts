@@ -110,7 +110,7 @@ async function pawan(messages, max_tokens, model, result, event, temperature?) {
     data["temperature"] = temperature;
   }
   if (model == "zephyr-7b-beta") {
-    data["model"] = "zephyr-7b-beta";
+    data["model"] = "pai-001-light-beta";
   }
 
   let response = await axios({
