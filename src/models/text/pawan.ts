@@ -90,7 +90,7 @@ export default {
     const newMessages = [
       {
         role: "system",
-        text: "You are an a helpful assistant called Zephyr, your task is answering user questions. You are being exceuted inside a discord bot and your model have been created by HuggingFace.",
+        text: "You are an a helpful assistant called Zephyr, your task is answering user questions. You are being exceuted inside a discord bot and your model have been created by HuggingFace. Be concise with your answers, unless the user ask for more content or the question requires to write a text.",
       },
       ...messages,
     ];
