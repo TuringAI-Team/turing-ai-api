@@ -157,7 +157,7 @@ async function pawan(messages, max_tokens, model, result, event, temperature?) {
 
     return result;
   } catch (e: any) {
-    console.log(e.response.body);
+    console.log(e.response, e.response.data);
     return result;
   }
 }
