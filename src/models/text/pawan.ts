@@ -112,48 +112,52 @@ async function pawan(messages, max_tokens, model, result, event, temperature?) {
   if (model == "zephyr-7b-beta") {
     data["model"] = "pai-001-light-beta";
   }
+  try {
+    let response = await axios({
+      method: "post",
+      url: `https://api.pawan.krd${
+        model == "pai-001-light-beta" ? "/pai-001-light-beta" : ""
+      }/v1/chat/completions`,
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${process.env.PAWAN_API_KEY}`,
+        //   stream response
+        Accept: "text/event-stream",
+      },
+      responseType: "stream",
+      data: data,
+    });
+    let stream = response.data;
 
-  let response = await axios({
-    method: "post",
-    url: `https://api.pawan.krd${
-      model == "pai-001-light-beta" ? "/pai-001-light-beta" : ""
-    }/v1/chat/completions`,
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${process.env.PAWAN_API_KEY}`,
-      //   stream response
-      Accept: "text/event-stream",
-    },
-    responseType: "stream",
-    data: data,
-  });
-  let stream = response.data;
-
-  stream.on("data", (d) => {
-    d = d.toString();
-    let dataArr = d.split("\n");
-    dataArr = dataArr.filter((x) => x != "");
-    for (var data of dataArr) {
-      data = data.replace("data: ", "").trim();
-      if (data != "[DONE]") {
-        data = JSON.parse(data);
-        result.result += data.choices[0].delta?.content || "";
-        result.finishReason = data.choices[0].finish_reason;
-        if (result.finishReason == "stop") {
-          result.done = true;
+    stream.on("data", (d) => {
+      d = d.toString();
+      let dataArr = d.split("\n");
+      dataArr = dataArr.filter((x) => x != "");
+      for (var data of dataArr) {
+        data = data.replace("data: ", "").trim();
+        if (data != "[DONE]") {
+          data = JSON.parse(data);
+          result.result += data.choices[0].delta?.content || "";
+          result.finishReason = data.choices[0].finish_reason;
+          if (result.finishReason == "stop") {
+            result.done = true;
+          }
         }
       }
-    }
 
-    event.emit("data", result);
-  });
-
-  // when the stream emits end you return the result, wait for the stream to end
-  await new Promise((resolve) => {
-    stream.on("end", () => {
-      resolve(result);
+      event.emit("data", result);
     });
-  });
 
-  return result;
+    // when the stream emits end you return the result, wait for the stream to end
+    await new Promise((resolve) => {
+      stream.on("end", () => {
+        resolve(result);
+      });
+    });
+
+    return result;
+  } catch (e) {
+    console.log(e);
+    return result;
+  }
 }
