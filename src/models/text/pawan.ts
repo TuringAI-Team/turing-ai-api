@@ -131,6 +131,7 @@ async function pawan(messages, max_tokens, model, result, event, temperature?) {
 
     stream.on("data", (d) => {
       d = d.toString();
+      console.log(d);
       let dataArr = d.split("\n");
       dataArr = dataArr.filter((x) => x != "");
       for (var data of dataArr) {
