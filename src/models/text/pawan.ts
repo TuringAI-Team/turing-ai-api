@@ -135,40 +135,51 @@ async function pawan(messages, max_tokens, model, result, event, temperature?) {
   async function* streamCompletion(data) {
     yield* linesToMessages(chunksToLines(data));
   }
-  let response = await axios({
-    method: "post",
-    url: `https://api.pawan.krd${
-      model == "pai-001-light-beta" ? "/pai-001-light-beta" : ""
-    }/v1/chat/completions`,
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${process.env.PAWAN_API_KEY}`,
-      //   stream response
-      Accept: "text/event-stream",
-    },
-    responseType: "stream",
-    data: data,
-  });
+  try {
+    // your axios request
+    let response = await axios({
+      method: "post",
+      url: `https://api.pawan.krd${
+        model == "pai-001-light-beta" ? "/pai-001-light-beta" : ""
+      }/v1/chat/completions`,
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${process.env.PAWAN_API_KEY}`,
+        //   stream response
+        Accept: "text/event-stream",
+      },
+      responseType: "stream",
+      data: data,
+    });
 
-  for await (const message of streamCompletion(response.data)) {
-    try {
-      const parsed = JSON.parse(message);
-      result += parsed.choices[0].delta?.content || "";
+    for await (const message of streamCompletion(response.data)) {
+      try {
+        const parsed = JSON.parse(message);
+        result += parsed.choices[0].delta?.content || "";
 
-      event.emit("data", result);
-      if (parsed.choices[0].finish_reason == "stop") {
-        result.done = true;
-        result.finishReason = "stop";
-        break;
+        event.emit("data", result);
+        if (parsed.choices[0].finish_reason == "stop") {
+          result.done = true;
+          result.finishReason = "stop";
+          break;
+        }
+        if (parsed.choices[0].finish_reason == "max_tokens") {
+          result.done = true;
+          result.finishReason = "max_tokens";
+          break;
+        }
+      } catch (error) {
+        console.error("Could not JSON parse stream message", message, error);
       }
-      if (parsed.choices[0].finish_reason == "max_tokens") {
-        result.done = true;
-        result.finishReason = "max_tokens";
-        break;
-      }
-    } catch (error) {
-      console.error("Could not JSON parse stream message", message, error);
     }
+    return result;
+  } catch (e: any) {
+    let errorResponseStr = "";
+
+    for await (const message of e.response.data) {
+      errorResponseStr += message;
+    }
+
+    console.log(errorResponseStr);
   }
-  return result;
 }
