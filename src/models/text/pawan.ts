@@ -94,6 +94,7 @@ export default {
       },
       ...messages,
     ];
+    console.log(newMessages);
     pawan(newMessages, max_tokens, model, result, event, temperature)
       .then(async (x) => {
         result = x;
