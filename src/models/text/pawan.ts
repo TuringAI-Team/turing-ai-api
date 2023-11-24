@@ -73,6 +73,7 @@ export default {
     },
   },
   execute: async (data) => {
+    console.log(data);
     let event = new EventEmitter();
     let { messages, model, max_tokens, temperature } = data;
 
