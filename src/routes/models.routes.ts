@@ -27,6 +27,7 @@ router.post(
 
 async function request(req, res) {
   let { type, ai } = req.params;
+  console.log(type, ai);
   const body = req.body;
   let logq = false;
   // random probability of 10% to log if the request  is type text
