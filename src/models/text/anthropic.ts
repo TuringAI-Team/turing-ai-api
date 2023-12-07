@@ -18,13 +18,8 @@ export default {
       model: {
         type: "string",
         required: false,
-        options: [
-          "claude-instant-1",
-          "claude-instant-1.2",
-          "claude-1",
-          "claude-2",
-        ],
-        default: "claude-instant-1",
+        options: ["claude-instant-1.2", "claude-2.1"],
+        default: "claude-instant-1.2",
       },
       max_tokens: {
         type: "number",
@@ -55,7 +50,7 @@ export default {
   },
   execute: async (data) => {
     let { messages, model, max_tokens, temperature, stream } = data;
-    if (!model) model = "claude-instant-1";
+    if (!model) model = "claude-instant-1.2";
     if (!max_tokens) max_tokens = 512;
     if (!temperature) temperature = 0.9;
     let prompt = "";
