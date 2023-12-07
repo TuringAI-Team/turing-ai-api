@@ -47,16 +47,12 @@
           "/text/gpt-new"
         ],
         [
-          "Huggingface based models",
-          "/text/huggingface"
-        ],
-        [
           "OpenChat models",
           "/text/openchat"
         ],
         [
-          "Translate text",
-          "/text/translate"
+          "Pawan.krd models",
+          "/text/pawan"
         ]
       ]
     ],
@@ -72,8 +68,12 @@
           "/image/controlnet"
         ],
         [
-          "Dall-e 2",
+          "Dall-e 3",
           "/image/dall-e"
+        ],
+        [
+          "Fast SDXL",
+          "/image/fast_sdxl"
         ],
         [
           "Kandinsky 2.1",

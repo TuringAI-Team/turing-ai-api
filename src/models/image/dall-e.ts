@@ -10,7 +10,7 @@ const openai = new OpenAIApi(configuration);
 export default {
   data: {
     name: "dall-e",
-    fullName: "Dall-e 2",
+    fullName: "Dall-e 3",
     parameters: {
       prompt: {
         type: "string",

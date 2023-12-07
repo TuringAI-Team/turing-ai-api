@@ -1,0 +1,120 @@
+---
+title: Fast SDXL
+---
+
+# Fast SDXL
+POST *https://api.turing.sh/image/fast_sdxl*
+
+## Parameters
+
+
+- **prompt**
+  - Type: string
+  - Required: true
+  - Description: Prompt to generate the image
+
+- **steps**
+  - Type: number
+  - Required: false
+  - Default: 4
+
+- **number**
+  - Type: number
+  - Required: false
+  - Description: Number of images to generate
+  - Default: 1
+
+- **negative_prompt**
+  - Type: string
+  - Required: false
+  - Default: disfigured mouth, disfigured teeth, half head, half face, blury, side looking, old, wrinkle, child, no face, pencil, full body, sharp, far away, overlapping, duplication, nude, disfigured, kitsch, oversaturated, grain, low-res, Deformed, blurry, bad anatomy, poorly drawn face, mutation, mutated, extra limb, ugly, poorly drawn hands, missing limb, blurry, floating limbs, disconnected limbs, malformed hands, blur, out of focus, long body, disgusting, poorly drawn, childish, mutilated, mangled, surreal, out of frame, duplicate, 2 faces
+
+- **width**
+  - Type: number
+  - Required: false
+  - Default: 1024
+
+- **height**
+  - Type: number
+  - Required: false
+  - Default: 1024
+
+- **model_version**
+  - Type: string
+  - Required: false
+  - Options: lcm, turbo
+  - Default: lcm
+
+- **stream**
+  - Type: boolean
+  - Required: false
+  - Default: true
+
+## Response
+
+
+- **cost**
+  - Type: number
+
+- **results**
+  - Type: array
+
+- **status**
+  - Type: string
+
+- **progress**
+  - Type: number
+
+- **id**
+  - Type: string
+
+## Examples
+
+<CodeGroup title="Fast SDXL example">
+  ```typescript
+  import axios from "axios";
+  (async () => {
+    let response = await axios({
+      method: "post",
+      url: 'https://api.turing.sh/image/fast_sdxl',
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer YOUR_API_KEY",
+        "x-captcha-token": "Captcha key"
+      },
+      data: {
+  "prompt": "string",
+  "steps": 4,
+  "number": 1,
+  "negative_prompt": "disfigured mouth, disfigured teeth, half head, half face, blury, side looking, old, wrinkle, child, no face, pencil, full body, sharp, far away, overlapping, duplication, nude, disfigured, kitsch, oversaturated, grain, low-res, Deformed, blurry, bad anatomy, poorly drawn face, mutation, mutated, extra limb, ugly, poorly drawn hands, missing limb, blurry, floating limbs, disconnected limbs, malformed hands, blur, out of focus, long body, disgusting, poorly drawn, childish, mutilated, mangled, surreal, out of frame, duplicate, 2 faces",
+  "width": 1024,
+  "height": 1024,
+  "model_version": "lcm",
+  "stream": true
+},
+    })
+  })();
+  ```
+  ```python
+  import requests
+  import json
+  response = requests.post(
+    "https://api.turing.sh/image/fast_sdxl",
+    headers={
+      "Content-Type": "application/json",
+      "Authorization": "Bearer YOUR_API_KEY",
+      "x-captcha-token": "Captcha key"
+    },
+    data=json.dumps({
+  "prompt": "string",
+  "steps": 4,
+  "number": 1,
+  "negative_prompt": "disfigured mouth, disfigured teeth, half head, half face, blury, side looking, old, wrinkle, child, no face, pencil, full body, sharp, far away, overlapping, duplication, nude, disfigured, kitsch, oversaturated, grain, low-res, Deformed, blurry, bad anatomy, poorly drawn face, mutation, mutated, extra limb, ugly, poorly drawn hands, missing limb, blurry, floating limbs, disconnected limbs, malformed hands, blur, out of focus, long body, disgusting, poorly drawn, childish, mutilated, mangled, surreal, out of frame, duplicate, 2 faces",
+  "width": 1024,
+  "height": 1024,
+  "model_version": "lcm",
+  "stream": true
+}),
+  )
+  ```
+</CodeGroup>

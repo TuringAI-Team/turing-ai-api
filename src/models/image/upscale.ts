@@ -55,7 +55,6 @@ export default {
   execute: async (data) => {
     if (!data.upscaler) data.upscaler = "RealESRGAN_x2plus";
     let res = await generateAsync(data);
-    console.log(res);
     let result: any = {
       id: res.id,
       cost: 10 / 1000,

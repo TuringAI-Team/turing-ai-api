@@ -15,8 +15,8 @@ POST *https://api.turing.sh/text/openchat*
 - **model**
   - Type: string
   - Required: false
-  - Options: openchat_v3.2
-  - Default: openchat_v3.2
+  - Options: openchat_v3.2_mistral
+  - Default: openchat_v3.2_mistral
 
 - **max_tokens**
   - Type: number
@@ -27,6 +27,18 @@ POST *https://api.turing.sh/text/openchat*
   - Type: number
   - Required: false
   - Default: 0.9
+
+- **id**
+  - Type: string
+  - Required: false
+  - Description: ID of the conversation (used for data saving)
+  - Default: 943cd7f1-3275-4a43-be5e-7fd623637949
+
+- **autoSystemMessage**
+  - Type: boolean
+  - Required: false
+  - Description: Send system messages automatically
+  - Default: true
 
 ## Response
 
@@ -42,6 +54,10 @@ POST *https://api.turing.sh/text/openchat*
 
 - **finishReason**
   - Type: string
+
+- **id**
+  - Type: string
+  - Description: ID of the conversation (used for data saving)
 
 ## Examples
 
@@ -59,9 +75,11 @@ POST *https://api.turing.sh/text/openchat*
       },
       data: {
   "messages": "array",
-  "model": "openchat_v3.2",
+  "model": "openchat_v3.2_mistral",
   "max_tokens": 512,
-  "temperature": 0.9
+  "temperature": 0.9,
+  "id": "943cd7f1-3275-4a43-be5e-7fd623637949",
+  "autoSystemMessage": true
 },
     })
   })();
@@ -78,9 +96,11 @@ POST *https://api.turing.sh/text/openchat*
     },
     data=json.dumps({
   "messages": "array",
-  "model": "openchat_v3.2",
+  "model": "openchat_v3.2_mistral",
   "max_tokens": 512,
-  "temperature": 0.9
+  "temperature": 0.9,
+  "id": "943cd7f1-3275-4a43-be5e-7fd623637949",
+  "autoSystemMessage": true
 }),
   )
   ```

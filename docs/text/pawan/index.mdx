@@ -1,9 +1,9 @@
 ---
-title: OpenAI models
+title: Pawan.krd models
 ---
 
-# OpenAI models
-POST *https://api.turing.sh/text/gpt-new*
+# Pawan.krd models
+POST *https://api.turing.sh/text/pawan*
 
 ## Parameters
 
@@ -14,8 +14,9 @@ POST *https://api.turing.sh/text/gpt-new*
 
 - **model**
   - Type: string
-  - Required: true
-  - Options: gpt-3.5-turbo, gpt-4, gpt-3.5-turbo-16k
+  - Required: false
+  - Options: zephyr-7b-beta, pai-001-light-beta
+  - Default: zephyr-7b-beta
 
 - **max_tokens**
   - Type: number
@@ -27,17 +28,17 @@ POST *https://api.turing.sh/text/gpt-new*
   - Required: false
   - Default: 0.9
 
-- **plugins**
-  - Type: array
-  - Required: false
-  - Options: google, youtube-search, weather, wikipedia, tenor, alphavantage-stocks, alphavantage-crypto, alphavantage-forex, free-games, tasty, world-news, calculator, github, code-interpreter, diagrams, render-diagrams, planfit, wolfram, image, music
-  - Default: 
-
 - **id**
   - Type: string
   - Required: false
   - Description: ID of the conversation (used for data saving)
-  - Default: 8bacc35f-f468-49d3-b718-d1a10f1c885c
+  - Default: aa511fda-d8c1-4a7e-bdbd-fbe4c2929585
+
+- **autoSystemMessage**
+  - Type: boolean
+  - Required: false
+  - Description: Send system messages automatically
+  - Default: true
 
 ## Response
 
@@ -51,9 +52,6 @@ POST *https://api.turing.sh/text/gpt-new*
 - **cost**
   - Type: number
 
-- **tool**
-  - Type: object
-
 - **finishReason**
   - Type: string
 
@@ -63,13 +61,13 @@ POST *https://api.turing.sh/text/gpt-new*
 
 ## Examples
 
-<CodeGroup title="OpenAI models example">
+<CodeGroup title="Pawan.krd models example">
   ```typescript
   import axios from "axios";
   (async () => {
     let response = await axios({
       method: "post",
-      url: 'https://api.turing.sh/text/gpt-new',
+      url: 'https://api.turing.sh/text/pawan',
       headers: {
         "Content-Type": "application/json",
         Authorization: "Bearer YOUR_API_KEY",
@@ -77,11 +75,11 @@ POST *https://api.turing.sh/text/gpt-new*
       },
       data: {
   "messages": "array",
-  "model": "gpt-3.5-turbo",
+  "model": "zephyr-7b-beta",
   "max_tokens": 512,
   "temperature": 0.9,
-  "plugins": [],
-  "id": "8bacc35f-f468-49d3-b718-d1a10f1c885c"
+  "id": "aa511fda-d8c1-4a7e-bdbd-fbe4c2929585",
+  "autoSystemMessage": true
 },
     })
   })();
@@ -90,7 +88,7 @@ POST *https://api.turing.sh/text/gpt-new*
   import requests
   import json
   response = requests.post(
-    "https://api.turing.sh/text/gpt-new",
+    "https://api.turing.sh/text/pawan",
     headers={
       "Content-Type": "application/json",
       "Authorization": "Bearer YOUR_API_KEY",
@@ -98,11 +96,11 @@ POST *https://api.turing.sh/text/gpt-new*
     },
     data=json.dumps({
   "messages": "array",
-  "model": "gpt-3.5-turbo",
+  "model": "zephyr-7b-beta",
   "max_tokens": 512,
   "temperature": 0.9,
-  "plugins": [],
-  "id": "8bacc35f-f468-49d3-b718-d1a10f1c885c"
+  "id": "aa511fda-d8c1-4a7e-bdbd-fbe4c2929585",
+  "autoSystemMessage": true
 }),
   )
   ```
