@@ -79,16 +79,16 @@ export default {
             let promptTokens = getPromptLength(prompt);
             let completionTokens = getPromptLength(com.result);
             let pricePerK = {
-              prompt: 1.63,
-              completion: 5.51,
+              prompt: 0.008,
+              completion: 0.024,
             };
             if (!model.includes("instant")) {
-              pricePerK.prompt = 11.02;
-              pricePerK.completion = 32.68;
+              pricePerK.prompt = 0.0008;
+              pricePerK.completion = 0.0024;
             }
-            let promptCost = (promptTokens / 1000000) * pricePerK.prompt;
+            let promptCost = (promptTokens / 1000) * pricePerK.prompt;
             let completionCOst =
-              (completionTokens / 1000000) * pricePerK.completion;
+              (completionTokens / 1000) * pricePerK.completion;
             com.cost = promptCost + completionCOst;
           }
           fullCompletion += com.completion;
