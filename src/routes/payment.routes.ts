@@ -141,10 +141,8 @@ router.post("/pay", key, geo, async (req, res) => {
 router.post("/webhook", async (req, res) => {
   const payload = req.body;
   const headerSignature = req.headers["x-sellix-unescaped-signature"];
-  console.log(payload, headerSignature);
   if (!headerSignature) {
     return res.status(401).send("No signature");
-    return;
   }
 
   const signature = crypto
@@ -159,8 +157,8 @@ router.post("/webhook", async (req, res) => {
       Buffer.from(headerSignature, "utf-8")
     )
   ) {
+    console.log("Invalid signature");
     return res.status(401).send("Invalid signature");
-    return;
   }
   if (payload.event != "order:paid") {
     return res.status(400).send("Invalid event type");
