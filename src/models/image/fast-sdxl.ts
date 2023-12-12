@@ -116,9 +116,8 @@ export default {
 
     let start = Date.now();
     predict({
-      model: `${
-        model_version == "lcm" ? "lucataco/sdxl-lcm" : "fofr/sdxl-turbo"
-      }`, // The model name
+      model: `${model_version == "lcm" ? "lucataco/sdxl-lcm" : "fofr/sdxl-turbo"
+        }`, // The model name
       input: {
         prompt: prompt,
         num_inference_steps: steps || 4,
@@ -162,7 +161,17 @@ export default {
       result.status = "done";
       result.progress = null;
       event.emit("data", result);
-    });
+    }).catch((e) => {
+      result.results.push({
+        base64: null,
+        id: randomUUID(),
+        seed: Math.floor(Math.random() * 100000000),
+        status: "filtered",
+      });
+      result.status = "error";
+      result.progress = null;
+      event.emit("data", result);
+    })
     return event;
   },
 };
