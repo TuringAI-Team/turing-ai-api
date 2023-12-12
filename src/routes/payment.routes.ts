@@ -157,7 +157,7 @@ router.post("/webhook", async (req, res) => {
       Buffer.from(headerSignature, "utf-8")
     )
   ) {
-    console.log("Invalid signature", signature);
+    console.log("Invalid signature", signature, headerSignature);
     return res.status(401).send("Invalid signature");
   }
   if (payload.event != "order:paid") {
