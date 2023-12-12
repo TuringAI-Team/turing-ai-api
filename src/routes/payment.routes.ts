@@ -141,6 +141,7 @@ router.post("/pay", key, geo, async (req, res) => {
 router.post("/webhook", async (req, res) => {
   const payload = req.body;
   const headerSignature = req.headers["x-sellix-unescaped-signature"];
+  console.log(payload, headerSignature);
   if (!headerSignature) {
     return res.status(401).send("No signature");
     return;
