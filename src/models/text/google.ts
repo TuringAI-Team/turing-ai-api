@@ -1,9 +1,20 @@
 import axios from "axios";
-import { getPromptLength } from "../../utils/tokenizer.js";
+import {
+  getChatMessageLength,
+  getPromptLength,
+} from "../../utils/tokenizer.js";
 import { EventEmitter } from "events";
 import { randomUUID } from "crypto";
-import { HarmBlockThreshold, HarmCategory, VertexAI } from "@google-cloud/vertexai";
-const vertexAI = new VertexAI({ project: process.env.GOOGLE_PROJECT_ID, location: "us-central1" });
+import {
+  HarmBlockThreshold,
+  HarmCategory,
+  VertexAI,
+} from "@google-cloud/vertexai";
+import delay from "delay";
+const vertexAI = new VertexAI({
+  project: process.env.GOOGLE_PROJECT_ID,
+  location: "us-central1",
+});
 
 export default {
   data: {
@@ -86,7 +97,12 @@ export default {
       model: model,
       // The following parameters are optional
       // They can also be passed to individual content generation requests
-      safety_settings: [{ category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE }],
+      safety_settings: [
+        {
+          category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+          threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+        },
+      ],
       generation_config: { max_output_tokens: max_tokens },
     });
 
@@ -114,31 +130,38 @@ export default {
     const request = {
       contents: messages.map((message) => {
         return {
-          role: message.author == "user" ? "user" : "bot",
+          role: message.author == "user" ? "user" : "model",
           parts: [{ text: message.content }],
         };
-      })
-    }
-    const streamingResp = await generativeModel.generateContentStream(request);
-    const cost = 0
-    const promptLength = await generativeModel.countTokens(request);
-    const resultLength = 0
-    for await (const item of streamingResp.stream) {
-      console.log('stream chunk: ', JSON.stringify(item));
-      res.data = item
-    }
-    res.done = true;
-    res.record = {
-      ...res.record,
-      output: res.data,
-      cost: cost,
-      promtLength: promptLength,
-      resultLength: resultLength,
+      }),
     };
-    res = {
-      ...res,
-    };
-    event.emit("data", res);
+    let promptLength = 0;
+    generativeModel
+      .generateContentStream(request)
+      .then(async (streamingResp) => {
+        const cost = 0;
+        let resultLength = 0;
+        for await (const item of streamingResp.stream) {
+          res.result = item.candidates[0].content.parts[0].text;
+          resultLength = item.usageMetadata?.candidates_token_count || 0;
+          promptLength = item.usageMetadata?.prompt_token_count || 0;
+          event.emit("data", res);
+        }
+        res.cost += (promptLength / 1000) * 0.0001;
+        res.cost += (resultLength / 1000) * 0.0002;
+        res.done = true;
+        res.record = {
+          ...res.record,
+          output: res.result,
+          cost: cost,
+          promtLength: promptLength,
+          resultLength: resultLength,
+        };
+        res = {
+          ...res,
+        };
+        event.emit("data", res);
+      });
     return event;
   },
 };

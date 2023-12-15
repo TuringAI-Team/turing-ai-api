@@ -4,37 +4,40 @@ import puppeteer from "puppeteer";
 import delay from "delay";
 
 export async function getUpdatedStats() {
-  let res = await fetch(
-    "https://discord.com/api/v9/applications/1053015370115588147",
-    {
-      headers: {
-        accept: "*/*",
-        "accept-language": "es-ES,es;q=0.9,en;q=0.8",
-        authorization: process.env.STATS_AUTH,
-        "sec-ch-ua":
-          '"Chromium";v="116", "Not)A;Brand";v="24", "Brave";v="116"',
-        "sec-ch-ua-mobile": "?0",
-        "sec-ch-ua-platform": '"Windows"',
-        "sec-fetch-dest": "empty",
-        "sec-fetch-mode": "cors",
-        "sec-fetch-site": "same-origin",
-        "sec-gpc": "1",
-      },
-      referrer:
-        "https://discord.com/developers/applications/1053015370115588147/information",
-      referrerPolicy: "strict-origin-when-cross-origin",
-      body: null,
-      method: "GET",
-      mode: "cors",
-      credentials: "include",
-    }
-  );
-  let answer = await res.json();
-  let guildsNumber = answer.approximate_guild_count;
   try {
+
+    let res = await fetch(
+      "https://discord.com/api/v9/applications/1053015370115588147",
+      {
+        headers: {
+          accept: "*/*",
+          "accept-language": "es-ES,es;q=0.9,en;q=0.8",
+          authorization: process.env.STATS_AUTH,
+          "sec-ch-ua":
+            '"Chromium";v="116", "Not)A;Brand";v="24", "Brave";v="116"',
+          "sec-ch-ua-mobile": "?0",
+          "sec-ch-ua-platform": '"Windows"',
+          "sec-fetch-dest": "empty",
+          "sec-fetch-mode": "cors",
+          "sec-fetch-site": "same-origin",
+          "sec-gpc": "1",
+        },
+        referrer:
+          "https://discord.com/developers/applications/1053015370115588147/information",
+        referrerPolicy: "strict-origin-when-cross-origin",
+        body: null,
+        method: "GET",
+        mode: "cors",
+        credentials: "include",
+      }
+    );
+    let answer = await res.json();
+    let guildsNumber = answer.approximate_guild_count;
     await pushStats(guildsNumber);
-  } catch (error) {}
-  return guildsNumber;
+    return guildsNumber;
+  } catch (error) {
+    return 296000
+  }
 }
 
 export async function getStats() {
@@ -65,7 +68,7 @@ async function pushStats(guilds: number) {
         shard_count: shards,
       },
     });
-  } catch (error) {}
+  } catch (error) { }
   try {
     await axios({
       method: "post",
@@ -79,5 +82,5 @@ async function pushStats(guilds: number) {
         shardCount: shards,
       },
     });
-  } catch (error) {}
+  } catch (error) { }
 }
