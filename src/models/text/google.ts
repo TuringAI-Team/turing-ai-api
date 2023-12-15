@@ -142,6 +142,8 @@ export default {
         const cost = 0;
         let resultLength = 0;
         for await (const item of streamingResp.stream) {
+          if (item.candidates.length == 0) continue;
+          if (item.candidates[0]?.content?.parts.length == 0) continue;
           res.result = item.candidates[0]?.content?.parts[0]?.text || "";
           resultLength = item.usageMetadata?.candidates_token_count || 0;
           promptLength = item.usageMetadata?.prompt_token_count || 0;
@@ -161,7 +163,15 @@ export default {
           ...res,
         };
         event.emit("data", res);
-      });
+      }).catch((err) => {
+        console.log(err);
+        console.log(request);
+        event.emit("data", {
+          done: true,
+
+        })
+      })
+
     return event;
   },
 };
