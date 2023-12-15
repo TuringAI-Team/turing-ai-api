@@ -142,6 +142,21 @@ export default {
       .then(async (streamingResp) => {
         const cost = 0;
         let resultLength = 0;
+        if (!streamingResp) {
+          res.done = true;
+          res.record = {
+            ...res.record,
+            output: res.result,
+            cost: cost,
+            promtLength: promptLength,
+            resultLength: resultLength,
+          };
+          res = {
+            ...res,
+          };
+          event.emit("data", res);
+          return;
+        }
         for await (const item of streamingResp.stream) {
           if (item.candidates?.length == 0) continue;
           if (!item.candidates[0]?.content?.parts) continue;
