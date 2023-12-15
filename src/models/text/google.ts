@@ -136,7 +136,6 @@ export default {
       }),
     };
     let promptLength = 0;
-    console.log(request);
     await delay(250);
     generativeModel
       .generateContentStream(request)
@@ -191,7 +190,6 @@ export default {
           })
         }
       }).catch((err) => {
-        console.log(request);
         console.log(err);
         event.emit("data", {
           done: true,
