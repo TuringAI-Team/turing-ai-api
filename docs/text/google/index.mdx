@@ -15,8 +15,8 @@ POST *https://api.turing.sh/text/google*
 - **model**
   - Type: string
   - Required: false
-  - Options: chat-bison
-  - Default: chat-bison
+  - Options: gemini-pro, gemini-pro-vision
+  - Default: gemini-pro
 
 - **max_tokens**
   - Type: number
@@ -32,7 +32,7 @@ POST *https://api.turing.sh/text/google*
   - Type: string
   - Required: false
   - Description: ID of the conversation (used for data saving)
-  - Default: a245411d-354d-43d0-8ef9-50d30a92998e
+  - Default: 884db9f0-3655-4068-b498-48ca11ca1f6e
 
 ## Response
 
@@ -69,10 +69,10 @@ POST *https://api.turing.sh/text/google*
       },
       data: {
   "messages": "array",
-  "model": "chat-bison",
+  "model": "gemini-pro",
   "max_tokens": 512,
   "temperature": 0.9,
-  "id": "a245411d-354d-43d0-8ef9-50d30a92998e"
+  "id": "884db9f0-3655-4068-b498-48ca11ca1f6e"
 },
     })
   })();
@@ -89,10 +89,10 @@ POST *https://api.turing.sh/text/google*
     },
     data=json.dumps({
   "messages": "array",
-  "model": "chat-bison",
+  "model": "gemini-pro",
   "max_tokens": 512,
   "temperature": 0.9,
-  "id": "a245411d-354d-43d0-8ef9-50d30a92998e"
+  "id": "884db9f0-3655-4068-b498-48ca11ca1f6e"
 }),
   )
   ```

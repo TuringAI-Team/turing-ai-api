@@ -1,8 +1,9 @@
 import axios from "axios";
-import { GoogleAuth } from "google-auth-library";
 import { getPromptLength } from "../../utils/tokenizer.js";
 import { EventEmitter } from "events";
 import { randomUUID } from "crypto";
+import { HarmBlockThreshold, HarmCategory, VertexAI } from "@google-cloud/vertexai";
+const vertexAI = new VertexAI({ project: process.env.GOOGLE_PROJECT_ID, location: "us-central1" });
 
 export default {
   data: {
@@ -17,8 +18,8 @@ export default {
       model: {
         type: "string",
         required: false,
-        options: ["chat-bison"],
-        default: "chat-bison",
+        options: ["gemini-pro", "gemini-pro-vision"],
+        default: "gemini-pro",
       },
       max_tokens: {
         type: "number",
@@ -59,7 +60,7 @@ export default {
   execute: async (data) => {
     let { messages, model, max_tokens, temperature, id } = data;
     if (!model) {
-      model = "chat-bison";
+      model = "gemini-pro";
     }
     let event = new EventEmitter();
     let res: any = {
@@ -81,14 +82,15 @@ export default {
     });
     // filter messages that are not null
     messages = messages.filter((message) => message != null);
-    const auth = new GoogleAuth({
-      keyFilename: "./g-keyfile.json", // Path to your service account key file
-      scopes: ["https://www.googleapis.com/auth/cloud-platform"],
+    const generativeModel = vertexAI.preview.getGenerativeModel({
+      model: model,
+      // The following parameters are optional
+      // They can also be passed to individual content generation requests
+      safety_settings: [{ category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE }],
+      generation_config: { max_output_tokens: max_tokens },
     });
+
     event.emit("data", res);
-    const client = await auth.getClient();
-    let token: any = await client.getAccessToken();
-    token = token.token;
     res.record = {
       input: {
         instances: [
@@ -108,65 +110,35 @@ export default {
         },
       },
     };
-    axios({
-      method: "post",
-      url: `https://us-central1-aiplatform.googleapis.com/v1/projects/turingai-4354f/locations/us-central1/publishers/google/models/${
-        model == "chat-bison" ? "chat-bison@001" : "chat-bison@001"
-      }:predict`,
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      data: {
-        instances: [
-          {
-            context: message
-              ? message.content
-              : "You are PaLM 2 a AI chatbot created by Google.",
-            messages: messages,
-            examples: [],
-          },
-        ],
-        parameters: {
-          temperature: temperature || 0.2,
-          maxOutputTokens: max_tokens || 250,
-          topP: 0.8,
-          topK: 40,
-        },
-      },
-    })
-      .then((response) => {
-        let cost = 0;
-        let promptLength = getPromptLength(
-          messages.map((message) => message.content).join(" ")
-        );
 
-        let result = response.data.predictions[0].candidates[0].content;
-        res.result = result;
-        let resultLength = getPromptLength(result);
-        let pricePerK = 0.0003;
-        cost = (promptLength + resultLength) * pricePerK;
-        res.cost = cost;
-        res.done = true;
-        res.record = {
-          ...res.record,
-          output: response.data,
-          cost: cost,
-          promtLength: promptLength,
-          resultLength: resultLength,
+    const request = {
+      contents: messages.map((message) => {
+        return {
+          role: message.author == "user" ? "user" : "bot",
+          parts: [{ text: message.content }],
         };
-        res = {
-          ...res,
-          ...response.data,
-        };
-        event.emit("data", res);
       })
-      .catch((err) => {
-        console.log(err.response.data.error);
-        res.done = true;
-        res.error = err.response.data.error;
-      });
-
+    }
+    const streamingResp = await generativeModel.generateContentStream(request);
+    const cost = 0
+    const promptLength = await generativeModel.countTokens(request);
+    const resultLength = 0
+    for await (const item of streamingResp.stream) {
+      console.log('stream chunk: ', JSON.stringify(item));
+      res.data = item
+    }
+    res.done = true;
+    res.record = {
+      ...res.record,
+      output: res.data,
+      cost: cost,
+      promtLength: promptLength,
+      resultLength: resultLength,
+    };
+    res = {
+      ...res,
+    };
+    event.emit("data", res);
     return event;
   },
 };

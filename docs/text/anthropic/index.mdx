@@ -15,8 +15,8 @@ POST *https://api.turing.sh/text/anthropic*
 - **model**
   - Type: string
   - Required: false
-  - Options: claude-instant-1, claude-instant-1.2, claude-1, claude-2
-  - Default: claude-instant-1
+  - Options: claude-instant-1.2, claude-2.1
+  - Default: claude-instant-1.2
 
 - **max_tokens**
   - Type: number
@@ -59,7 +59,7 @@ POST *https://api.turing.sh/text/anthropic*
       },
       data: {
   "messages": "array",
-  "model": "claude-instant-1",
+  "model": "claude-instant-1.2",
   "max_tokens": 512,
   "temperature": 0.9
 },
@@ -78,7 +78,7 @@ POST *https://api.turing.sh/text/anthropic*
     },
     data=json.dumps({
   "messages": "array",
-  "model": "claude-instant-1",
+  "model": "claude-instant-1.2",
   "max_tokens": 512,
   "temperature": 0.9
 }),
