@@ -142,7 +142,8 @@ export default {
       .then(async (streamingResp) => {
         const cost = 0;
         let resultLength = 0;
-        if (!streamingResp) {
+        if (!streamingResp || !streamingResp.stream) {
+          console.log("No response", request);
           res.done = true;
           res.record = {
             ...res.record,
@@ -157,35 +158,43 @@ export default {
           event.emit("data", res);
           return;
         }
-        for await (const item of streamingResp.stream) {
-          if (item.candidates?.length == 0) continue;
-          if (!item.candidates[0]?.content?.parts) continue;
-          if (item.candidates[0]?.content?.parts.length == 0) continue;
-          res.result = item.candidates[0]?.content?.parts[0]?.text || "";
-          resultLength = item.usageMetadata?.candidates_token_count || 0;
-          promptLength = item.usageMetadata?.prompt_token_count || 0;
+        try {
+
+          for await (const item of streamingResp.stream) {
+            if (item.candidates?.length == 0) continue;
+            if (!item.candidates[0]?.content?.parts) continue;
+            if (item.candidates[0]?.content?.parts.length == 0) continue;
+            res.result = item.candidates[0]?.content?.parts[0]?.text || "";
+            resultLength = item.usageMetadata?.candidates_token_count || 0;
+            promptLength = item.usageMetadata?.prompt_token_count || 0;
+            event.emit("data", res);
+          }
+          res.cost += (promptLength / 1000) * 0.0001;
+          res.cost += (resultLength / 1000) * 0.0002;
+          res.done = true;
+          res.record = {
+            ...res.record,
+            output: res.result,
+            cost: cost,
+            promtLength: promptLength,
+            resultLength: resultLength,
+          };
+          res = {
+            ...res,
+          };
           event.emit("data", res);
+        } catch (e) {
+          console.log(request);
+          console.log(e);
+          event.emit("data", {
+            done: true,
+          })
         }
-        res.cost += (promptLength / 1000) * 0.0001;
-        res.cost += (resultLength / 1000) * 0.0002;
-        res.done = true;
-        res.record = {
-          ...res.record,
-          output: res.result,
-          cost: cost,
-          promtLength: promptLength,
-          resultLength: resultLength,
-        };
-        res = {
-          ...res,
-        };
-        event.emit("data", res);
       }).catch((err) => {
-        console.log(err);
         console.log(request);
+        console.log(err);
         event.emit("data", {
           done: true,
-
         })
       })
 
