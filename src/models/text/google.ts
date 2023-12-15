@@ -136,6 +136,7 @@ export default {
       }),
     };
     let promptLength = 0;
+    console.log(request);
     await delay(250);
     generativeModel
       .generateContentStream(request)
@@ -143,7 +144,6 @@ export default {
         const cost = 0;
         let resultLength = 0;
         if (!streamingResp || !streamingResp.stream) {
-          console.log("No response", request);
           res.done = true;
           res.record = {
             ...res.record,
