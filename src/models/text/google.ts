@@ -142,7 +142,7 @@ export default {
         const cost = 0;
         let resultLength = 0;
         for await (const item of streamingResp.stream) {
-          res.result = item.candidates[0].content.parts[0].text;
+          res.result = item.candidates[0].content.parts[0].text || "";
           resultLength = item.usageMetadata?.candidates_token_count || 0;
           promptLength = item.usageMetadata?.prompt_token_count || 0;
           event.emit("data", res);
