@@ -11,10 +11,23 @@ import {
   VertexAI,
 } from "@google-cloud/vertexai";
 import delay from "delay";
-const vertexAI = new VertexAI({
-  project: process.env.GOOGLE_PROJECT_ID,
-  location: "us-central1",
-});
+const regions = [
+  "us-central1",
+  "northamerica-northeast1",
+  "us-east4",
+  "us-west1",
+  "us-west4",
+  /*
+  "europe-west4",
+  "europe-west2",
+  "europe-west3",
+  "europe-west4",
+  "europe-west9",*/
+  "asia-northeast1",
+  "asia-northeast3",
+  "asia-southeast1",
+]
+
 
 export default {
   data: {
@@ -81,6 +94,11 @@ export default {
       record: null,
       id: id || randomUUID(),
     };
+    const region = regions[Math.floor(Math.random() * regions.length)]
+    const vertexAI = new VertexAI({
+      project: process.env.GOOGLE_PROJECT_ID,
+      location: region,
+    });
     // get message that is message.role == "system"
     let message = messages.find((message) => message.role == "system");
     messages = messages.map((message) => {
@@ -136,7 +154,7 @@ export default {
       }),
     };
     let promptLength = 0;
-    await delay(250);
+    await delay(500);
     generativeModel
       .generateContentStream(request)
       .then(async (streamingResp) => {
