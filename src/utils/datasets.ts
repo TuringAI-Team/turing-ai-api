@@ -7,7 +7,7 @@ export async function dataset(
   record: any,
   id?: string
 ) {
-  if (type == "image" && ai != "vision") {
+  if (type == "image" || ai != "vision") {
     // means record is an array of images
     record.forEach(async (r: any) => {
       await datasetSave(type, ai, r, r.id);

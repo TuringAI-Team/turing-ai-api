@@ -155,7 +155,6 @@ export default {
     };
     let promptLength = 0;
     await delay(500);
-    console.log(request);
     generativeModel
       .generateContentStream(request)
       .then(async (streamingResp) => {
