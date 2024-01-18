@@ -256,27 +256,6 @@ async function generateAsync(data) {
   if (data.seed) {
     formatData.params.seed = data.seed;
   }
-  if (data.model) {
-    if (data.model == "TURBO XL") {
-      formatData.model = "SDXL 1.0";
-      formatData.params = {
-        ...formatData.params,
-        loras: [
-          {
-            "name": "246747",
-            "model": 1,
-            "clip": 1,
-            "is_version": true
-          }
-        ]
-      }
-    } else {
-      formatData.models = [data.model];
-    }
-
-  } else {
-    formatData.models = ["SDXL 1.0"];
-  }
 
   if (data.nsfw) {
     formatData.nsfw = true;
@@ -305,6 +284,29 @@ async function generateAsync(data) {
   if (data.strength) {
     formatData.params.denoising_strength = data.strength;
   }
+  if (data.model) {
+    if (data.model == "TURBO XL") {
+      formatData.model = "SDXL 1.0";
+      formatData.params.steps = 8
+      formatData.params = {
+        ...formatData.params,
+        loras: [
+          {
+            "name": "246747",
+            "model": 1,
+            "clip": 1,
+            "is_version": true
+          }
+        ]
+      }
+    } else {
+      formatData.models = [data.model];
+    }
+
+  } else {
+    formatData.models = ["SDXL 1.0"];
+  }
+
   formatData.shared = true;
   formatData.r2 = false;
   let res = await axios({
