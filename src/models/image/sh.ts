@@ -75,42 +75,13 @@ export default {
         type: "string",
         required: false,
         options: [
-          "Deliberate",
-          "Anything Diffusion",
-          "stable_diffusion",
-          "ICBINP - I Can't Believe It's Not Photography",
-          "ChilloutMix",
-          "majicMIX realistic",
-          "Dreamshaper",
-          "URPM",
-          "Hentai Diffusion",
-          "CamelliaMix 2.5D",
-          "BB95 Furry Mix",
-          "Counterfeit",
-          "iCoMix",
-          "Abyss OrangeMix",
-          "Realistic Vision",
-          "BRA",
-          "Epic Diffusion",
-          "GTA5 Artwork Diffusion",
-          "Liberty",
-          "RealBiter",
-          "Zeipher Female Model",
-          "Analog Madness",
-          "stable_diffusion_2.1",
-          "HRL",
-          "Rev Animated",
-          "Anygen",
-          "Furry Epoch",
-          "Neurogen",
-          "Hassanblend",
-          "Dreamlike Photoreal",
-          "Project Unreal Engine 5",
-          "Arcane Diffusion",
-          "OpenJourney Diffusion",
-          "SDXL_beta::stability.ai#6901",
+          "SDXL 1.0",
+          "AlbedoBase XL (SDXL)",
+          "ICBINP XL",
+          "TURBO XL",
+          "Fustercluck"
         ],
-        default: "SDXL_beta::stability.ai#6901",
+        default: "SDXL 1.0",
       },
       nsfw: {
         type: "boolean",
@@ -152,6 +123,7 @@ export default {
     },
   },
   execute: async (data) => {
+
     let res = await generateAsync(data);
     let result: any = {
       id: res.id,
@@ -285,10 +257,27 @@ async function generateAsync(data) {
     formatData.params.seed = data.seed;
   }
   if (data.model) {
-    formatData.models = [data.model];
+    if (data.model == "TURBO XL") {
+      formatData.model = "SDXL 1.0";
+      formatData.params = {
+        ...formatData.params,
+        loras: [
+          {
+            "name": "246747",
+            "model": 1,
+            "clip": 1,
+            "is_version": true
+          }
+        ]
+      }
+    } else {
+      formatData.models = [data.model];
+    }
+
   } else {
-    formatData.models = ["SDXL_beta::stability.ai#6901"];
+    formatData.models = ["SDXL 1.0"];
   }
+
   if (data.nsfw) {
     formatData.nsfw = true;
   }
@@ -305,11 +294,11 @@ async function generateAsync(data) {
     formatData.params.n = data.number;
   } else {
     formatData.params.n = 1;
-    if (data.model.includes("SDXL")) {
+    if (data.model.includes("XL")) {
       formatData.params.n = 2;
     }
   }
-  if (data.model.includes("SDXL")) {
+  if (data.model.includes("XL")) {
     formatData.params.width = 1024;
     formatData.params.height = 1024;
   }
