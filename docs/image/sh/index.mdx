@@ -63,8 +63,8 @@ POST *https://api.turing.sh/image/sh*
 - **model**
   - Type: string
   - Required: false
-  - Options: Deliberate, Anything Diffusion, stable_diffusion, ICBINP - I Can't Believe It's Not Photography, ChilloutMix, majicMIX realistic, Dreamshaper, URPM, Hentai Diffusion, CamelliaMix 2.5D, BB95 Furry Mix, Counterfeit, iCoMix, Abyss OrangeMix, Realistic Vision, BRA, Epic Diffusion, GTA5 Artwork Diffusion, Liberty, RealBiter, Zeipher Female Model, Analog Madness, stable_diffusion_2.1, HRL, Rev Animated, Anygen, Furry Epoch, Neurogen, Hassanblend, Dreamlike Photoreal, Project Unreal Engine 5, Arcane Diffusion, OpenJourney Diffusion, SDXL_beta::stability.ai#6901
-  - Default: SDXL_beta::stability.ai#6901
+  - Options: SDXL 1.0, AlbedoBase XL (SDXL), ICBINP XL, TURBO XL, Fustercluck, stable_cascade
+  - Default: stable_cascade
 
 - **nsfw**
   - Type: boolean
@@ -123,7 +123,7 @@ POST *https://api.turing.sh/image/sh*
   "steps": 50,
   "number": 1,
   "sampler": "k_lms",
-  "model": "SDXL_beta::stability.ai#6901",
+  "model": "stable_cascade",
   "stream": true
 },
     })
@@ -146,7 +146,7 @@ POST *https://api.turing.sh/image/sh*
   "steps": 50,
   "number": 1,
   "sampler": "k_lms",
-  "model": "SDXL_beta::stability.ai#6901",
+  "model": "stable_cascade",
   "stream": true
 }),
   )

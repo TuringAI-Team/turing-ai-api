@@ -26,8 +26,7 @@ const regions = [
   "asia-northeast1",
   "asia-northeast3",
   "asia-southeast1",
-]
-
+];
 
 export default {
   data: {
@@ -94,7 +93,7 @@ export default {
       record: null,
       id: id || randomUUID(),
     };
-    const region = regions[Math.floor(Math.random() * regions.length)]
+    const region = regions[Math.floor(Math.random() * regions.length)];
     const vertexAI = new VertexAI({
       project: process.env.GOOGLE_PROJECT_ID,
       location: region,
@@ -176,7 +175,6 @@ export default {
           return;
         }
         try {
-
           for await (const item of streamingResp.stream) {
             if (item.candidates?.length == 0) continue;
             if (!item.candidates[0]?.content?.parts) continue;
@@ -186,7 +184,7 @@ export default {
             promptLength = item.usageMetadata?.prompt_token_count || 0;
             event.emit("data", res);
           }
-          const final = await streamingResp.response
+          const final = await streamingResp.response;
           res.result = final.candidates[0]?.content?.parts[0]?.text || "";
           res.cost += (promptLength / 1000) * 0.0001;
           res.cost += (resultLength / 1000) * 0.0002;
@@ -207,14 +205,15 @@ export default {
           console.log(e);
           event.emit("data", {
             done: true,
-          })
+          });
         }
-      }).catch((err) => {
+      })
+      .catch((err) => {
         console.log(err);
         event.emit("data", {
           done: true,
-        })
-      })
+        });
+      });
 
     return event;
   },

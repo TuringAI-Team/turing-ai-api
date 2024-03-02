@@ -12,13 +12,20 @@ POST *https://api.turing.sh/image/vision*
   - Type: array
   - Required: true
   - Description: Model to use for the analysis
-  - Options: blip2, ocr
-  - Default: blip2
+  - Options: blip2, ocr, gemini
+  - Default: gemini
 
 - **image**
   - Type: string
   - Required: true
   - Description: Image URL for the model to process
+
+- **typeImage**
+  - Type: string
+  - Required: false
+  - Description: Type of image to process
+  - Options: anything, person
+  - Default: anything
 
 ## Response
 
@@ -55,9 +62,10 @@ POST *https://api.turing.sh/image/vision*
       },
       data: {
   "model": [
-    "blip2"
+    "gemini"
   ],
-  "image": "string"
+  "image": "string",
+  "typeImage": "anything"
 },
     })
   })();
@@ -74,9 +82,10 @@ POST *https://api.turing.sh/image/vision*
     },
     data=json.dumps({
   "model": [
-    "blip2"
+    "gemini"
   ],
-  "image": "string"
+  "image": "string",
+  "typeImage": "anything"
 }),
   )
   ```

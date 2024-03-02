@@ -47,6 +47,10 @@
           "/text/gpt-new"
         ],
         [
+          "GroqCloud models",
+          "/text/groq"
+        ],
+        [
           "OpenChat models",
           "/text/openchat"
         ],

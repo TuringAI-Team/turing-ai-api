@@ -79,9 +79,10 @@ export default {
           "AlbedoBase XL (SDXL)",
           "ICBINP XL",
           "TURBO XL",
-          "Fustercluck"
+          "Fustercluck",
+          "stable_cascade",
         ],
-        default: "SDXL 1.0",
+        default: "stable_cascade",
       },
       nsfw: {
         type: "boolean",
@@ -123,7 +124,6 @@ export default {
     },
   },
   execute: async (data) => {
-
     let res = await generateAsync(data);
     let result: any = {
       id: res.id,
@@ -287,22 +287,21 @@ async function generateAsync(data) {
   if (data.model) {
     if (data.model == "TURBO XL") {
       formatData.model = "SDXL 1.0";
-      formatData.params.steps = 8
+      formatData.params.steps = 8;
       formatData.params = {
         ...formatData.params,
         loras: [
           {
-            "name": "246747",
-            "model": 1,
-            "clip": 1,
-            "is_version": true
-          }
-        ]
-      }
+            name: "246747",
+            model: 1,
+            clip: 1,
+            is_version: true,
+          },
+        ],
+      };
     } else {
       formatData.models = [data.model];
     }
-
   } else {
     formatData.models = ["SDXL 1.0"];
   }

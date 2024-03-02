@@ -43,6 +43,7 @@
     "google-auth-library": "^8.9.0",
     "google-tts-api": "^2.0.2",
     "googlethis": "^1.7.1",
+    "groq-sdk": "^0.3.1",
     "hcaptcha": "^0.1.1",
     "helmet": "^7.0.0",
     "jsonwebtoken": "^9.0.2",

@@ -12,7 +12,6 @@ import delay from "delay";
 import { randomUUID } from "crypto";
 import { run } from "@mermaid-js/mermaid-cli";
 import sh from "../models/image/sh.js";
-import kandinsky from "../models/image/kandinsky.js";
 
 let compilers: any = await getCompilers();
 compilers = compilers.map((c) => c.name);
